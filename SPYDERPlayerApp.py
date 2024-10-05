@@ -25,22 +25,31 @@ class VideoDisplay(QWidget):
 
 class VideoControlPannel(QWidget):     
     def __init__(self, parent=None):
+
         super().__init__(parent)
         self.SpyderPlayer = parent
         
         controllerUIpath = os.getcwd() + "/assets/VideoControlPanel.ui"
         self.ui = uic.loadUi(controllerUIpath, self)
         
-        #self.playerController.setStyleSheet("background-color: transparent;")
+        #self.ui.setStyleSheet("background-color: transparent;")
         # Make sure the control panel is frameless and transparent
-        self.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint ) #| Qt.WindowType.WindowStaysOnTopHint)
+        self.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint )
+        #self.setWindowFlags(Qt.WindowType.FramelessWindowHint ) #| Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+        
+            
         #self.setStyleSheet("background: transparent;") 
         
                 
               
 class SpyderPlayer(QWidget):
     channelList = []
+    playListVisible: bool = True
+    volume: int = 100
+    lastChannelIndex: int = -1
+    selectedChannelIndex: int = -1
+    
     def __init__(self):
         super().__init__()
         
@@ -51,46 +60,93 @@ class SpyderPlayer(QWidget):
         self.ui = uic.loadUi(mainUIPath, self)  
         
         # Load Stacked Widget
-        self.videoStack = self.ui.Stacked_widget
+        #self.videoStack = self.ui.Stacked_widget
    
-        self.videoPanel = VideoDisplay(self)
-        self.videoStack.addWidget(self.videoPanel)
+        #self.videoPanel = VideoDisplay(self)
+        #self.videoStack.addWidget(self.videoPanel)
+        self.videoPanel = self.ui.VideoView_widget
         
-        self.control_panel = VideoControlPannel(self)  #FloatingControlPanel()
-        self.control_panel.hide() 
+        self.controlPanelFullScreen = VideoControlPannel(self)  #FloatingControlPanel()
+        self.controlPanelFullScreen.hide() 
         #self.control_panel.installEventFilter(self)
+        self.controlPanelBottom = VideoControlPannel(self)
+        self.ui.Bottom_widget = self.controlPanelBottom
+        
+        
+        #self.ui.verticalLayout.addWidget(self.controlPanelBottom)
                    
         # Set up player      
+        
         self.player = QMediaPlayer()
-        self.audio_output = QAudioOutput()
-        self.player.setAudioOutput(self.audio_output)
+        self.audioOutput = QAudioOutput()
+        self.player.setAudioOutput(self.audioOutput)
         #self.videoWidget = self.ui.VideoView_widget
         
-        self.player.setVideoOutput(self.videoPanel.videoOutput)
+        self.player.setVideoOutput(self.videoPanel)
         
         # Set the Left of vertical splitter to a fixed size
-        self.ui.splitter.setSizes([200, 500])
-        self.ui.splitter_2.setSizes([500, 1])
+        self.ui.Horizontal_splitter.setSizes([200, 500])
+        self.ui.Vertical_splitter.setSizes([500, 1])
         # Set the side of the table column to the width of the horizontal layout
         self.ui.Channels_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
-                
+        self.ui.botomverticalLayout.addWidget(self.controlPanelBottom)
+        self.controlPanelBottom.show()        
+        
         # Install event filter to detect window state changes
         self.setMouseTracking(True)
         #self.videoWidget.setMouseTracking(True)
         self.ui.Channels_table.setMouseTracking(True)
         self.installEventFilter(self)
-        self.videoStack.installEventFilter(self)
+        #self.videoStack.installEventFilter(self)
         self.ui.Channels_table.installEventFilter(self)   
         self.player.installEventFilter(self) 
         
+        #----------------------------------------------------------------------------
+        # Connect signals
+        #----------------------------------------------------------------------------
         # Connect signal to when cell is hovered show tooltip
         self.ui.Channels_table.cellClicked.connect(self.ShowFullChannelName)
               
         self.Channels_table.cellDoubleClicked.connect(self.PlayChannel)
-        self.control_panel.ui.Play_button.clicked.connect(self.PlayStopStream)
-        self.ui.Play_button.clicked.connect(self.PlayStopStream)
+        
+        # Play Button
+        self.controlPanelFullScreen.ui.Play_button.clicked.connect(self.PlayPausePlayer)
+        self.controlPanelBottom.ui.Play_button.clicked.connect(self.PlayPausePlayer)
+        
+        # Stop Button
+        self.controlPanelFullScreen.ui.Stop_button.clicked.connect(self.StopPlayer)
+        self.controlPanelBottom.ui.Stop_button.clicked.connect(self.StopPlayer)
+        
+        # Mute Button
+        self.controlPanelFullScreen.ui.Mute_button.clicked.connect(self.MutePlayer)
+        self.controlPanelBottom.ui.Mute_button.clicked.connect(self.MutePlayer)
+        
+        # Full Volume Button
+        self.controlPanelFullScreen.ui.FullVolume_button.clicked.connect(self.FullVolumePlayer)
+        self.controlPanelBottom.ui.FullVolume_button.clicked.connect(self.FullVolumePlayer)
+        
+        # Volume Slider
+        self.controlPanelFullScreen.ui.Volume_slider.sliderReleased.connect(self.ChangeVolume)
+        self.controlPanelBottom.ui.Volume_slider.sliderReleased.connect(self.ChangeVolume)
+        self.audioOutput.setVolume(100)
+        self.controlPanelFullScreen.ui.Volume_slider.setValue(100)
+        self.controlPanelBottom.ui.Volume_slider.setValue(100)
+        
+        # Toggle List Button
+        self.controlPanelFullScreen.ui.ToggleList_button.clicked.connect(self.TogglePlaylistView)
+        self.controlPanelBottom.ui.ToggleList_button.clicked.connect(self.TogglePlaylistView)
+        
+        # Last Channel Button
+        self.controlPanelFullScreen.ui.Last_button.clicked.connect(self.PlayLastChannel)
+        self.controlPanelBottom.ui.Last_button.clicked.connect(self.PlayLastChannel) 
+        
+        
+        #self.controlPanelFullScreen.ui.Stop_button.clicked.connect(self.StopStream)
+        
+        
+        #self.ui.Play_button.clicked.connect(self.PlayStopStream)
         self.LoadPlayList('us.m3u')
-        self.SelectedRow = -1
+
         
         # Set up a timer to detect inactivity
         self.inactivityTimer = QTimer(self)
@@ -98,7 +154,7 @@ class SpyderPlayer(QWidget):
         self.inactivityTimer.timeout.connect(self.HideCursor)
         self.inactivityTimer.start()        
         
-        self.videoStack.setCurrentWidget(self.videoPanel)
+        #self.videoStack.setCurrentWidget(self.videoPanel)
 
         self.player.mediaStatusChanged.connect(self.on_media_status_changed)
         
@@ -128,9 +184,12 @@ class SpyderPlayer(QWidget):
                 self.ShowCursor()
                 return True
             elif event.key() == Qt.Key.Key_F:
-                self.PlayerFullScreen()
+                if self.windowState() == Qt.WindowState.WindowFullScreen:
+                    self.PlayerNormalScreen()
+                else:
+                    self.PlayerFullScreen()
             elif event.key() == Qt.Key.Key_K or event.key() == Qt.Key.Key_Space:
-                self.PlayStopStream()
+                self.PlayPausePlayer()
                 
             self.ShowCursor()
             
@@ -147,24 +206,67 @@ class SpyderPlayer(QWidget):
             
     def PlayerFullScreen(self):
         #if self.windowState() != Qt.WindowState.WindowFullScreen:
-        self.ui.splitter.setSizes([0, 500])  # Hide left side    
-        self.ui.splitter_2.setSizes([500, 0])            
+        self.ui.Horizontal_splitter.setSizes([0, 500])  # Hide left side    
+        self.ui.Vertical_splitter.setSizes([500, 0])  
+        self.playListVisible = False
         self.setWindowState(Qt.WindowState.WindowFullScreen)
-        self.control_panel.show()
+        self.controlPanelFullScreen.show()
         self.setFocus()
         
             
     def PlayerNormalScreen(self):
         #if self.windowState() == Qt.WindowState.WindowFullScreen:
-        self.control_panel.hide()
+        self.controlPanelFullScreen.hide()
         self.setWindowState(Qt.WindowState.WindowNoState)
         #self.ui.VideoView_widget.showNormal()  # Ensure the widget is visible
-        self.ui.splitter.setSizes([200, 500])  # Restore left side
-        self.ui.splitter_2.setSizes([500, 1])
+        self.ui.Horizontal_splitter.setSizes([200, 500])  # Restore left side
+        self.ui.Vertical_splitter.setSizes([500, 1])
+        self.playListVisible = True
         self.setFocus()
         
         #self.playerController.hide()  # Hide control panel in normal screen mode
             
+    def TogglePlaylistView(self):
+        if self.playListVisible:
+            self.ui.Horizontal_splitter.setSizes([0, 500])  # Hide left side 
+            self.playListVisible = False
+        else:
+            self.ui.Horizontal_splitter.setSizes([200, 500])
+            self.playListVisible = True
+            
+    def MutePlayer(self):
+        #self.volume = self.audioOutput.volume()
+        #volume: int = 0  #int(self.audioOutput.volume())
+        #print(f"Volume: {self.audioOutput.volume()}")
+        
+        if self.audioOutput.isMuted():
+            self.audioOutput.setMuted(False)
+            self.UpdateVolumeSlider(self.volume)
+        else:
+            self.volume = int(self.audioOutput.volume()*100)
+            self.audioOutput.setMuted(True)
+            self.UpdateVolumeSlider(0)   
+
+    def StopPlayer(self):
+        self.player.stop()
+        
+    
+    def FullVolumePlayer(self):
+        self.audioOutput.setVolume(1.0)
+        self.audioOutput.setMuted(False)
+        self.UpdateVolumeSlider(100)
+                
+    def ChangeVolume(self):
+        slider = self.sender()
+        volume = slider.value()
+        print(f"Volume: {volume}")
+        self.audioOutput.setVolume(volume/100)
+        self.UpdateVolumeSlider(volume)
+        self.audioOutput.setMuted(False)
+        
+    def UpdateVolumeSlider(self, volume: int):
+        self.controlPanelFullScreen.ui.Volume_slider.setValue(volume)
+        self.controlPanelBottom.ui.Volume_slider.setValue(volume)
                 
     def LoadPlayList(self, playlistFile):
         
@@ -224,9 +326,11 @@ class SpyderPlayer(QWidget):
     def WindowChanged(self):
         if self.windowState() == QWidget.WindowState.WindowMaximized or self.windowState() == QWidget.WindowState.WindowFullScreen:
             self.showNormal()
-            self.ui.splitter.setSizes([200, 500])
+            self.ui.Horizontal_splitter.setSizes([200, 500])
+            self.ui.Vertical_splitter.setSizes([500, 1])
         else:
-            self.ui.splitter.setSizes([0, 500])
+            self.ui.splitter.Horizontal_splitter.setSizes([0, 500])
+            self.ui.splitter.Vertical_splitter.setSizes([500, 0])
             self.showFullScreen()
             
     def PlayChannel(self):
@@ -236,39 +340,53 @@ class SpyderPlayer(QWidget):
         self.PlayerThread()
         
     def PlayerThread(self):
+        self.lastChannelIndex = self.selectedChannelIndex
         
         # Get the selected row
-        self.SelectedRow = self.ui.Channels_table.currentRow()
-        
+        self.selectedChannelIndex = self.ui.Channels_table.currentRow()
+
         # Get the channel name and stream URL
-        channel_name, stream_url = self.channelList[self.SelectedRow]   
+        channel_name, stream_url = self.channelList[self.selectedChannelIndex]   
 
         # Play the stream
         self.player.setSource(QUrl(stream_url))
         self.player.play()
         
-                
             
-    def PlayStopStream(self):
+    def PlayPausePlayer(self):
         if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
             self.player.pause()
             #self.player_thread.join()
-        elif self.SelectedRow >= 0:
+        elif self.selectedChannelIndex >= 0:
             self.setFocus()
             #self.player.setPosition(0)
             self.player.play()
             #self.PlayChannel()
 
+    def PlayLastChannel(self):
+        tempChannel = self.selectedChannelIndex
+        
+        self.selectedChannelIndex = self.lastChannelIndex
+        self.lastChannelIndex = tempChannel
+        
+        # Get the channel name and stream URL
+        channel_name, stream_url = self.channelList[self.selectedChannelIndex]   
+
+        # Play the stream
+        self.player.setSource(QUrl(stream_url))
+        self.player.play()
+        
+        
     def HideCursor(self):
         if self.windowState() != Qt.WindowState.WindowFullScreen:
             return
         
-        panel_width = self.control_panel.width()
-        panel_height = self.control_panel.height()
+        panel_width = self.controlPanelFullScreen.width()
+        panel_height = self.controlPanelFullScreen.height()
         new_x = (self.width() - panel_width) // 2
         new_y = self.height() - panel_height - 20  # 20 pixels from bottom
-        self.control_panel.move(self.mapToGlobal(QPoint(new_x, new_y)))
-        self.control_panel.hide()
+        self.controlPanelFullScreen.move(self.mapToGlobal(QPoint(new_x, new_y)))
+        self.controlPanelFullScreen.hide()
                     
         # Hide the mouse cursor
         self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
@@ -277,24 +395,24 @@ class SpyderPlayer(QWidget):
         #self.hideCursor()
   
     def ShowCursor(self):
-        panel_width = self.control_panel.width()
-        panel_height = self.control_panel.height()
+        panel_width = self.controlPanelFullScreen.width()
+        panel_height = self.controlPanelFullScreen.height()
         
         if self.windowState() == Qt.WindowState.WindowFullScreen:
             new_x = (self.width() - panel_width) // 2
             new_y = self.height() - panel_height - 20
             global_pos = self.mapToGlobal(QPoint(new_x, new_y))
         else:
-            new_x = (self.videoPanel.videoOutput.width() - panel_width) // 2 
-            new_y = self.videoPanel.videoOutput.height() - panel_height - 20
-            global_pos = self.videoPanel.videoOutput.mapToGlobal(QPoint(new_x, new_y))
+            new_x = (self.videoPanel.width() - panel_width) // 2 
+            new_y = self.videoPanel.height() - panel_height - 20
+            global_pos = self.videoPanel.mapToGlobal(QPoint(new_x, new_y))
         
-        self.control_panel.move(global_pos)
+        self.controlPanelFullScreen.move(global_pos)
         
         if self.windowState() == Qt.WindowState.WindowFullScreen:
-            self.control_panel.show()
+            self.controlPanelFullScreen.show()
         else:
-            self.control_panel.hide()
+            self.controlPanelFullScreen.hide()
           
         self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
         #self.controlContainer.show()
