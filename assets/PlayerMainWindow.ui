@@ -19,8 +19,11 @@
   <property name="mouseTracking">
    <bool>true</bool>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::FocusPolicy::NoFocus</enum>
+  </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>SPYDER Player</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -63,11 +66,23 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
         <height>16777215</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::FocusPolicy::NoFocus</enum>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Shape::StyledPanel</enum>
       </property>
       <property name="editTriggers">
        <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
@@ -97,16 +112,18 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QVideoWidget" name="VideoView_widget" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <widget class="QStackedWidget" name="Frame_stackedwidget">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
           </property>
-          <property name="tabletTracking">
+          <property name="mouseTracking">
            <bool>true</bool>
           </property>
+          <widget class="QWidget" name="page"/>
+          <widget class="QWidget" name="page_2"/>
          </widget>
         </item>
        </layout>
@@ -123,14 +140,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QVideoWidget</class>
-   <extends>QWidget</extends>
-   <header>PyQt6.QtMultimediaWidgets</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
