@@ -1,27 +1,16 @@
 import re, os
-from PyQt6 import uic
+from PyQt6 import uic, QtCore
 from PyQt6.QtGui import QCursor
-from PyQt6.QtCore import Qt, QUrl, QEvent, QTimer, QPoint
+from PyQt6.QtCore import Qt, QUrl, QEvent, QTimer, QPoint, pyqtSignal
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QToolTip, QWidget, QHeaderView,  QHBoxLayout, QVBoxLayout, QPushButton, QSlider
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
+from PlaylistManager import PlaylistManager
+
 import inspect
 
 
-class VideoDisplay(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        
-        # Get current directory and append GUI file     
-        videoUIPath = os.getcwd() + "/assets/VideoDisplayPanel.ui"
-
-        # Load the UI files
-        self.ui = uic.loadUi(videoUIPath, self)          
-        self.videoOutput = self.ui.VideoView_widget
-        
-        self.show()
-        
-        
+                
 class VideoControlPannel(QWidget):     
     def __init__(self, parent=None):
 
@@ -54,14 +43,23 @@ class SpyderPlayer(QWidget):
     selectedChannelIndex: int = -1
     cursorVisible: bool = True
     
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.mousePressPos = None
+        self.mouseMoveActive = False
         
         # Get current directory and append GUI file     
         mainUIPath = os.getcwd() + "/assets/PlayerMainWindow.ui"
         
         # Load the UI files
         self.ui = uic.loadUi(mainUIPath, self)  
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint )
+        
+        #---------------------------
+        # Setup Playlist Tree
+        #---------------------------
+        self.playlistmanager = PlaylistManager(self.ui.Playlist_treeview, self)
+        
         
         #---------------------------
         # Setup Control Panel
@@ -73,27 +71,21 @@ class SpyderPlayer(QWidget):
         self.ui.Bottom_widget = self.controlPanelBottom
         self.controlPanelBottom.installEventFilter(self)
         
-        # Setup Video Output Panel
-        self.videoPanel = VideoDisplay(self)
-        self.videoStack = self.ui.Frame_stackedwidget
-        self.videoStack.addWidget(self.videoPanel)
-        #self.videoStack.installEventFilter(self)
-        
+
         #---------------------------           
         # Setup player      
-        #---------------------------    
+        #---------------------------   
+        self.videoPanel = self.ui.VideoView_widget 
         self.player = QMediaPlayer()
         self.audioOutput = QAudioOutput()
         self.player.setAudioOutput(self.audioOutput)
-        #self.videoWidget = self.ui.VideoView_widget
-        
-        self.player.setVideoOutput(self.videoPanel.videoOutput)
+        self.player.setVideoOutput(self.videoPanel)
         
         # Set the Left of vertical splitter to a fixed size
-        self.ui.Horizontal_splitter.setSizes([200, 500])
+        self.ui.Horizontal_splitter.setSizes([300, 1000])
         self.ui.Vertical_splitter.setSizes([500, 1])
         # Set the side of the table column to the width of the horizontal layout
-        self.ui.Channels_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        #self.ui.Channels_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self.ui.botomverticalLayout.addWidget(self.controlPanelBottom)
         self.controlPanelBottom.show()        
         
@@ -101,19 +93,21 @@ class SpyderPlayer(QWidget):
         self.setMouseTracking(True)
         #self.videoWidget.setMouseTracking(True)
         self.videoPanel.setMouseTracking(True)
-        self.ui.Channels_table.setMouseTracking(True)
+        #self.ui.Channels_table.setMouseTracking(True)
         self.installEventFilter(self)
-        self.videoStack.installEventFilter(self)
-        self.ui.Channels_table.installEventFilter(self)   
+        #self.videoStack.installEventFilter(self)
+        #self.ui.Channels_table.installEventFilter(self)   
         self.player.installEventFilter(self) 
         
         #----------------------------------------------------------------------------
         # Connect signals
         #----------------------------------------------------------------------------
         # Connect signal to when cell is hovered show tooltip
-        self.ui.Channels_table.cellClicked.connect(self.ShowFullChannelName)
+        #self.ui.Channels_table.cellClicked.connect(self.ShowFullChannelName)
               
-        self.Channels_table.cellDoubleClicked.connect(self.PlayChannel)
+        #self.Channels_table.cellDoubleClicked.connect(self.PlayChannel)
+        self.playlistmanager.treeItemSelectedSignal.connect(self.PlaySelectedChannel)
+        
         
         # Play Button
         self.controlPanelFullScreen.ui.Play_button.clicked.connect(self.PlayPausePlayer)
@@ -146,9 +140,10 @@ class SpyderPlayer(QWidget):
         self.controlPanelFullScreen.ui.Last_button.clicked.connect(self.PlayLastChannel)
         self.controlPanelBottom.ui.Last_button.clicked.connect(self.PlayLastChannel) 
         
+        self.ui.Close_button.clicked.connect(self.ExitApp)
         
         #self.ui.Play_button.clicked.connect(self.PlayStopStream)
-        self.LoadPlayList('us.m3u')
+        #self.LoadPlayList('us.m3u')
 
         
         # Set up a timer to detect inactivity
@@ -157,7 +152,6 @@ class SpyderPlayer(QWidget):
         self.inactivityTimer.timeout.connect(self.HideCursor)
         #self.inactivityTimer.start()        
         
-        self.videoStack.setCurrentWidget(self.videoPanel)
 
         self.player.mediaStatusChanged.connect(self.on_media_status_changed)
         
@@ -235,24 +229,30 @@ class SpyderPlayer(QWidget):
 
             
     def PlayerFullScreen(self):
+        self.ui.Title_frame.hide()
         #if self.windowState() != Qt.WindowState.WindowFullScreen:
         self.ui.Horizontal_splitter.setSizes([0, 500])  # Hide left side    
         self.ui.Vertical_splitter.setSizes([500, 0])  
         self.playListVisible = False
         self.setWindowState(Qt.WindowState.WindowFullScreen)
         self.controlPanelFullScreen.show()
-        self.videoStack.setCurrentWidget(self.videoPanel)
+        self.setFocus()
+        
+        #self.videoStack.setCurrentWidget(self.videoPanel)
         self.inactivityTimer.start() 
-        self.ui.Channels_table.setFocus()
+        #self.ui.Playlist_treeview.setFocus()
+        #self.ui.Horizontal_splitter.setEnabled(True)
         
             
     def PlayerNormalScreen(self):
         #if self.windowState() == Qt.WindowState.WindowFullScreen:
+        self.ui.Title_frame.show()
         self.controlPanelFullScreen.hide()
         self.setWindowState(Qt.WindowState.WindowNoState)
         #self.ui.VideoView_widget.showNormal()  # Ensure the widget is visible
-        self.ui.Horizontal_splitter.setSizes([200, 500])  # Restore left side
+        self.ui.Horizontal_splitter.setSizes([300, 1000])  # Restore left side
         self.ui.Vertical_splitter.setSizes([500, 1])
+        
         self.playListVisible = True
         self.inactivityTimer.stop()
         self.setFocus()
@@ -261,10 +261,11 @@ class SpyderPlayer(QWidget):
             
     def TogglePlaylistView(self):
         if self.playListVisible:
-            self.ui.Horizontal_splitter.setSizes([0, 500])  # Hide left side 
+            self.ui.Horizontal_splitter.setSizes([0, 1000])  # Hide left side 
+            #self.ui.Horizontal_splitter.setEnabled(True)
             self.playListVisible = False
         else:
-            self.ui.Horizontal_splitter.setSizes([200, 500])
+            self.ui.Horizontal_splitter.setSizes([300, 1000])
             self.playListVisible = True
             
     def MutePlayer(self):
@@ -363,7 +364,7 @@ class SpyderPlayer(QWidget):
             self.ui.splitter.Horizontal_splitter.setSizes([0, 500])
             self.ui.splitter.Vertical_splitter.setSizes([500, 0])
             self.showFullScreen()
-            self.ui.Channels_table.setFocus()
+            #self.ui.Channels_table.setFocus()
             self.inactivityTimer.start()
             
     def PlayChannel(self):
@@ -385,6 +386,10 @@ class SpyderPlayer(QWidget):
         self.player.setSource(QUrl(stream_url))
         self.player.play()
         
+    def PlaySelectedChannel(self, channel_name, stream_url):
+        
+        self.player.setSource(QUrl(stream_url))
+        self.player.play()    
             
     def PlayPausePlayer(self):
         if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
@@ -397,17 +402,22 @@ class SpyderPlayer(QWidget):
             #self.PlayChannel()
 
     def PlayLastChannel(self):
-        tempChannel = self.selectedChannelIndex
+        '''tempChannel = self.selectedChannelIndex
         
         self.selectedChannelIndex = self.lastChannelIndex
-        self.lastChannelIndex = tempChannel
+        self.lastChannelIndex = tempChannel'''
         
         # Get the channel name and stream URL
-        channel_name, stream_url = self.channelList[self.selectedChannelIndex]   
-
+        #channel_name, stream_url = self.channelList[self.selectedChannelIndex]  
+        '''self.playlistmanager.GoToLastSelectedItem() 
+        channel_name, stream_url = self.playlistmanager.GetSelectedItem()
+        
         # Play the stream
         self.player.setSource(QUrl(stream_url))
-        self.player.play()
+        self.player.play()'''
+        channel_name, stream_url = self.playlistmanager.GoToLastSelectedItem()
+        self.PlaySelectedChannel(channel_name, stream_url)
+        
         
         
     def HideCursor(self):
@@ -425,7 +435,7 @@ class SpyderPlayer(QWidget):
         self.controlPanelFullScreen.move(self.mapToGlobal(QPoint(new_x, new_y)))'''
         
         #self.videoStack.setCurrentWidget(self.videoPanel)
-        self.ui.Channels_table.setFocus()
+        #self.ui.Channels_table.setFocus()
         
         # Hide the mouse cursor
         
@@ -504,6 +514,31 @@ class SpyderPlayer(QWidget):
         
     def ShowCursorBlank(self):
         self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
+        
+    def ExitApp(self):
+        self.close()
+        app.exit()
+        
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            # Capture the global position where the mouse was pressed
+            self.mousePressPos = event.globalPosition().toPoint()
+            self.mouseMoveActive = True
+
+    def mouseMoveEvent(self, event):
+        if self.mouseMoveActive and self.mousePressPos:
+            # Calculate how far the mouse moved
+            delta = event.globalPosition().toPoint() - self.mousePressPos
+            # Move the widget (or window) by the same amount
+            self.move(self.pos() + delta)
+            # Update the press position for the next movement calculation
+            self.mousePressPos = event.globalPosition().toPoint()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            # Reset when the left mouse button is released
+            self.mousePressPos = None
+            self.mouseMoveActive = False        
 
 if __name__ == "__main__":
     app = QApplication([])
