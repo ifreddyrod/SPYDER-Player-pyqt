@@ -4,7 +4,7 @@ from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor
 from PyQt6.QtCore import QSize, Qt, pyqtSignal
 import re
 import os
-
+import json
 
 class TreeStandardItem(QStandardItem):
     def __init__(self, nameText, bgColor:QColor = None):
@@ -15,6 +15,7 @@ class TreeStandardItem(QStandardItem):
         self.setEditable(False)
         if bgColor != None:
             self.setBackground(bgColor)
+        
             
     def GetParentName(self) -> str:
         parent = self.parent().text()
@@ -22,14 +23,22 @@ class TreeStandardItem(QStandardItem):
         parent = parent.lstrip()
         return parent
         
-class ChannelInfo:    
-    def __init__(self, channelName: str, source: str, playListName: str, treeItem: TreeStandardItem):
+class VideoInfo:    
+    def __init__(self, channelName: str, source: str, playListName: str, treeItem: TreeStandardItem = None):
         self.channelName = channelName
         self.source = source
         self.playListName = playListName
         self.treeItem = treeItem
     
-    
+    def GetDict(self):
+        # Convert the ChannelInfo object to a dictionary
+        return {
+            "channelName": self.channelName,
+            "source": self.source,
+            "playListName": self.playListName,
+            # Exclude treeItem as it's not JSON serializable
+        }
+        
 class PlaylistManager(QWidget):
     treeItemSelectedSignal: pyqtSignal = pyqtSignal(str, str)
     currentSelectedItem: QStandardItem = None
@@ -42,7 +51,34 @@ class PlaylistManager(QWidget):
         self.playlistTree = playlistTreefromUI
         self.CustomizeTree()
         
-        #self.playListTree.setStyleSheet("QTreeView::branch {  border-image: url(none.png); }")
+        iconPath = os.getcwd() + "/assets/icons/"
+        
+        icon_star_trans = os.path.join(iconPath, 'star-trans.png')
+        icon_star_full = os.path.join(iconPath, 'star-full.png')
+        icon_star_empty = os.path.join(iconPath, 'star-empty.png')      
+          
+        print(f"icon_star_trans: {icon_star_trans}")
+        print(f"icon_star_full: {icon_star_full}")
+        print(f"icon_star_empty: {icon_star_empty}")
+        
+        
+        # Create a stylesheet with the dynamically constructed paths
+        stylesheet = f"""
+        QTreeView::indicator:indeterminate {{
+            image: url("{icon_star_trans}");
+        }}
+
+        QTreeView::indicator:checked {{
+            image: url("{icon_star_full}");
+        }}
+
+        QTreeView::indicator:unchecked {{
+        image: url("{icon_star_empty}");
+        }}
+        
+        background-color: rgb(15, 15, 15);
+        """  
+        self.playlistTree.setStyleSheet(stylesheet)
         
         # Create the model once and use it for both playlists
         self.model = QStandardItemModel()
@@ -53,14 +89,15 @@ class PlaylistManager(QWidget):
         # Add Standard playlists
         #rows = ["Search Results", "Favorites", "Library"]
         self.textPadding = "    "
+        self.playListHeaderColor = QColor(28, 9, 50)
         
-        self.searchList = TreeStandardItem(self.textPadding +"Search Results", QColor(23, 23, 23))
+        self.searchList = TreeStandardItem(self.textPadding +"Search Results", self.playListHeaderColor)
         self.model.appendRow(self.searchList)
         
-        self.favoriteList = TreeStandardItem(self.textPadding +"Favorites", QColor(23, 23, 23))
-        self.model.appendRow(self.favoriteList)
+        self.favoritesList = TreeStandardItem(self.textPadding +"Favorites", self.playListHeaderColor)
+        self.model.appendRow(self.favoritesList)
         
-        self.libraryList = TreeStandardItem(self.textPadding +"Library", QColor(23, 23, 23))
+        self.libraryList = TreeStandardItem(self.textPadding +"Library", self.playListHeaderColor)
         self.model.appendRow(self.libraryList)
          
         # Create Event Connections
@@ -72,6 +109,7 @@ class PlaylistManager(QWidget):
         # Load Custom playlists
         self.LoadPlayList("us.m3u")
         self.LoadPlayList("playlist_usa.m3u8")
+        self.LoadFavorites()
         
     def CustomizeTree(self):
         self.playlistTree.setIndentation(25) 
@@ -89,7 +127,7 @@ class PlaylistManager(QWidget):
         playlistName, extension = os.path.splitext(os.path.basename(playListFile))
 
         # Create a parent item with the name of the playlist file
-        playlistTreeItem = TreeStandardItem(self.textPadding + playlistName, QColor(23, 23, 23))
+        playlistTreeItem = TreeStandardItem(self.textPadding + playlistName, self.playListHeaderColor)
         #playlist_item.setSizeHint(QSize(200, 40))
         #playlist_item.setBackground(QColor(23, 23, 23))
         
@@ -222,25 +260,42 @@ class PlaylistManager(QWidget):
             channelSource = item.data(Qt.ItemDataRole.UserRole)
             channelPlaylist = item.GetParentName()
             
-            print("Checked - Playlist Name: " + channelPlaylist)
-            self.favoritesInfo.append(ChannelInfo(channelName, channelSource, channelPlaylist, item))
+            print(f"channelName:{channelName}, channelSource{channelSource}, channelPlaylist: {channelPlaylist}")
             
+            index = -1
+            for i, info in enumerate(self.favoritesInfo):
+                if info.channelName == channelName and info.source == channelSource:
+                    index = i
+                    break
+             
+            if index != -1:
+                print("Item already in favorites list")
+                return
+               
+            self.favoritesInfo.append(VideoInfo(channelName, channelSource, channelPlaylist, item))
+            print(f"favoritesInfo size: {len(self.favoritesInfo)}")
+            
+            self.model.blockSignals(True)
             favoriteChannel = TreeStandardItem(channelName)
             favoriteChannel.setCheckable(True)
             favoriteChannel.setData(channelSource, Qt.ItemDataRole.UserRole)
             favoriteChannel.setCheckState(Qt.CheckState.Checked)
-            self.favoriteList.appendRow(favoriteChannel)
-            self.UpdateHeaderCount(self.favoriteList)
-            
+            self.favoritesList.appendRow(favoriteChannel)
+            self.UpdateHeaderCount(self.favoritesList)
+            self.model.blockSignals(False)
             #count = self.favoriteList.rowCount()
             #self.favoriteList.setText(self.textPadding + self.favoriteList.itemName + "  (" + str(count) + ")")
             
-            #self.model.layoutChanged.emit()
+            self.SaveFavorites()
+            self.model.layoutChanged.emit()
             
         elif item.checkState() == Qt.CheckState.Unchecked:
             channelName = item.text()
             channelSource = item.data(Qt.ItemDataRole.UserRole)
             
+            if len(self.favoritesInfo) == 0: 
+                print("No items in favorites list")
+                return 
             
             # Find the corresponding favorite item in favoritesInfo
             index = -1
@@ -256,110 +311,99 @@ class PlaylistManager(QWidget):
             # Remove the item from the favorites list
             favoriteItem = self.favoritesInfo[index].treeItem
 
+            '''print(f"favoritesInfo size: {len(self.favoritesInfo)}")
+            name = favoriteItem.text()
+            source = favoriteItem.data(Qt.ItemDataRole.UserRole)
+            playlist = favoriteItem.GetParentName()
+            print(f"channelName: {name}, source: {source}, playlist: {playlist}")'''
+            
+            
+            # Search Favorites list for item with name and source
+            favoriteIndex = -1
+            for i in range(self.favoritesList.rowCount()):
+                row = self.favoritesList.child(i)
+                
+                if row.itemName == channelName and row.data(Qt.ItemDataRole.UserRole) == channelSource:
+                    favoriteIndex = i
+                    break
+            
+            if favoriteIndex == -1:
+                print("Channel not found in favorites list")
+                return
+            
             # Ensure the item is unchecked in both the playlist and Favorites list
-            #self.model.blockSignals(True)
+            self.model.blockSignals(True)
             channelPlaylist = item.GetParentName()
-            if(channelPlaylist != "Favorites"):
+            # If Item deselected from Favorites list, then uncheck corresponding playlist item
+            if(channelPlaylist == "Favorites"):
                 favoriteItem.setCheckState(Qt.CheckState.Unchecked)
                 
-            #self.model.blockSignals(False)
+            self.model.blockSignals(False)
             
-            # Remove the item from the model
-            self.favoriteList.removeRow(favoriteItem.row())
-
+            # Remove the item from the favorites list
+            self.favoritesList.removeRow(favoriteIndex)
+                   
             # Remove the item from favoritesInfo
             self.favoritesInfo.pop(index)
-
+                    
             # Update the header count
-            self.UpdateHeaderCount(self.favoriteList)   
+            self.UpdateHeaderCount(self.favoritesList)   
             
-            
+            self.SaveFavorites()
             self.model.layoutChanged.emit()         
-            '''
-            print("UNChecked - channel Name: " + channelName)
-            # Find the index of the favorite item
-            index = 0
-            for info in self.favoritesInfo:
-                if info.channelName == channelName and info.source == channelSource and info.playListName == channelPlaylist:
-                    break
-                index += 1
-                
-            if index >= len(self.favoritesInfo):
-                print("Channel not found in favorites list")
-                return    
-                
-            # Get Item to Remove
-            itemToUncheck = self.favoritesInfo[index].treeItem
-            itemToUncheck.setCheckState(Qt.CheckState.Unchecked)
-            
-            self.favoritesInfo.pop(index)
-            self.favoriteList.removeRow(index)  '''
 
-            
-            
-            
-            
-            
-    
-'''
-    def GetPlaylistandChannel(self, item):
-        # Find which playlist the original channel belongs to
-        for row in range(self.rootItem.rowCount()):
-            playlist_item = self.rootItem.child(row)
-            if playlist_item.text() != self.textPadding + "Favorites" and playlist_item.indexOfChild(item) != -1:
-                return playlist_item.text(), item.text()
-        return None, None
+    def SaveFavorites(self):
+        with open("favorites.json", "w") as f:
+            json.dump([channel.GetDict() for channel in self.favoritesInfo], f, indent=4)
+
+        print("Favorites saved successfully")
         
-    def FavoriteClicked(self, item):
-        # Check if the item is a channel and its checkbox is checked
-        if item.isCheckable() and item.checkState() == Qt.CheckState.Checked:
-            # Add to Favorites if it's not already there
-            playlist_name, channel_name = self.GetPlaylistandChannel(item)
-            if playlist_name and channel_name:  
-            #if item not in self.favoriteListObjects:
-                favoriteChannel = QStandardItem(item.text())  #TreeItem(item.text())
-                favoriteChannel.setCheckable(True)
-
-                # Map original channel to the favorite item
-                self.favoriteListObjects[(playlist_name, channel_name)] = favoriteChannel
-                self.favoriteList.appendRow(favoriteChannel)
-
-                # Save the updated Favorites list to file
-                #self.SaveFavorites()
-
-        elif item.isCheckable() and item.checkState() == Qt.CheckState.Unchecked:
-            # Remove from Favorites if unchecked in the original playlist
-            playlist_name, channel_name = self.GetPlaylistandChannel(item)
-            if playlist_name and channel_name:
-            #if item in self.favoriteListObjects:
-                if (playlist_name, channel_name) in self.favoriteListObjects:
-                    favorite_item = self.favoriteListObjects[(playlist_name, channel_name)]
-                    self.RemoveFavoriteItem(favorite_item, playlist_name, channel_name)
-
-                    # Save the updated Favorites list to file
-                    #self.save_favorites()           
-    
-    def RemoveFavoriteItem(self, favorite_item, playlist_name, channel_name):
-        # Find the favorite item in the "Favorites" playlist
-        for row in range(self.favoriteList.rowCount()):
-            if self.favoriteList.child(row) == favorite_item:
-                # Uncheck the original channel when it's removed from Favorites
-                original_item = None
-                for i in range(self.rootItem.rowCount()):
-                    playlist_item = self.rootItem.child(i)
-                    if playlist_item.text() == playlist_name:
-                        for j in range(playlist_item.rowCount()):
-                            if playlist_item.child(j).text() == channel_name:
-                                original_item = playlist_item.child(j)
-                                break
-                        break
-                if original_item:
-                    original_item.setCheckState(Qt.CheckState.Unchecked)  
-                      
-
-                # Remove from Favorites
+    def LoadFavorites(self):
+        # Get Favorites from File
+        with open("favorites.json", "r") as f:
+            self.favoritesInfo = [VideoInfo(**channel) for channel in json.load(f)]
+            
+        self.model.blockSignals(True)    
+        # Find Corresponding Playlist Items
+        for item in self.favoritesInfo:
+            # Find the item.playListName in the model
+            item.treeItem = self.GetChannelFromTree(item.playListName, item.channelName, item.source)
+            
+            if item.treeItem:
+                item.treeItem.setCheckState(Qt.CheckState.Checked)   
                 
-                # Remove the mapping
-                del self.favoriteListObjects[(playlist_name, channel_name)]
+            # Add the item to the favorites list
+            favoriteItem = TreeStandardItem(item.channelName)
+            favoriteItem.setCheckable(True)
+            favoriteItem.setData(item.source, Qt.ItemDataRole.UserRole)
+            favoriteItem.setCheckState(Qt.CheckState.Checked)
+            self.favoritesList.appendRow(favoriteItem)
+              
+        self.UpdateHeaderCount(self.favoritesList)    
+        self.model.blockSignals(False)
+            
+        self.model.layoutChanged.emit()    
+            
+        print("Favorites loaded successfully")
+    
+    def GetChannelFromTree(self, playlistName: str, channelName: str, source: str):
+        model = self.playlistTree.model()
+        
+        print(f"playlistName: {playlistName}, channelName: {channelName}, source: {source}")
+        print(f"model.rowCount(): {model.rowCount()}")
+        
+        # Traverse the top-level items (playlists)
+        for row in range(model.rowCount()):
+            playlist = model.item(row)  # Get the playlist item (QStandardItem)
+            print(f"---->playlist: {playlist.text()}")
+            
+            if playlist.itemName == playlistName:  # Match the playlist name
+                print(f"Playlist: {playlist.text()}")
+                # Traverse the children (channels)
+                for childRow in range(playlist.rowCount()):
+                    channelItem = playlist.child(childRow)  # Get the channel item
+                    
+                    if channelItem.itemName == channelName and channelItem.data(Qt.ItemDataRole.UserRole) == source:  # Match the channel name
+                        return channelItem  # Return the matching QStandardItem (channel)
 
-                break       '''             
+        return None  # Return None if the playlist or channel wasn't found

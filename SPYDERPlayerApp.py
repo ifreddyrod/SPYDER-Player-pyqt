@@ -54,7 +54,8 @@ class SpyderPlayer(QWidget):
         # Load the UI files
         self.ui = uic.loadUi(mainUIPath, self)  
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint )
-        
+        self.videoLabel = self.ui.CurrentlyPlaying_label
+        self.videoLabel.setText("")
         #---------------------------
         # Setup Playlist Tree
         #---------------------------
@@ -108,7 +109,6 @@ class SpyderPlayer(QWidget):
         #self.Channels_table.cellDoubleClicked.connect(self.PlayChannel)
         self.playlistmanager.treeItemSelectedSignal.connect(self.PlaySelectedChannel)
         
-        
         # Play Button
         self.controlPanelFullScreen.ui.Play_button.clicked.connect(self.PlayPausePlayer)
         self.controlPanelBottom.ui.Play_button.clicked.connect(self.PlayPausePlayer)
@@ -140,8 +140,6 @@ class SpyderPlayer(QWidget):
         self.controlPanelFullScreen.ui.Last_button.clicked.connect(self.PlayLastChannel)
         self.controlPanelBottom.ui.Last_button.clicked.connect(self.PlayLastChannel) 
         
-        self.ui.Close_button.clicked.connect(self.ExitApp)
-        
         #self.ui.Play_button.clicked.connect(self.PlayStopStream)
         #self.LoadPlayList('us.m3u')
 
@@ -152,6 +150,9 @@ class SpyderPlayer(QWidget):
         self.inactivityTimer.timeout.connect(self.HideCursor)
         #self.inactivityTimer.start()        
         
+        self.ui.Close_button.clicked.connect(self.ExitApp)
+        self.ui.Minimize_button.clicked.connect(lambda: self.showMinimized())
+        self.ui.Maximize_button.clicked.connect(self.PlayerFullScreen)
 
         self.player.mediaStatusChanged.connect(self.on_media_status_changed)
         
@@ -174,6 +175,8 @@ class SpyderPlayer(QWidget):
                 self.ShowCursor()
                 print("Full Screen: ", QEvent.Type.WindowStateChange.name)
                 
+            elif self.windowState() == Qt.WindowState.WindowMinimized:
+                pass  # Do nothing
             else:
                 self.PlayerNormalScreen()
                 print("Normal Screen: ", QEvent.Type.WindowStateChange.name)
@@ -360,6 +363,8 @@ class SpyderPlayer(QWidget):
             self.ui.Vertical_splitter.setSizes([500, 1])
             
             #self.ShowControlPanel()
+        elif self.windowState() == QWidget.WindowState.WindowMinimized:
+            pass  # Do nothing
         else:
             self.ui.splitter.Horizontal_splitter.setSizes([0, 500])
             self.ui.splitter.Vertical_splitter.setSizes([500, 0])
@@ -382,12 +387,14 @@ class SpyderPlayer(QWidget):
         # Get the channel name and stream URL
         channel_name, stream_url = self.channelList[self.selectedChannelIndex]   
 
+        self.videoLabel.setText(channel_name)
+        
         # Play the stream
         self.player.setSource(QUrl(stream_url))
         self.player.play()
         
     def PlaySelectedChannel(self, channel_name, stream_url):
-        
+        self.videoLabel.setText(channel_name)
         self.player.setSource(QUrl(stream_url))
         self.player.play()    
             
@@ -402,20 +409,8 @@ class SpyderPlayer(QWidget):
             #self.PlayChannel()
 
     def PlayLastChannel(self):
-        '''tempChannel = self.selectedChannelIndex
-        
-        self.selectedChannelIndex = self.lastChannelIndex
-        self.lastChannelIndex = tempChannel'''
-        
-        # Get the channel name and stream URL
-        #channel_name, stream_url = self.channelList[self.selectedChannelIndex]  
-        '''self.playlistmanager.GoToLastSelectedItem() 
-        channel_name, stream_url = self.playlistmanager.GetSelectedItem()
-        
-        # Play the stream
-        self.player.setSource(QUrl(stream_url))
-        self.player.play()'''
         channel_name, stream_url = self.playlistmanager.GoToLastSelectedItem()
+        self.videoLabel.setText(channel_name)
         self.PlaySelectedChannel(channel_name, stream_url)
         
         
