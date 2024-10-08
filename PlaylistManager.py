@@ -83,7 +83,7 @@ class PlaylistManager(QWidget):
         # Create the model once and use it for both playlists
         self.model = QStandardItemModel()
         self.rootItem = self.model.invisibleRootItem()
-        self.model.setHorizontalHeaderLabels(["Channels"])
+        self.model.setHorizontalHeaderLabels(["Play Lists"])
         self.playlistTree.setModel(self.model)  # Set model initially
 
         # Add Standard playlists
@@ -114,7 +114,7 @@ class PlaylistManager(QWidget):
     def CustomizeTree(self):
         self.playlistTree.setIndentation(25) 
         self.playlistTree.setHeaderHidden(True)
-        self.playlistTree.setRootIsDecorated(False)
+        self.playlistTree.setRootIsDecorated(True)
         
             
     def CustomizeTreeRow(self, treeItem):
