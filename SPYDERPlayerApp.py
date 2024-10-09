@@ -1,6 +1,6 @@
 import re, os
 from PyQt6 import uic, QtCore
-from PyQt6.QtGui import QCursor
+from PyQt6.QtGui import QCursor, QIcon
 from PyQt6.QtCore import Qt, QUrl, QEvent, QTimer, QPoint, pyqtSignal
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QToolTip, QWidget, QHeaderView,  QHBoxLayout, QVBoxLayout, QPushButton, QSlider
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
@@ -44,6 +44,7 @@ class SpyderPlayer(QWidget):
     cursorVisible: bool = True
     
     def __init__(self, parent=None):
+
         super().__init__(parent)
         self.mousePressPos = None
         self.mouseMoveActive = False
@@ -140,6 +141,9 @@ class SpyderPlayer(QWidget):
         self.controlPanelFullScreen.ui.Last_button.clicked.connect(self.PlayLastChannel)
         self.controlPanelBottom.ui.Last_button.clicked.connect(self.PlayLastChannel) 
         
+        # Search button
+        self.ui.Search_button.clicked.connect(self.SearchChannels)
+        
         #self.ui.Play_button.clicked.connect(self.PlayStopStream)
         #self.LoadPlayList('us.m3u')
 
@@ -185,36 +189,63 @@ class SpyderPlayer(QWidget):
         elif event.type() == QEvent.Type.KeyRelease:   
             #self.ShowCursor()
             #print("Key Press: ", QEvent.Type.KeyPress.name)
-            if event.key() == Qt.Key.Key_Escape and self.windowState() == Qt.WindowState.WindowFullScreen:
-                self.PlayerNormalScreen()
-                print("Key Press: esc")
-                #return True
-            elif event.key() == Qt.Key.Key_F:
-                if self.windowState() == Qt.WindowState.WindowFullScreen:
+            if self.ui.Query_input.hasFocus() == False:
+                if event.key() == Qt.Key.Key_Escape and self.windowState() == Qt.WindowState.WindowFullScreen:
                     self.PlayerNormalScreen()
-                    print("Key Press: F")
+                    print("Key Press: esc")
+                    #return True
+                elif event.key() == Qt.Key.Key_F:
+                    if self.windowState() == Qt.WindowState.WindowFullScreen:
+                        self.PlayerNormalScreen()
+                        print("Key Press: F")
+                        return True
+                    else:
+                        self.PlayerFullScreen()
+                        return True
+                elif event.key() == Qt.Key.Key_K or event.key() == Qt.Key.Key_Space:
+                    self.PlayPausePlayer()
+                elif event.key() == Qt.Key.Key_M:
+                    self.MutePlayer()
+                elif event.key() == Qt.Key.Key_Q:
+                    print("Key Press: Q")
+                    #self.setFocus()
+                    #self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
+                    self.HideCursor()
+                    #print("Hide cursor")
+                    return True
+                elif event.key() == Qt.Key.Key_W:
+                    print("Key Press: W")
+                    #self.setFocus()
+                    #self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
+                    self.ShowCursor()
+                    #print("Show cursor")
+                    return True
+                elif event.key() == Qt.Key.Key_P:
+                    self.TogglePlaylistView()
+                    return True
+                elif event.key() == Qt.Key.Key_L:
+                    self.PlayLastChannel()
+                    return True
+                elif event.key() == Qt.Key.Key_Up:
+                    self.IncreaseVolume()
+                    return True
+                elif event.key() == Qt.Key.Key_Down:
+                    self.DecreaseVolume()
                     return True
                 else:
-                    self.PlayerFullScreen()
+                    self.ShowCursor()
                     return True
-            elif event.key() == Qt.Key.Key_K or event.key() == Qt.Key.Key_Space:
-                self.PlayPausePlayer()
-            elif event.key() == Qt.Key.Key_M:
-                self.MutePlayer()
-            elif event.key() == Qt.Key.Key_Q:
-                print("Key Press: Q")
-                #self.setFocus()
-                #self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
-                self.HideCursor()
-                #print("Hide cursor")
+                
+            elif event.key() == Qt.Key.Key_Return:
+                self.SearchChannels()
+                self.ui.Playlist_treeview.setFocus()
                 return True
-            elif event.key() == Qt.Key.Key_W:
-                print("Key Press: W")
-                #self.setFocus()
-                #self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
-                self.ShowCursor()
-                #print("Show cursor")
+            
+            elif event.key() == Qt.Key.Key_Escape:
+                self.ui.Playlist_treeview.setFocus()
                 return True
+            
+            
             else:
                 self.ShowCursor()
                 
@@ -301,6 +332,22 @@ class SpyderPlayer(QWidget):
         self.controlPanelFullScreen.ui.Volume_slider.setValue(volume)
         self.controlPanelBottom.ui.Volume_slider.setValue(volume)
                 
+    def IncreaseVolume(self):
+        volume = self.audioOutput.volume()            
+        volume = volume + 0.1
+        if volume > 1.0:
+            volume = 1.0
+        self.audioOutput.setVolume(volume)
+        self.UpdateVolumeSlider(int(volume*100))
+        
+    def DecreaseVolume(self):
+        volume = self.audioOutput.volume()            
+        volume = volume - 0.1
+        if volume < 0.0:
+            volume = 0.0
+        self.audioOutput.setVolume(volume)
+        self.UpdateVolumeSlider(int(volume*100))
+        
     def LoadPlayList(self, playlistFile):
         
          # Open the file and read it line by line
@@ -397,19 +444,50 @@ class SpyderPlayer(QWidget):
         self.videoLabel.setText(channel_name)
         self.player.setSource(QUrl(stream_url))
         self.player.play()    
+        duration = self.player.duration()
+        position = self.player.position()
+        print(f"Duration: {duration} Position: {position}")
+        
+        if duration == 0 and position == 0:
+            self.controlPanelFullScreen.ui.Forward_button.setEnabled(False)
+            self.controlPanelFullScreen.ui.Backward_button.setEnabled(False)
+            self.controlPanelBottom.ui.Forward_button.setEnabled(False)
+            self.controlPanelBottom.ui.Backward_button.setEnabled(False)
             
+        else:
+            self.controlPanelFullScreen.ui.Forward_button.setEnabled(True)
+            self.controlPanelFullScreen.ui.Backward_button.setEnabled(True)
+            self.controlPanelBottom.ui.Forward_button.setEnabled(True)
+            self.controlPanelBottom.ui.Backward_button.setEnabled(True)
+        self.ChangePlayButtonIcon(True)
+            
+          
+    def ChangePlayButtonIcon(self, playing: bool):
+        if playing:
+            self.controlPanelFullScreen.ui.Play_button.setIcon(QIcon("assets/icons/pause.png"))
+            self.controlPanelBottom.ui.Play_button.setIcon(QIcon("assets/icons/pause.png"))
+        else:
+            self.controlPanelFullScreen.ui.Play_button.setIcon(QIcon("assets/icons/play.png"))
+            self.controlPanelBottom.ui.Play_button.setIcon(QIcon("assets/icons/play.png"))
+                
     def PlayPausePlayer(self):
         if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
             self.player.pause()
+            self.ChangePlayButtonIcon(False)
             #self.player_thread.join()
-        elif self.selectedChannelIndex >= 0:
+        else: # self.selectedChannelIndex >= 0:
             self.setFocus()
             #self.player.setPosition(0)
             self.player.play()
+            self.ChangePlayButtonIcon(True)
             #self.PlayChannel()
 
     def PlayLastChannel(self):
         channel_name, stream_url = self.playlistmanager.GoToLastSelectedItem()
+        
+        if channel_name is None or stream_url is None:
+            return
+        
         self.videoLabel.setText(channel_name)
         self.PlaySelectedChannel(channel_name, stream_url)
         
@@ -500,6 +578,9 @@ class SpyderPlayer(QWidget):
             self.inactivityTimer.start()     
         #print("Show cursor")  
 
+    def SearchChannels(self):
+        searchText = self.ui.Query_input.text()
+        self.playlistmanager.SearchChannels(searchText)
     
     def ShowCursorBusy(self):
         self.setCursor(QCursor(Qt.CursorShape.BusyCursor))      

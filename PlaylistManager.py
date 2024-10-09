@@ -10,7 +10,8 @@ class TreeStandardItem(QStandardItem):
     def __init__(self, nameText, bgColor:QColor = None):
         super().__init__(nameText)
         self.itemName = nameText.lstrip()
-
+        self.playListName = ""
+        
         self.setSizeHint(QSize(200, 40)) 
         self.setEditable(False)
         if bgColor != None:
@@ -44,6 +45,7 @@ class PlaylistManager(QWidget):
     currentSelectedItem: QStandardItem = None
     lastSelectedItem: QStandardItem = None
     favoritesInfo = []
+    searchResultsCount = 0
     
     def __init__(self, playlistTreefromUI: QTreeView, parent=None):
         super().__init__(parent)
@@ -56,10 +58,6 @@ class PlaylistManager(QWidget):
         icon_star_trans = os.path.join(iconPath, 'star-trans.png')
         icon_star_full = os.path.join(iconPath, 'star-full.png')
         icon_star_empty = os.path.join(iconPath, 'star-empty.png')      
-          
-        print(f"icon_star_trans: {icon_star_trans}")
-        print(f"icon_star_full: {icon_star_full}")
-        print(f"icon_star_empty: {icon_star_empty}")
         
         
         # Create a stylesheet with the dynamically constructed paths
@@ -91,13 +89,13 @@ class PlaylistManager(QWidget):
         self.textPadding = "    "
         self.playListHeaderColor = QColor(28, 9, 50)
         
-        self.searchList = TreeStandardItem(self.textPadding +"Search Results", self.playListHeaderColor)
+        self.searchList = TreeStandardItem(self.textPadding + "Search Results", self.playListHeaderColor)
         self.model.appendRow(self.searchList)
         
-        self.favoritesList = TreeStandardItem(self.textPadding +"Favorites", self.playListHeaderColor)
+        self.favoritesList = TreeStandardItem(self.textPadding + "Favorites", self.playListHeaderColor)
         self.model.appendRow(self.favoritesList)
         
-        self.libraryList = TreeStandardItem(self.textPadding +"Library", self.playListHeaderColor)
+        self.libraryList = TreeStandardItem(self.textPadding + "Library", self.playListHeaderColor)
         self.model.appendRow(self.libraryList)
          
         # Create Event Connections
@@ -166,6 +164,7 @@ class PlaylistManager(QWidget):
                     #channel_item.setBackground(Qt.GlobalColor.black)
                     # Store the URL in the item without displaying it
                     channel_item.setData(stream_url, Qt.ItemDataRole.UserRole)
+                    channel_item.playListName = playlistName
                     playlistTreeItem.appendRow(channel_item)
         
         # Get the playListTree Count
@@ -182,13 +181,20 @@ class PlaylistManager(QWidget):
         """Handle the double-click event to retrieve channel name and URL."""
         # Get the clicked item from the model
         item = self.model.itemFromIndex(index)
-
+        
         # Retrieve the channel name (displayed)
         channel_name = item.text()
 
         # Retrieve the hidden URL (stored in UserRole)
         stream_url = item.data(Qt.ItemDataRole.UserRole)
-
+        
+        # Check if selection is from Search List, Find the Channel from the Tree
+        if item.playListName == self.searchList.itemName:
+            play_list_name = item.GetParentName()
+            # Get the channel from the tree
+            item = self.GetChannelFromTree(play_list_name, channel_name, stream_url)
+        
+        
         self.currentSelectedItem = item
         
         self.lastSelectedItem = temp
@@ -231,6 +237,9 @@ class PlaylistManager(QWidget):
         return channel_name, stream_url
     
     def GoToLastSelectedItem(self):
+        if self.lastSelectedItem is None:
+            return None, None
+        
         temp = self.currentSelectedItem
         self.currentSelectedItem = self.lastSelectedItem
         self.lastSelectedItem = temp
@@ -249,8 +258,10 @@ class PlaylistManager(QWidget):
         
         return channel_name, stream_url
     
-    def UpdateHeaderCount(self, item: TreeStandardItem):
-        count = item.rowCount()
+    def UpdateHeaderCount(self, item: TreeStandardItem, count: int = -1):
+        if count == -1:
+            count = item.rowCount()
+            
         item.setText(self.textPadding + item.itemName + "  (" + str(count) + ")")
     
     def FavoriteClicked(self, item):
@@ -260,7 +271,7 @@ class PlaylistManager(QWidget):
             channelSource = item.data(Qt.ItemDataRole.UserRole)
             channelPlaylist = item.GetParentName()
             
-            print(f"channelName:{channelName}, channelSource{channelSource}, channelPlaylist: {channelPlaylist}")
+            #print(f"channelName:{channelName}, channelSource{channelSource}, channelPlaylist: {channelPlaylist}")
             
             index = -1
             for i, info in enumerate(self.favoritesInfo):
@@ -273,7 +284,7 @@ class PlaylistManager(QWidget):
                 return
                
             self.favoritesInfo.append(VideoInfo(channelName, channelSource, channelPlaylist, item))
-            print(f"favoritesInfo size: {len(self.favoritesInfo)}")
+            #print(f"favoritesInfo size: {len(self.favoritesInfo)}")
             
             self.model.blockSignals(True)
             favoriteChannel = TreeStandardItem(channelName)
@@ -292,9 +303,11 @@ class PlaylistManager(QWidget):
         elif item.checkState() == Qt.CheckState.Unchecked:
             channelName = item.text()
             channelSource = item.data(Qt.ItemDataRole.UserRole)
+            channelPlaylist = item.playListName
             
             if len(self.favoritesInfo) == 0: 
-                print("No items in favorites list")
+                #print("No items in favorites list")
+                pass
                 return 
             
             # Find the corresponding favorite item in favoritesInfo
@@ -331,21 +344,37 @@ class PlaylistManager(QWidget):
                 print("Channel not found in favorites list")
                 return
             
-            # Ensure the item is unchecked in both the playlist and Favorites list
             self.model.blockSignals(True)
-            channelPlaylist = item.GetParentName()
+            # Search the Search Results for Favorties
+            if self.searchResultsCount > 0:
+                #searchList =  self.playlistTree.model().item(0) # First item is the Search List list results
+                favList = self.searchList.child(0) #searchList.child(0) # First item is the Favorites list
+                for i in range(favList.rowCount()):
+                    channel = favList.child(i)
+                    if channel.itemName == channelName and channel.data(Qt.ItemDataRole.UserRole) == channelSource:
+                        favList.removeRow(i)
+                        self.searchResultsCount -= 1
+                        #channel.setCheckState(Qt.CheckState.Unchecked)
+                        break
+                self.UpdateHeaderCount(favList)
+                self.UpdateHeaderCount(self.searchList, self.searchResultsCount)
+
+            
+            # Ensure the item is unchecked in both the playlist and Favorites list
+            
+            
             # If Item deselected from Favorites list, then uncheck corresponding playlist item
             if(channelPlaylist == "Favorites"):
                 favoriteItem.setCheckState(Qt.CheckState.Unchecked)
                 
-            self.model.blockSignals(False)
-            
             # Remove the item from the favorites list
             self.favoritesList.removeRow(favoriteIndex)
                    
             # Remove the item from favoritesInfo
             self.favoritesInfo.pop(index)
-                    
+                
+            self.model.blockSignals(False)
+                
             # Update the header count
             self.UpdateHeaderCount(self.favoritesList)   
             
@@ -389,16 +418,16 @@ class PlaylistManager(QWidget):
     def GetChannelFromTree(self, playlistName: str, channelName: str, source: str):
         model = self.playlistTree.model()
         
-        print(f"playlistName: {playlistName}, channelName: {channelName}, source: {source}")
-        print(f"model.rowCount(): {model.rowCount()}")
+        #print(f"playlistName: {playlistName}, channelName: {channelName}, source: {source}")
+        #print(f"model.rowCount(): {model.rowCount()}")
         
         # Traverse the top-level items (playlists)
         for row in range(model.rowCount()):
             playlist = model.item(row)  # Get the playlist item (QStandardItem)
-            print(f"---->playlist: {playlist.text()}")
+            #print(f"---->playlist: {playlist.text()}")
             
             if playlist.itemName == playlistName:  # Match the playlist name
-                print(f"Playlist: {playlist.text()}")
+                #print(f"Playlist: {playlist.text()}")
                 # Traverse the children (channels)
                 for childRow in range(playlist.rowCount()):
                     channelItem = playlist.child(childRow)  # Get the channel item
@@ -407,3 +436,55 @@ class PlaylistManager(QWidget):
                         return channelItem  # Return the matching QStandardItem (channel)
 
         return None  # Return None if the playlist or channel wasn't found
+    
+    def SearchChannels(self, searchText: str):
+        # Return if search text is empty
+        if not searchText:
+            return
+        
+        searchText = searchText.lower()
+        
+        # Clear the search list 
+        self.searchList.removeRows(0, self.searchList.rowCount())
+        self.searchResultsCount = 0
+        
+        # Get Playlist Count
+        playlistCount = self.playlistTree.model().rowCount()
+        
+        searchResultsCount = 0
+        self.model.blockSignals(True)
+        
+        # Traverse (playlists) but ignore the Search Playlist
+        for playlist in range(1, playlistCount):
+            playlistToSearch = self.playlistTree.model().item(playlist)  # Get the playlist item (QStandardItem)
+            
+            playListResults = TreeStandardItem(playlistToSearch.itemName)
+            
+            # Traverse (channels)
+            for channel in range(playlistToSearch.rowCount()):
+                channelToSearch = playlistToSearch.child(channel)  # Get the channel item
+                channelName: str = channelToSearch.itemName.lower()
+                
+                # Search the channel name for seach query
+                searchIndex = channelName.find(searchText)
+                if searchIndex != -1:
+                    # if search query found, add the channel to the search list
+                    foundChannel = TreeStandardItem(channelToSearch.itemName)
+                    foundChannel.setData(channelToSearch.data(Qt.ItemDataRole.UserRole), Qt.ItemDataRole.UserRole)
+                    foundChannel.playListName = self.searchList.itemName
+                    foundChannel.setCheckable(True)
+                    foundChannel.setCheckState(channelToSearch.checkState())
+                    playListResults.appendRow(foundChannel)
+                    searchResultsCount += 1
+            
+            # Update Channel Count
+            self.UpdateHeaderCount(playListResults)
+            self.searchList.appendRow(playListResults)
+        
+        self.searchResultsCount = searchResultsCount
+        # Update Search Results Count
+        self.UpdateHeaderCount(self.searchList, searchResultsCount)
+        #self.model.expandItems(self.searchList)
+        self.model.blockSignals(False)
+        self.model.layoutChanged.emit()
+        

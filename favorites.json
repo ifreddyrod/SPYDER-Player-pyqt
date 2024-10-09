@@ -20,11 +20,6 @@
         "playListName": "us"
     },
     {
-        "channelName": "Newsmax 2 (720p)",
-        "source": "https://nmxlive.akamaized.net/hls/live/529965/Live_1/index.m3u8",
-        "playListName": "us"
-    },
-    {
         "channelName": "The Ultimate Music Channel (1080p)",
         "source": "https://app.viloud.tv/hls/channel/0694b92d093cc2bd5438ff9bbccaf1a2.m3u8",
         "playListName": "us"
