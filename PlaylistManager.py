@@ -2,9 +2,12 @@ from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QWidget, QTreeView
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor
 from PyQt6.QtCore import QSize, Qt, pyqtSignal
+from m3u_parser import M3uParser
+import tempfile
 import re
-import os
 import json
+import requests
+import os
 
 class TreeStandardItem(QStandardItem):
     def __init__(self, nameText, bgColor:QColor = None):
@@ -107,7 +110,9 @@ class PlaylistManager(QWidget):
         # Load Custom playlists
         self.LoadPlayList("us.m3u")
         self.LoadPlayList("playlist_usa.m3u8")
-        self.LoadFavorites()
+        self.LoadPlayList("Movies.m3u")
+        
+	self.LoadFavorites()
         
     def CustomizeTree(self):
         self.playlistTree.setIndentation(25) 
@@ -124,55 +129,65 @@ class PlaylistManager(QWidget):
 
         playlistName, extension = os.path.splitext(os.path.basename(playListFile))
 
-        # Create a parent item with the name of the playlist file
+        # Initialize the parser
+        parser = M3uParser()
+        
+        #-----------------------------------------------
+        # Attemp to fetch and parse a remote playlist
+        #-----------------------------------------------
+        if playlistPath.startswith("http"):
+            try:
+                response = requests.get(playlistPath)
+                
+                # Create a temporary file
+                with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.m3u') as temp_file:
+                    # Write the content to the temporary file
+                    temp_file.write(response.text)
+                    responseFile = temp_file.name
+        
+                parser.parse_m3u(responseFile, check_live=False)
+                os.remove(responseFile)
+            except requests.exceptions.RequestException as e:
+                print(f"Error fetching remote playlist: {e}")
+                return
+        #----------------------------------------
+        # Attempt to parse local playlist file   
+        #---------------------------------------- 
+        else:
+            # Attempt to read the playlist file o
+            parser.parse_m3u(playlistPath, check_live=False)
+
+        #------------------------------
+        # Check if the parser is empty
+        #------------------------------
+        entries = parser.get_list()
+        if not entries:
+            print("The playlist is empty.")
+            return
+        
+        # Create a Playlist Entry to the Tree and add it 
         playlistTreeItem = TreeStandardItem(self.textPadding + playlistName, self.playListHeaderColor)
-        #playlist_item.setSizeHint(QSize(200, 40))
-        #playlist_item.setBackground(QColor(23, 23, 23))
-        
-        # Remove editability from playlist item
-        #playlist_item.setEditable(False)
-        #playlist_item.setFlags(playlist_item.flags() | Qt.ItemFlag.ItemNeverHasChildren)
-  
         self.model.appendRow(playlistTreeItem)  # Append the playlist to the model
-
-        # Open the file and read it line by line
-        with open(playlistPath, 'r') as file:
-            lines = file.readlines()
-
-        # Regex to capture EXTINF metadata and URL
-        extinf_pattern = re.compile(r'#EXTINF:-1.*?,(.*)')
-        stream_url = None
-        channel_name = None
-
-        for line in lines:
-            line = line.strip()  # Remove leading/trailing whitespace
-            if line.startswith("#EXTINF"):
-                # Extract the channel name from the EXTINF line
-                match = extinf_pattern.match(line)
-                if match:
-                    channel_name = match.group(1)
-            elif line.startswith("http"):
-                # The line after EXTINF is the stream URL
-                stream_url = line
-                if channel_name and stream_url:
-                    # Create a new item for the channel and add it as a child to the playlist item
-                    channel_item = TreeStandardItem(channel_name)
-                    #channel_item = QStandardItem(channel_name)
-                    #channel_item.setSizeHint(QSize(200, 40))  
-                    channel_item.setEditable(False)
-                    channel_item.setCheckable(True)
-                    #channel_item.setBackground(Qt.GlobalColor.black)
-                    # Store the URL in the item without displaying it
-                    channel_item.setData(stream_url, Qt.ItemDataRole.UserRole)
-                    channel_item.playListName = playlistName
-                    playlistTreeItem.appendRow(channel_item)
         
-        # Get the playListTree Count
-        count = playlistTreeItem.rowCount()
-        
+        #------------------------------
+        # Process the parsed entries
+        #------------------------------
+        for entry in entries:
+            channel_name = entry.get('name', 'Unknown') # Get the title from the EXTINF tag
+            source = entry.get('url', 'No URL')  # Get the stream URL or file path
+            
+            if channel_name and source:
+                # Create a new item for the channel and add it as a child to the playlist item
+                channel_item = TreeStandardItem(channel_name)
+                channel_item.setEditable(False)
+                channel_item.setCheckable(True)
+                # Store the URL in the item without displaying it
+                channel_item.setData(source, Qt.ItemDataRole.UserRole)
+                channel_item.playListName = playlistName
+                playlistTreeItem.appendRow(channel_item) 
+                
         # Rename the playlist item
         self.UpdateHeaderCount(playlistTreeItem)
-        #playlistTreeItem.setText(self.textPadding + playlistTreeItem.itemName + "  (" + str(count) + ")")
         
 
     def ChannelDoubleClicked(self, index):

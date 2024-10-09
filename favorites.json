@@ -23,5 +23,15 @@
         "channelName": "The Ultimate Music Channel (1080p)",
         "source": "https://app.viloud.tv/hls/channel/0694b92d093cc2bd5438ff9bbccaf1a2.m3u8",
         "playListName": "us"
+    },
+    {
+        "channelName": "Radio Ritmo (1080p) [Not 24/7]",
+        "source": "https://panel.tvstream.cl:1936/8046/8046/playlist.m3u8",
+        "playListName": "us"
+    },
+    {
+        "channelName": "La Mega Mundial",
+        "source": "https://server40.servistreaming.com:3477/stream/play.m3u8",
+        "playListName": "us"
     }
 ]

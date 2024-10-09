@@ -144,6 +144,8 @@ class SpyderPlayer(QWidget):
         # Search button
         self.ui.Search_button.clicked.connect(self.SearchChannels)
         
+        self.player.durationChanged.connect(self.PlayerDurationChanged)
+        
         #self.ui.Play_button.clicked.connect(self.PlayStopStream)
         #self.LoadPlayList('us.m3u')
 
@@ -159,6 +161,38 @@ class SpyderPlayer(QWidget):
         self.ui.Maximize_button.clicked.connect(self.PlayerFullScreen)
 
         self.player.mediaStatusChanged.connect(self.on_media_status_changed)
+
+    def ms_to_time_string(self,ms: int):
+        # Convert milliseconds to seconds
+        seconds = int(ms / 1000)
+        
+        # Calculate hours, minutes, and remaining seconds
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+        seconds = seconds % 60
+    
+        # Format as HH:MM:SS
+        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+            
+    def PlayerDurationChanged(self, duration):
+        print("Duration type", type(duration))
+        
+        videoLength = self.ms_to_time_string(duration)
+        
+        print("Duration Changed: ", videoLength)
+        
+        if duration == 0:
+            self.controlPanelFullScreen.ui.Forward_button.setEnabled(False)
+            self.controlPanelFullScreen.ui.Backward_button.setEnabled(False)
+            self.controlPanelBottom.ui.Forward_button.setEnabled(False)
+            self.controlPanelBottom.ui.Backward_button.setEnabled(False)
+            
+        else:
+            self.controlPanelFullScreen.ui.Forward_button.setEnabled(True)
+            self.controlPanelFullScreen.ui.Backward_button.setEnabled(True)
+            self.controlPanelBottom.ui.Forward_button.setEnabled(True)
+            self.controlPanelBottom.ui.Backward_button.setEnabled(True)
+
         
     def on_media_status_changed(self, status):
         if status == QMediaPlayer.MediaStatus.LoadedMedia:
@@ -232,6 +266,9 @@ class SpyderPlayer(QWidget):
                 elif event.key() == Qt.Key.Key_Down:
                     self.DecreaseVolume()
                     return True
+                elif event.key() == Qt.Key.Key_Left:
+                    postion = self.player.position()
+                    print("Position: ", postion)
                 else:
                     self.ShowCursor()
                     return True
@@ -348,60 +385,6 @@ class SpyderPlayer(QWidget):
         self.audioOutput.setVolume(volume)
         self.UpdateVolumeSlider(int(volume*100))
         
-    def LoadPlayList(self, playlistFile):
-        
-         # Open the file and read it line by line
-        with open(playlistFile, 'r') as file:
-            lines = file.readlines()
-
-        # Regex to capture EXTINF metadata and URL
-        extinf_pattern = re.compile(r'#EXTINF:-1.*?,(.*)')
-        stream_url = None
-
-        for line in lines:
-            line = line.strip()  # Remove leading/trailing whitespace
-            if line.startswith("#EXTINF"):
-                # Extract the channel name from the EXTINF line
-                match = extinf_pattern.match(line)
-                if match:
-                    channel_name = match.group(1)
-            elif line.startswith("http"):
-                # The line after EXTINF is the stream URL
-                stream_url = line
-                if channel_name and stream_url:
-                    #self.add_channel_to_table(channel_name, stream_url)    
-                    # add the channel to the list
-                    self.channelList.append((channel_name, stream_url))
-            
-        self.UpdateChannelsTable()
-        
-    def UpdateChannelsTable(self):
-        # Clear the table
-        self.ui.Channels_table.clearContents()
-        self.ui.Channels_table.setRowCount(len(self.channelList))
-
-        # Populate the table
-        for i, (channel_name, stream_url) in enumerate(self.channelList):
-            self.ui.Channels_table.setItem(i, 0, QTableWidgetItem(channel_name))
-            #self.ui.Channels_table.setToolTip(channel_name) 
-            
-                 
-    def ShowFullChannelName(self, row, column):   
-        # Ensure we are in the correct column (Channel name column)
-        if column != 0:
-            return
-        
-        if row < 0 or len(self.channelList) == 0:
-            return
-        
-        # Get the channel name
-        channel_name = self.channelList[row][0]
-        
-        print("Channel name:", channel_name)
-        
-        # Show the tooltip at the current cursor position
-        self.ui.Channels_table.setToolTip(channel_name)
-        #QToolTip.showText(QCursor.pos(), channel_name)
         
     def WindowChanged(self):
         if self.windowState() == QWidget.WindowState.WindowMaximized or self.windowState() == QWidget.WindowState.WindowFullScreen:
@@ -444,21 +427,10 @@ class SpyderPlayer(QWidget):
         self.videoLabel.setText(channel_name)
         self.player.setSource(QUrl(stream_url))
         self.player.play()    
-        duration = self.player.duration()
-        position = self.player.position()
-        print(f"Duration: {duration} Position: {position}")
+        #duration = self.player.duration()
+        #position = self.player.position()
+        #print(f"Duration: {duration} Position: {position}")
         
-        if duration == 0 and position == 0:
-            self.controlPanelFullScreen.ui.Forward_button.setEnabled(False)
-            self.controlPanelFullScreen.ui.Backward_button.setEnabled(False)
-            self.controlPanelBottom.ui.Forward_button.setEnabled(False)
-            self.controlPanelBottom.ui.Backward_button.setEnabled(False)
-            
-        else:
-            self.controlPanelFullScreen.ui.Forward_button.setEnabled(True)
-            self.controlPanelFullScreen.ui.Backward_button.setEnabled(True)
-            self.controlPanelBottom.ui.Forward_button.setEnabled(True)
-            self.controlPanelBottom.ui.Backward_button.setEnabled(True)
         self.ChangePlayButtonIcon(True)
             
           
