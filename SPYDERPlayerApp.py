@@ -84,8 +84,8 @@ class SpyderPlayer(QWidget):
         self.player.setVideoOutput(self.videoPanel)
         
         # Set the Left of vertical splitter to a fixed size
-        self.ui.Horizontal_splitter.setSizes([300, 1000])
-        self.ui.Vertical_splitter.setSizes([500, 1])
+        self.ui.Horizontal_splitter.setSizes([400, 1000])
+        self.ui.Vertical_splitter.setSizes([800, 1])
         # Set the side of the table column to the width of the horizontal layout
         #self.ui.Channels_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self.ui.botomverticalLayout.addWidget(self.controlPanelBottom)
@@ -161,6 +161,10 @@ class SpyderPlayer(QWidget):
         self.ui.Maximize_button.clicked.connect(self.PlayerFullScreen)
 
         self.player.mediaStatusChanged.connect(self.on_media_status_changed)
+        self.player.positionChanged.connect(self.VideoTimePositionChanged)
+        #self.controlPanelFullScreen.ui.VideoPosition_slider.sliderReleased.connect(self.ChangeVideoPosition)
+        self.controlPanelBottom.ui.VideoPosition_slider.sliderReleased.connect(self.ChangeVideoPosition)
+        
 
     def ms_to_time_string(self,ms: int):
         # Convert milliseconds to seconds
@@ -173,7 +177,16 @@ class SpyderPlayer(QWidget):
     
         # Format as HH:MM:SS
         return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
-            
+          
+    def format_time(self, ms):
+        # Format time in hh:mm:ss from milliseconds
+        seconds = ms // 1000
+        minutes = seconds // 60
+        hours = minutes // 60
+        minutes = minutes % 60
+        seconds = seconds % 60
+        return f"{hours:02}:{minutes:02}:{seconds:02}"
+      
     def PlayerDurationChanged(self, duration):
         print("Duration type", type(duration))
         
@@ -184,15 +197,39 @@ class SpyderPlayer(QWidget):
         if duration == 0:
             self.controlPanelFullScreen.ui.Forward_button.setEnabled(False)
             self.controlPanelFullScreen.ui.Backward_button.setEnabled(False)
+            self.controlPanelFullScreen.ui.CurrentTime_label.setText("00:00:00")
+            self.controlPanelFullScreen.ui.TotalDuration_label.setText("00:00:00")
             self.controlPanelBottom.ui.Forward_button.setEnabled(False)
             self.controlPanelBottom.ui.Backward_button.setEnabled(False)
+            self.controlPanelBottom.ui.CurrentTime_label.setText("00:00:00")
+            self.controlPanelBottom.ui.TotalDuration_label.setText("00:00:00")
+            self.controlPanelFullScreen.ui.VideoPosition_slider.setEnabled(False)
+            self.controlPanelBottom.ui.VideoPosition_slider.setEnabled(False)
             
         else:
             self.controlPanelFullScreen.ui.Forward_button.setEnabled(True)
             self.controlPanelFullScreen.ui.Backward_button.setEnabled(True)
             self.controlPanelBottom.ui.Forward_button.setEnabled(True)
             self.controlPanelBottom.ui.Backward_button.setEnabled(True)
+            self.controlPanelBottom.ui.TotalDuration_label.setText(videoLength)
+            self.controlPanelFullScreen.ui.TotalDuration_label.setText(videoLength)
+            self.controlPanelFullScreen.ui.VideoPosition_slider.setRange(0, duration)
+            self.controlPanelBottom.ui.VideoPosition_slider.setRange(0, duration)
+            self.controlPanelFullScreen.ui.VideoPosition_slider.setEnabled(True)
+            self.controlPanelBottom.ui.VideoPosition_slider.setEnabled(True)
 
+    def VideoTimePositionChanged(self, position):
+        self.controlPanelFullScreen.ui.VideoPosition_slider.setValue(position)
+        self.controlPanelBottom.ui.VideoPosition_slider.setValue(position)
+        self.controlPanelFullScreen.ui.CurrentTime_label.setText(self.format_time(position))
+        self.controlPanelBottom.ui.CurrentTime_label.setText(self.format_time(position))
+        
+    def ChangeVideoPosition(self):
+        #print("Position Type---->: ", type(position))
+        #self.player.setPosition(position)
+        slider = self.sender()
+        position = slider.value()
+        self.player.setPosition(position)
         
     def on_media_status_changed(self, status):
         if status == QMediaPlayer.MediaStatus.LoadedMedia:
@@ -321,8 +358,8 @@ class SpyderPlayer(QWidget):
         self.controlPanelFullScreen.hide()
         self.setWindowState(Qt.WindowState.WindowNoState)
         #self.ui.VideoView_widget.showNormal()  # Ensure the widget is visible
-        self.ui.Horizontal_splitter.setSizes([300, 1000])  # Restore left side
-        self.ui.Vertical_splitter.setSizes([500, 1])
+        self.ui.Horizontal_splitter.setSizes([400, 1000])  # Restore left side
+        self.ui.Vertical_splitter.setSizes([800, 1])
         
         self.playListVisible = True
         self.inactivityTimer.stop()
@@ -336,7 +373,7 @@ class SpyderPlayer(QWidget):
             #self.ui.Horizontal_splitter.setEnabled(True)
             self.playListVisible = False
         else:
-            self.ui.Horizontal_splitter.setSizes([300, 1000])
+            self.ui.Horizontal_splitter.setSizes([400, 1000])
             self.playListVisible = True
             
     def MutePlayer(self):
@@ -389,8 +426,8 @@ class SpyderPlayer(QWidget):
     def WindowChanged(self):
         if self.windowState() == QWidget.WindowState.WindowMaximized or self.windowState() == QWidget.WindowState.WindowFullScreen:
             self.showNormal()
-            self.ui.Horizontal_splitter.setSizes([200, 500])
-            self.ui.Vertical_splitter.setSizes([500, 1])
+            self.ui.Horizontal_splitter.setSizes([400, 1000])
+            self.ui.Vertical_splitter.setSizes([800, 1])
             
             #self.ShowControlPanel()
         elif self.windowState() == QWidget.WindowState.WindowMinimized:
