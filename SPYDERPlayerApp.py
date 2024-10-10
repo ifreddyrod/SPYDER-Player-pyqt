@@ -33,7 +33,7 @@ class VideoControlPannel(QWidget):
         self.SpyderPlayer.ShowCursorNormal()    
         
     def ShowCursorBlank(self):
-        self.SpyderPlayer.ShowCursorBlank()                     
+        self.SpyderPlayer.ShowCursorBlank()                       
               
 class SpyderPlayer(QWidget):
     channelList = []
@@ -42,6 +42,9 @@ class SpyderPlayer(QWidget):
     lastChannelIndex: int = -1
     selectedChannelIndex: int = -1
     cursorVisible: bool = True
+    videoChangesPosition: bool = False
+    dragging: bool = False
+    videoPosition: int = 0
     
     def __init__(self, parent=None):
 
@@ -61,35 +64,37 @@ class SpyderPlayer(QWidget):
         # Setup Playlist Tree
         #---------------------------
         self.playlistmanager = PlaylistManager(self.ui.Playlist_treeview, self)
-        
+        self.playlistmanager.installEventFilter(self)
         
         #---------------------------
         # Setup Control Panel
         #---------------------------
-        self.controlPanelFullScreen = VideoControlPannel(self)  #FloatingControlPanel()
-        self.controlPanelFullScreen.hide() 
-        self.controlPanelFullScreen.installEventFilter(self)
-        self.controlPanelBottom = VideoControlPannel(self)
-        self.ui.Bottom_widget = self.controlPanelBottom
-        self.controlPanelBottom.installEventFilter(self)
+        self.controlPanelFS = VideoControlPannel(self)  #FloatingControlPanel()
+        self.controlPanelFS.hide() 
+        self.controlPanelFS.installEventFilter(self)
+        self.controlPanel = VideoControlPannel(self)
+        self.ui.Bottom_widget = self.controlPanel
+        self.controlPanel.installEventFilter(self)
         
 
         #---------------------------           
         # Setup player      
         #---------------------------   
         self.videoPanel = self.ui.VideoView_widget 
+        self.videoPanel.installEventFilter(self)
         self.player = QMediaPlayer()
         self.audioOutput = QAudioOutput()
         self.player.setAudioOutput(self.audioOutput)
         self.player.setVideoOutput(self.videoPanel)
+        self.player.installEventFilter(self) 
         
         # Set the Left of vertical splitter to a fixed size
         self.ui.Horizontal_splitter.setSizes([400, 1000])
         self.ui.Vertical_splitter.setSizes([800, 1])
         # Set the side of the table column to the width of the horizontal layout
         #self.ui.Channels_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
-        self.ui.botomverticalLayout.addWidget(self.controlPanelBottom)
-        self.controlPanelBottom.show()        
+        self.ui.botomverticalLayout.addWidget(self.controlPanel)
+        self.controlPanel.show()        
         
         # Install event filter to detect window state changes
         self.setMouseTracking(True)
@@ -99,7 +104,7 @@ class SpyderPlayer(QWidget):
         self.installEventFilter(self)
         #self.videoStack.installEventFilter(self)
         #self.ui.Channels_table.installEventFilter(self)   
-        self.player.installEventFilter(self) 
+        
         
         #----------------------------------------------------------------------------
         # Connect signals
@@ -111,35 +116,43 @@ class SpyderPlayer(QWidget):
         self.playlistmanager.treeItemSelectedSignal.connect(self.PlaySelectedChannel)
         
         # Play Button
-        self.controlPanelFullScreen.ui.Play_button.clicked.connect(self.PlayPausePlayer)
-        self.controlPanelBottom.ui.Play_button.clicked.connect(self.PlayPausePlayer)
+        self.controlPanelFS.ui.Play_button.clicked.connect(self.PlayPausePlayer)
+        self.controlPanel.ui.Play_button.clicked.connect(self.PlayPausePlayer)
         
         # Stop Buttos
-        self.controlPanelFullScreen.ui.Stop_button.clicked.connect(self.StopPlayer)
-        self.controlPanelBottom.ui.Stop_button.clicked.connect(self.StopPlayer)
+        self.controlPanelFS.ui.Stop_button.clicked.connect(self.StopPlayer)
+        self.controlPanel.ui.Stop_button.clicked.connect(self.StopPlayer)
         
         # Mute Button
-        self.controlPanelFullScreen.ui.Mute_button.clicked.connect(self.MutePlayer)
-        self.controlPanelBottom.ui.Mute_button.clicked.connect(self.MutePlayer)
+        self.controlPanelFS.ui.Mute_button.clicked.connect(self.MutePlayer)
+        self.controlPanel.ui.Mute_button.clicked.connect(self.MutePlayer)
         
         # Full Volume Button
-        self.controlPanelFullScreen.ui.FullVolume_button.clicked.connect(self.FullVolumePlayer)
-        self.controlPanelBottom.ui.FullVolume_button.clicked.connect(self.FullVolumePlayer)
+        self.controlPanelFS.ui.FullVolume_button.clicked.connect(self.FullVolumePlayer)
+        self.controlPanel.ui.FullVolume_button.clicked.connect(self.FullVolumePlayer)
         
         # Volume Slider
-        self.controlPanelFullScreen.ui.Volume_slider.sliderReleased.connect(self.ChangeVolume)
-        self.controlPanelBottom.ui.Volume_slider.sliderReleased.connect(self.ChangeVolume)
+        self.controlPanelFS.ui.Volume_slider.sliderReleased.connect(self.ChangeVolume)
+        self.controlPanel.ui.Volume_slider.sliderReleased.connect(self.ChangeVolume)
         self.audioOutput.setVolume(100)
-        self.controlPanelFullScreen.ui.Volume_slider.setValue(100)
-        self.controlPanelBottom.ui.Volume_slider.setValue(100)
+        self.controlPanelFS.ui.Volume_slider.setValue(100)
+        self.controlPanel.ui.Volume_slider.setValue(100)
         
         # Toggle List Button
-        self.controlPanelFullScreen.ui.ToggleList_button.clicked.connect(self.TogglePlaylistView)
-        self.controlPanelBottom.ui.ToggleList_button.clicked.connect(self.TogglePlaylistView)
+        self.controlPanelFS.ui.ToggleList_button.clicked.connect(self.TogglePlaylistView)
+        self.controlPanel.ui.ToggleList_button.clicked.connect(self.TogglePlaylistView)
+        
+        # Skip Forward Button
+        self.controlPanelFS.ui.Forward_button.clicked.connect(self.SkipForward)
+        self.controlPanel.ui.Forward_button.clicked.connect(self.SkipForward)
+        
+        # Skip Backwared Button
+        self.controlPanelFS.ui.Backward_button.clicked.connect(self.SkipBackward)
+        self.controlPanel.ui.Backward_button.clicked.connect(self.SkipBackward)
         
         # Last Channel Button
-        self.controlPanelFullScreen.ui.Last_button.clicked.connect(self.PlayLastChannel)
-        self.controlPanelBottom.ui.Last_button.clicked.connect(self.PlayLastChannel) 
+        self.controlPanelFS.ui.Last_button.clicked.connect(self.PlayLastChannel)
+        self.controlPanel.ui.Last_button.clicked.connect(self.PlayLastChannel) 
         
         # Search button
         self.ui.Search_button.clicked.connect(self.SearchChannels)
@@ -154,7 +167,7 @@ class SpyderPlayer(QWidget):
         self.inactivityTimer = QTimer(self)
         self.inactivityTimer.setInterval(3000)  # 3000ms = 3 seconds
         self.inactivityTimer.timeout.connect(self.HideCursor)
-        #self.inactivityTimer.start()        
+        #self.inactivityTimer.start()   
         
         self.ui.Close_button.clicked.connect(self.ExitApp)
         self.ui.Minimize_button.clicked.connect(lambda: self.showMinimized())
@@ -162,85 +175,12 @@ class SpyderPlayer(QWidget):
 
         self.player.mediaStatusChanged.connect(self.on_media_status_changed)
         self.player.positionChanged.connect(self.VideoTimePositionChanged)
-        #self.controlPanelFullScreen.ui.VideoPosition_slider.sliderReleased.connect(self.ChangeVideoPosition)
-        self.controlPanelBottom.ui.VideoPosition_slider.sliderReleased.connect(self.ChangeVideoPosition)
+        self.controlPanelFS.ui.VideoPosition_slider.sliderReleased.connect(self.ChangeVideoPosition)
+        self.controlPanel.ui.VideoPosition_slider.sliderReleased.connect(self.ChangeVideoPosition)
         
+        self.controlPanelFS.ui.VideoPosition_slider.setEnabled(False)
+        self.controlPanel.ui.VideoPosition_slider.setEnabled(False)
 
-    def ms_to_time_string(self,ms: int):
-        # Convert milliseconds to seconds
-        seconds = int(ms / 1000)
-        
-        # Calculate hours, minutes, and remaining seconds
-        hours = seconds // 3600
-        minutes = (seconds % 3600) // 60
-        seconds = seconds % 60
-    
-        # Format as HH:MM:SS
-        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
-          
-    def format_time(self, ms):
-        # Format time in hh:mm:ss from milliseconds
-        seconds = ms // 1000
-        minutes = seconds // 60
-        hours = minutes // 60
-        minutes = minutes % 60
-        seconds = seconds % 60
-        return f"{hours:02}:{minutes:02}:{seconds:02}"
-      
-    def PlayerDurationChanged(self, duration):
-        print("Duration type", type(duration))
-        
-        videoLength = self.ms_to_time_string(duration)
-        
-        print("Duration Changed: ", videoLength)
-        
-        if duration == 0:
-            self.controlPanelFullScreen.ui.Forward_button.setEnabled(False)
-            self.controlPanelFullScreen.ui.Backward_button.setEnabled(False)
-            self.controlPanelFullScreen.ui.CurrentTime_label.setText("00:00:00")
-            self.controlPanelFullScreen.ui.TotalDuration_label.setText("00:00:00")
-            self.controlPanelBottom.ui.Forward_button.setEnabled(False)
-            self.controlPanelBottom.ui.Backward_button.setEnabled(False)
-            self.controlPanelBottom.ui.CurrentTime_label.setText("00:00:00")
-            self.controlPanelBottom.ui.TotalDuration_label.setText("00:00:00")
-            self.controlPanelFullScreen.ui.VideoPosition_slider.setEnabled(False)
-            self.controlPanelBottom.ui.VideoPosition_slider.setEnabled(False)
-            
-        else:
-            self.controlPanelFullScreen.ui.Forward_button.setEnabled(True)
-            self.controlPanelFullScreen.ui.Backward_button.setEnabled(True)
-            self.controlPanelBottom.ui.Forward_button.setEnabled(True)
-            self.controlPanelBottom.ui.Backward_button.setEnabled(True)
-            self.controlPanelBottom.ui.TotalDuration_label.setText(videoLength)
-            self.controlPanelFullScreen.ui.TotalDuration_label.setText(videoLength)
-            self.controlPanelFullScreen.ui.VideoPosition_slider.setRange(0, duration)
-            self.controlPanelBottom.ui.VideoPosition_slider.setRange(0, duration)
-            self.controlPanelFullScreen.ui.VideoPosition_slider.setEnabled(True)
-            self.controlPanelBottom.ui.VideoPosition_slider.setEnabled(True)
-
-    def VideoTimePositionChanged(self, position):
-        self.controlPanelFullScreen.ui.VideoPosition_slider.setValue(position)
-        self.controlPanelBottom.ui.VideoPosition_slider.setValue(position)
-        self.controlPanelFullScreen.ui.CurrentTime_label.setText(self.format_time(position))
-        self.controlPanelBottom.ui.CurrentTime_label.setText(self.format_time(position))
-        
-    def ChangeVideoPosition(self):
-        #print("Position Type---->: ", type(position))
-        #self.player.setPosition(position)
-        slider = self.sender()
-        position = slider.value()
-        self.player.setPosition(position)
-        
-    def on_media_status_changed(self, status):
-        if status == QMediaPlayer.MediaStatus.LoadedMedia:
-            self.ShowCursorNormal()
-        elif status == QMediaPlayer.MediaStatus.LoadingMedia:
-            self.ShowCursorBusy()
-        
-    '''def mouseMoveEvent(self, event):
-        print("Mouse move event")
-        return super().mouseMoveEvent(event)'''
-        
              
     def eventFilter(self, obj, event):
         #print("Event Filter: ", event.type().name )
@@ -291,7 +231,7 @@ class SpyderPlayer(QWidget):
                     self.ShowCursor()
                     #print("Show cursor")
                     return True
-                elif event.key() == Qt.Key.Key_P:
+                elif event.key() == Qt.Key.Key_L:
                     self.TogglePlaylistView()
                     return True
                 elif event.key() == Qt.Key.Key_L:
@@ -304,9 +244,10 @@ class SpyderPlayer(QWidget):
                     self.DecreaseVolume()
                     return True
                 elif event.key() == Qt.Key.Key_Left:
-                    postion = self.player.position()
-                    print("Position: ", postion)
-                else:
+                    self.SkipBackward()
+                elif event.key() == Qt.Key.Key_Right:
+                    self.SkipForward()
+                else:   
                     self.ShowCursor()
                     return True
                 
@@ -330,10 +271,99 @@ class SpyderPlayer(QWidget):
                 self.ShowCursor()
                 # Restart the timer on mouse move
                 #self.inactivityTimer.start()
+            elif event.type() == QEvent.Type.MouseButtonPress:
+                self.dragging = True
+            elif event.type() == QEvent.Type.MouseButtonRelease:
+                self.dragging = False
                         
         return super().eventFilter(obj, event)
 
-     
+    def Format_ms_to_Time(self, ms: int):
+        # Convert milliseconds to seconds
+        seconds = int(ms / 1000)
+        
+        # Calculate hours, minutes, and remaining seconds
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+        seconds = seconds % 60
+    
+        # Format as HH:MM:SS
+        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+          
+      
+    def PlayerDurationChanged(self, duration):
+        print("Duration type", type(duration))
+        
+        videoLength = self.Format_ms_to_Time(duration)
+        
+        print("Duration Changed: ", videoLength)
+        
+        if duration == 0:
+            self.controlPanelFS.ui.Forward_button.setEnabled(False)
+            self.controlPanelFS.ui.Backward_button.setEnabled(False)
+            self.controlPanelFS.ui.CurrentTime_label.setText("00:00:00")
+            self.controlPanelFS.ui.TotalDuration_label.setText("00:00:00")
+            self.controlPanel.ui.Forward_button.setEnabled(False)
+            self.controlPanel.ui.Backward_button.setEnabled(False)
+            self.controlPanel.ui.CurrentTime_label.setText("00:00:00")
+            self.controlPanel.ui.TotalDuration_label.setText("00:00:00")
+            #self.controlPanelFS.ui.VideoPosition_slider.setEnabled(False)
+            #self.controlPanel.ui.VideoPosition_slider.setEnabled(False)
+            self.videoChangesPosition = False
+            
+        else:
+            self.controlPanelFS.ui.Forward_button.setEnabled(True)
+            self.controlPanelFS.ui.Backward_button.setEnabled(True)
+            self.controlPanel.ui.Forward_button.setEnabled(True)
+            self.controlPanel.ui.Backward_button.setEnabled(True)
+            self.controlPanel.ui.TotalDuration_label.setText(videoLength)
+            self.controlPanelFS.ui.TotalDuration_label.setText(videoLength)
+            self.controlPanelFS.ui.VideoPosition_slider.setRange(0, duration)
+            self.controlPanel.ui.VideoPosition_slider.setRange(0, duration)
+            #self.controlPanelFS.ui.VideoPosition_slider.setEnabled(True)
+            #self.controlPanel.ui.VideoPosition_slider.setEnabled(True)
+            self.videoChangesPosition = True
+
+    def VideoTimePositionChanged(self, position):
+        if self.videoChangesPosition == True:
+            self.controlPanelFS.ui.VideoPosition_slider.setValue(position)
+            self.controlPanel.ui.VideoPosition_slider.setValue(position)
+            self.controlPanelFS.ui.CurrentTime_label.setText(self.Format_ms_to_Time(position))
+            self.controlPanel.ui.CurrentTime_label.setText(self.Format_ms_to_Time(position))
+        
+        
+    def ChangeVideoPosition(self):
+        self.blockSignals(True) 
+        '''self.controlPanelFS.ui.VideoPosition_slider.blockSignals(True)
+        self.controlPanel.ui.VideoPosition_slider.blockSignals(True)
+        self.controlPanelFS.ui.VideoPosition_slider.sliderReleased.disconnect(self.ChangeVideoPosition)
+        self.controlPanel.ui.VideoPosition_slider.sliderReleased.disconnect(self.ChangeVideoPosition)
+        self.videoChangesPosition == False'''
+        #self.player.pause()
+        
+        slider = self.sender()
+        position = slider.value()
+            
+        self.player.setPosition(position)
+            
+        self.videoChangesPosition == True
+        print("Slider Position Changed: ", position)
+        '''self.controlPanelFS.ui.VideoPosition_slider.blockSignals(False)
+        self.controlPanel.ui.VideoPosition_slider.blockSignals(False)        
+        self.player.blockSignals(False)
+        self.controlPanelFS.ui.VideoPosition_slider.sliderReleased.connect(self.ChangeVideoPosition)
+        self.controlPanel.ui.VideoPosition_slider.sliderReleased.connect(self.ChangeVideoPosition)
+        #self.player.play()'''
+        self.blockSignals(False)
+        
+    def on_media_status_changed(self, status):
+        if status == QMediaPlayer.MediaStatus.LoadedMedia:
+            self.ShowCursorNormal()
+        elif status == QMediaPlayer.MediaStatus.LoadingMedia:
+            self.ShowCursorBusy()
+        else: #elif status == QMediaPlayer.MediaStatus.NoMedia:
+            print("Media Player Status: ", status)
+            self.ShowCursorNormal()     
 
             
     def PlayerFullScreen(self):
@@ -343,7 +373,7 @@ class SpyderPlayer(QWidget):
         self.ui.Vertical_splitter.setSizes([500, 0])  
         self.playListVisible = False
         self.setWindowState(Qt.WindowState.WindowFullScreen)
-        self.controlPanelFullScreen.show()
+        self.controlPanelFS.show()
         self.setFocus()
         
         #self.videoStack.setCurrentWidget(self.videoPanel)
@@ -355,7 +385,7 @@ class SpyderPlayer(QWidget):
     def PlayerNormalScreen(self):
         #if self.windowState() == Qt.WindowState.WindowFullScreen:
         self.ui.Title_frame.show()
-        self.controlPanelFullScreen.hide()
+        self.controlPanelFS.hide()
         self.setWindowState(Qt.WindowState.WindowNoState)
         #self.ui.VideoView_widget.showNormal()  # Ensure the widget is visible
         self.ui.Horizontal_splitter.setSizes([400, 1000])  # Restore left side
@@ -380,10 +410,18 @@ class SpyderPlayer(QWidget):
         if self.audioOutput.isMuted():
             self.audioOutput.setMuted(False)
             self.UpdateVolumeSlider(self.volume)
+            self.controlPanelFS.ui.Volume_slider.setEnabled(True)
+            self.controlPanel.ui.Volume_slider.setEnabled(True)
+            self.controlPanel.ui.FullVolume_button.setEnabled(True)
+            self.controlPanelFS.ui.FullVolume_button.setEnabled(True)            
         else:
             self.volume = int(self.audioOutput.volume()*100)
             self.audioOutput.setMuted(True)
-            self.UpdateVolumeSlider(0)   
+            self.UpdateVolumeSlider(0)  
+            self.controlPanelFS.ui.Volume_slider.setEnabled(False)
+            self.controlPanel.ui.Volume_slider.setEnabled(False)
+            self.controlPanel.ui.FullVolume_button.setEnabled(False)
+            self.controlPanelFS.ui.FullVolume_button.setEnabled(False)
 
     def StopPlayer(self):
         self.player.stop()
@@ -403,8 +441,8 @@ class SpyderPlayer(QWidget):
         self.audioOutput.setMuted(False)
         
     def UpdateVolumeSlider(self, volume: int):
-        self.controlPanelFullScreen.ui.Volume_slider.setValue(volume)
-        self.controlPanelBottom.ui.Volume_slider.setValue(volume)
+        self.controlPanelFS.ui.Volume_slider.setValue(volume)
+        self.controlPanel.ui.Volume_slider.setValue(volume)
                 
     def IncreaseVolume(self):
         volume = self.audioOutput.volume()            
@@ -422,12 +460,19 @@ class SpyderPlayer(QWidget):
         self.audioOutput.setVolume(volume)
         self.UpdateVolumeSlider(int(volume*100))
         
+      
+    def SkipForward(self):
+        self.player.setPosition(self.player.position() + 10000)
         
+    def SkipBackward(self):
+        self.player.setPosition(self.player.position() - 10000)
+            
     def WindowChanged(self):
         if self.windowState() == QWidget.WindowState.WindowMaximized or self.windowState() == QWidget.WindowState.WindowFullScreen:
             self.showNormal()
             self.ui.Horizontal_splitter.setSizes([400, 1000])
             self.ui.Vertical_splitter.setSizes([800, 1])
+            self.controlPanel.setFocus()
             
             #self.ShowControlPanel()
         elif self.windowState() == QWidget.WindowState.WindowMinimized:
@@ -436,6 +481,7 @@ class SpyderPlayer(QWidget):
             self.ui.splitter.Horizontal_splitter.setSizes([0, 500])
             self.ui.splitter.Vertical_splitter.setSizes([500, 0])
             self.showFullScreen()
+            self.videoPanel.setFocus()
             #self.ui.Channels_table.setFocus()
             self.inactivityTimer.start()
             
@@ -461,34 +507,44 @@ class SpyderPlayer(QWidget):
         self.player.play()
         
     def PlaySelectedChannel(self, channel_name, stream_url):
+        self.player.stop()
         self.videoLabel.setText(channel_name)
         self.player.setSource(QUrl(stream_url))
-        self.player.play()    
+        try:
+            self.player.play()
+        except Exception as e:
+            print(e)
+            self.player.stop()
+        #self.player.play()    
         #duration = self.player.duration()
         #position = self.player.position()
         #print(f"Duration: {duration} Position: {position}")
         
-        self.ChangePlayButtonIcon(True)
+        self.ChangePlayingUIStates(True)
             
           
-    def ChangePlayButtonIcon(self, playing: bool):
+    def ChangePlayingUIStates(self, playing: bool):
         if playing:
-            self.controlPanelFullScreen.ui.Play_button.setIcon(QIcon("assets/icons/pause.png"))
-            self.controlPanelBottom.ui.Play_button.setIcon(QIcon("assets/icons/pause.png"))
+            self.controlPanelFS.ui.Play_button.setIcon(QIcon("assets/icons/pause.png"))
+            self.controlPanel.ui.Play_button.setIcon(QIcon("assets/icons/pause.png"))
+            self.controlPanelFS.ui.VideoPosition_slider.setEnabled(False)
+            self.controlPanel.ui.VideoPosition_slider.setEnabled(False)
         else:
-            self.controlPanelFullScreen.ui.Play_button.setIcon(QIcon("assets/icons/play.png"))
-            self.controlPanelBottom.ui.Play_button.setIcon(QIcon("assets/icons/play.png"))
+            self.controlPanelFS.ui.Play_button.setIcon(QIcon("assets/icons/play.png"))
+            self.controlPanel.ui.Play_button.setIcon(QIcon("assets/icons/play.png"))
+            self.controlPanelFS.ui.VideoPosition_slider.setEnabled(self.videoChangesPosition)
+            self.controlPanel.ui.VideoPosition_slider.setEnabled(self.videoChangesPosition)            
                 
     def PlayPausePlayer(self):
         if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
             self.player.pause()
-            self.ChangePlayButtonIcon(False)
+            self.ChangePlayingUIStates(False)
             #self.player_thread.join()
         else: # self.selectedChannelIndex >= 0:
             self.setFocus()
             #self.player.setPosition(0)
             self.player.play()
-            self.ChangePlayButtonIcon(True)
+            self.ChangePlayingUIStates(True)
             #self.PlayChannel()
 
     def PlayLastChannel(self):
@@ -505,10 +561,11 @@ class SpyderPlayer(QWidget):
     def HideCursor(self):
         #self.inactivityTimer.stop()
         #print(self.windowState())
-        print(inspect.currentframe().f_code.co_name)
         
         if self.windowState() != Qt.WindowState.WindowFullScreen: # or self.cursorVisible == False:
             return
+        
+        #if self.controlPanelFS
         
         '''panel_width = self.controlPanelFullScreen.width()
         panel_height = self.controlPanelFullScreen.height()
@@ -522,9 +579,10 @@ class SpyderPlayer(QWidget):
         # Hide the mouse cursor
         
         self.inactivityTimer.stop()
-        self.controlPanelFullScreen.ShowCursorBlank()
-        self.controlPanelFullScreen.hide()
+        self.controlPanelFS.ShowCursorBlank()
+        self.controlPanelFS.hide()
         self.inactivityTimer.start()
+        self.videoPanel.setFocus()
         self.ShowCursorBlank()
         #self.cursorVisible = False
         #keyboard.press('q')
@@ -533,8 +591,8 @@ class SpyderPlayer(QWidget):
         #self.hideCursor()
   
     def ShowControlPanel(self):
-        panel_width = self.controlPanelFullScreen.width()
-        panel_height = self.controlPanelFullScreen.height()
+        panel_width = self.controlPanelFS.width()
+        panel_height = self.controlPanelFS.height()
         
         if self.windowState() == Qt.WindowState.WindowFullScreen:
             new_x = (self.width() - panel_width) // 2
@@ -545,12 +603,12 @@ class SpyderPlayer(QWidget):
             new_y = self.videoPanel.height() - panel_height - 20
             global_pos = self.videoPanel.mapToGlobal(QPoint(new_x, new_y))
         
-        self.controlPanelFullScreen.move(global_pos)
+        self.controlPanelFS.move(global_pos)
         
         if self.windowState() == Qt.WindowState.WindowFullScreen:
-            self.controlPanelFullScreen.show()
+            self.controlPanelFS.show()
         else:
-            self.controlPanelFullScreen.hide()
+            self.controlPanelFS.hide()
                     
     def ShowCursor(self):
         '''panel_width = self.controlPanelFullScreen.width()
@@ -571,8 +629,6 @@ class SpyderPlayer(QWidget):
             self.controlPanelFullScreen.show()
         else:
             self.controlPanelFullScreen.hide()'''
-            
-        print(inspect.currentframe().f_code.co_name)
         
         if self.windowState() != Qt.WindowState.WindowFullScreen:
             return
@@ -603,7 +659,7 @@ class SpyderPlayer(QWidget):
     def ExitApp(self):
         self.close()
         app.exit()
-        
+       
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.MouseButton.LeftButton:
             # Capture the global position where the mouse was pressed
@@ -623,7 +679,7 @@ class SpyderPlayer(QWidget):
         if event.button() == QtCore.Qt.MouseButton.LeftButton:
             # Reset when the left mouse button is released
             self.mousePressPos = None
-            self.mouseMoveActive = False        
+            self.mouseMoveActive = False      
 
 if __name__ == "__main__":
     app = QApplication([])

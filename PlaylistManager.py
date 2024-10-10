@@ -112,7 +112,7 @@ class PlaylistManager(QWidget):
         self.LoadPlayList("playlist_usa.m3u8")
         self.LoadPlayList("Movies.m3u")
         
-	self.LoadFavorites()
+        self.LoadFavorites()
         
     def CustomizeTree(self):
         self.playlistTree.setIndentation(25) 
@@ -215,13 +215,6 @@ class PlaylistManager(QWidget):
         self.lastSelectedItem = temp
         
         self.treeItemSelectedSignal.emit(channel_name, stream_url)
-        # Check if a URL is stored (to ensure it's a channel, not a playlist)
-        '''if stream_url:
-            # Play the stream or handle it as needed
-            print(f"Channel: {channel_name}")
-            print(f"URL: {stream_url}")'''
-            # Here you can call your player or function to start playing the stream
-            #self.play_channel(channel_name, stream_url)
     
     def RowClicked(self, index):
         """Expand or collapse playlist on single click."""
