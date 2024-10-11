@@ -49,6 +49,7 @@ class PlaylistManager(QWidget):
     lastSelectedItem: QStandardItem = None
     favoritesInfo = []
     searchResultsCount = 0
+    currentItem = 0
     
     def __init__(self, playlistTreefromUI: QTreeView, parent=None):
         super().__init__(parent)
@@ -62,13 +63,22 @@ class PlaylistManager(QWidget):
         icon_star_full = os.path.join(iconPath, 'star-full.png')
         icon_star_empty = os.path.join(iconPath, 'star-empty.png')      
         
+        print(f"icon_star_trans: {icon_star_trans}")
+        print(f"icon_star_full: {icon_star_full}")
+        print(f"icon_star_empty: {icon_star_empty}")
+        
         
         # Create a stylesheet with the dynamically constructed paths
         stylesheet = f"""
+        QTreeView::indicator {{
+            width: 15px;
+            height: 15px;
+        }}
+                
         QTreeView::indicator:indeterminate {{
             image: url("{icon_star_trans}");
         }}
-
+                
         QTreeView::indicator:checked {{
             image: url("{icon_star_full}");
         }}
@@ -77,7 +87,7 @@ class PlaylistManager(QWidget):
         image: url("{icon_star_empty}");
         }}
         
-        background-color: rgb(15, 15, 15);
+        
         """  
         self.playlistTree.setStyleSheet(stylesheet)
         
@@ -109,8 +119,9 @@ class PlaylistManager(QWidget):
          
         # Load Custom playlists
         self.LoadPlayList("us.m3u")
-        self.LoadPlayList("playlist_usa.m3u8")
-        self.LoadPlayList("Movies.m3u")
+        self.LoadPlayList("us_longlist.m3u")
+        #self.LoadPlayList("Movies.m3u")
+
         
         self.LoadFavorites()
         
@@ -219,6 +230,7 @@ class PlaylistManager(QWidget):
     def RowClicked(self, index):
         """Expand or collapse playlist on single click."""
         item = self.model.itemFromIndex(index)
+        self.currentItem = item
         if item and item.hasChildren():  # Check if it's a parent (playlist)
             # Toggle expand/collapse state
             if self.playlistTree.isExpanded(index):
@@ -494,5 +506,76 @@ class PlaylistManager(QWidget):
         self.UpdateHeaderCount(self.searchList, searchResultsCount)
         #self.model.expandItems(self.searchList)
         self.model.blockSignals(False)
+        self.currentItem = self.playlistTree.model().item(0)
+        searchIndex = self.model.indexFromItem(self.currentItem)
+        self.playlistTree.setCurrentIndex(searchIndex)  
+        self.playlistTree.setExpanded(searchIndex, True)
         self.model.layoutChanged.emit()
         
+    '''def SortSearchResultsDescending(self):
+        self.searchList.sortChildren(0, Qt.SortOrder.DescendingOrder)
+        self.model.layoutChanged.emit()
+        
+    def SortSearchResultsAscending(self):
+        self.searchList.sortChildren(0, Qt.SortOrder.AscendingOrder)
+        self.model.layoutChanged.emit()'''
+        
+    def SortSearchResults(self, order=Qt.SortOrder.AscendingOrder):
+        for i in range(self.searchList.rowCount()):
+            playlist = self.searchList.child(i)
+            playlist.sortChildren(0, order)
+        self.searchList.sortChildren(0, order)
+        self.model.layoutChanged.emit()
+            
+    def SortSearchResultsDescending(self):
+        self.SortSearchResults(Qt.SortOrder.DescendingOrder)
+
+    def SortSearchResultsAscending(self):
+        self.SortSearchResults(Qt.SortOrder.AscendingOrder)    
+                   
+    def CollapseCurrentPlaylist(self):
+        current_item = self.currentItem
+        
+        if current_item.hasChildren():
+            index = self.model.indexFromItem(current_item)
+        else:
+            index = self.model.indexFromItem(current_item.parent())
+            
+        self.playlistTree.setCurrentIndex(index)  
+        self.playlistTree.collapse(index)
+        self.currentItem = self.playlistTree.model().itemFromIndex(index)
+            
+    def CollapseAllPlaylists(self):
+        self.playlistTree.collapseAll()
+        
+    def GotoTopOfList(self):
+        #self.playlistTree.scrollToTop()
+        current_item = self.currentItem
+        
+        if current_item.hasChildren():
+            index = self.model.indexFromItem(current_item)
+        else:
+            index = self.model.indexFromItem(current_item.parent())
+            
+        self.playlistTree.scrollTo(index)
+        
+    def GotoBottomOfList(self):  
+        #self.playlistTree.scrollToBottom()      
+        current_item = self.currentItem
+        
+        if current_item.hasChildren():
+            index = self.model.indexFromItem(current_item)
+            parent = current_item
+        else:
+            index = self.model.indexFromItem(current_item.parent())  
+            parent = current_item.parent()      
+
+        end_index = parent.rowCount() - 1  #self.GetPlayListLastItem(current_item)
+        
+        endIndex = self.model.indexFromItem(parent.child(end_index))
+        print(f"end_index: {end_index}")
+        
+        self.playlistTree.scrollTo(endIndex)
+
+        
+            

@@ -7,8 +7,6 @@ from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PlaylistManager import PlaylistManager
 
-import inspect
-
 
                 
 class VideoControlPannel(QWidget):     
@@ -33,7 +31,11 @@ class VideoControlPannel(QWidget):
         self.SpyderPlayer.ShowCursorNormal()    
         
     def ShowCursorBlank(self):
-        self.SpyderPlayer.ShowCursorBlank()                       
+        self.SpyderPlayer.ShowCursorBlank()    
+        
+    def eventFilter(self, obj, event):
+        QApplication.sendEvent(self.SpyderPlayer, event)
+                           
               
 class SpyderPlayer(QWidget):
     channelList = []
@@ -247,6 +249,29 @@ class SpyderPlayer(QWidget):
                     self.SkipBackward()
                 elif event.key() == Qt.Key.Key_Right:
                     self.SkipForward()
+                    
+                elif event.key() == Qt.Key.Key_C:
+                    if self.playlistmanager.isVisible():
+                        self.playlistmanager.CollapseCurrentPlaylist()
+                elif event.key() == Qt.Key.Key_V:
+                    if self.playlistmanager.isVisible():
+                        self.playlistmanager.CollapseAllPlaylists()
+                elif event.key() == Qt.Key.Key_T: # or Qt.Key.Key_PageUp:
+                    if self.playlistmanager.isVisible():
+                        self.playlistmanager.GotoTopOfList()
+                    return True
+                elif event.key() == Qt.Key.Key_B: # or Qt.Key.Key_PageDown:
+                    if self.playlistmanager.isVisible():
+                        print("Key Press: B")
+                        self.playlistmanager.GotoBottomOfList()
+                        
+                elif event.key() == Qt.Key.Key_D:
+                    if self.playlistmanager.isVisible():
+                        self.playlistmanager.SortSearchResultsDescending()
+                elif event.key() == Qt.Key.Key_A:
+                    if self.playlistmanager.isVisible():
+                        self.playlistmanager.SortSearchResultsAscending()                       
+                    return True
                 else:   
                     self.ShowCursor()
                     return True
@@ -257,7 +282,8 @@ class SpyderPlayer(QWidget):
                 return True
             
             elif event.key() == Qt.Key.Key_Escape:
-                self.ui.Playlist_treeview.setFocus()
+                self.ui.Query_input.setText('')
+                #self.ui.Playlist_treeview.setFocus()
                 return True
             
             
