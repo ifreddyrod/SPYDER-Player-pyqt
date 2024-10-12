@@ -70,9 +70,15 @@ class PlaylistManager(QWidget):
         
         # Create a stylesheet with the dynamically constructed paths
         stylesheet = f"""
+        QTreeView {{
+            background-color: rgb(25, 25, 25);
+            color: rgb(255, 255, 255);
+            font-size: 14px;
+        }}
+        
         QTreeView::indicator {{
-            width: 15px;
-            height: 15px;
+            width: 16px;
+            height: 16px;
         }}
                 
         QTreeView::indicator:indeterminate {{
@@ -86,7 +92,6 @@ class PlaylistManager(QWidget):
         QTreeView::indicator:unchecked {{
         image: url("{icon_star_empty}");
         }}
-        
         
         """  
         self.playlistTree.setStyleSheet(stylesheet)
@@ -120,7 +125,7 @@ class PlaylistManager(QWidget):
         # Load Custom playlists
         self.LoadPlayList("us.m3u")
         self.LoadPlayList("us_longlist.m3u")
-        #self.LoadPlayList("Movies.m3u")
+        self.LoadPlayList("Movies.m3u")
 
         
         self.LoadFavorites()
@@ -463,6 +468,7 @@ class PlaylistManager(QWidget):
             return
         
         searchText = searchText.lower()
+        searchText = searchText.split('+')
         
         # Clear the search list 
         self.searchList.removeRows(0, self.searchList.rowCount())
@@ -486,7 +492,13 @@ class PlaylistManager(QWidget):
                 channelName: str = channelToSearch.itemName.lower()
                 
                 # Search the channel name for seach query
-                searchIndex = channelName.find(searchText)
+                #searchIndex = channelName.find(searchText)
+                
+                for searchItem in searchText:
+                    searchIndex = channelName.find(searchItem.strip())
+                    if searchIndex < 0:
+                        break;
+                
                 if searchIndex != -1:
                     # if search query found, add the channel to the search list
                     foundChannel = TreeStandardItem(channelToSearch.itemName)

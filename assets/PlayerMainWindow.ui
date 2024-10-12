@@ -26,8 +26,37 @@
    <string>SPYDER Player</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">color: rgb(255, 255, 255);
+   <string notr="true">/*color: rgb(255, 255, 255);*/
 
+/*QTreeView
+{
+	background-color: rgb(25, 25, 25);
+     color: rgb(255, 255, 255);
+     font-size: 14px;
+}
+
+QTreeView::indicator 
+{
+    	width: 16px;
+    	height: 16px;
+	color: rgba(0, 0, 0, 0)
+}
+
+QTreeView::indicator:unchecked
+{
+	image: url(&quot;icons/star-empty.png&quot;);
+}
+
+QTreeView::indicator:checked 
+{
+     image: url(&quot;icons/star-full.png&quot;);
+}
+
+
+QTreeView::indicator:indeterminate 
+{
+	image: url(&quot;icons/star-trans.png&quot;);
+}*/
 </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1000">
@@ -387,16 +416,21 @@ border-color: rgb(0, 0, 0);</string>
             <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: rgb(15, 15, 15);
+            <string notr="true">/*background-color: rgb(15, 15, 15);*/
 
-
-
-/*QTreeView::indicator 
+/*
+QTreeView
 {
-    width: 13px;
-    height: 13px;
+	background-color: rgb(25, 25, 25);
+     color: rgb(255, 255, 255);
+     font-size: 14px;
 }
 
+QTreeView::indicator 
+{
+    width: 16px;
+    height: 16px;
+}
 
 
 QTreeView::indicator:checked 
@@ -407,14 +441,15 @@ QTreeView::indicator:checked
 QTreeView::indicator:unchecked
 {
 	image: url(&quot;icons/star-empty.png&quot;);
-}*/
+}
+*/
 
 
 /*QTreeView::indicator:indeterminate 
 {
 	image: url(&quot;icons/star-trans.png&quot;);
-}*/
-
+}
+*/
 </string>
            </property>
            <property name="frameShape">

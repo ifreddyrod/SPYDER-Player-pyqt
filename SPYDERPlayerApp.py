@@ -24,14 +24,14 @@ class VideoControlPannel(QWidget):
         #self.setWindowFlags(Qt.WindowType.FramelessWindowHint ) #| Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         
-    def ShowCursorBusy(self):
+    '''def ShowCursorBusy(self):
         self.SpyderPlayer.ShowCursorBusy() 
         
     def ShowCursorNormal(self):
         self.SpyderPlayer.ShowCursorNormal()    
         
     def ShowCursorBlank(self):
-        self.SpyderPlayer.ShowCursorBlank()    
+        self.SpyderPlayer.ShowCursorBlank() '''   
         
     def eventFilter(self, obj, event):
         QApplication.sendEvent(self.SpyderPlayer, event)
@@ -605,7 +605,8 @@ class SpyderPlayer(QWidget):
         # Hide the mouse cursor
         
         self.inactivityTimer.stop()
-        self.controlPanelFS.ShowCursorBlank()
+        #
+        # self.controlPanelFS.ShowCursorBlank()
         self.controlPanelFS.hide()
         self.inactivityTimer.start()
         self.videoPanel.setFocus()
