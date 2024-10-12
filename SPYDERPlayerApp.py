@@ -5,7 +5,7 @@ from PyQt6.QtCore import Qt, QUrl, QEvent, QTimer, QPoint, pyqtSignal
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QToolTip, QWidget, QHeaderView,  QHBoxLayout, QVBoxLayout, QPushButton, QSlider
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
-from PlaylistManager import PlaylistManager
+from PlaylistManager import PlayListManager
 
 
                 
@@ -21,7 +21,7 @@ class VideoControlPannel(QWidget):
         #self.ui.setStyleSheet("background-color: transparent;")
         # Make sure the control panel is frameless and transparent
         self.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint )
-        #self.setWindowFlags(Qt.WindowType.FramelessWindowHint ) #| Qt.WindowType.WindowStaysOnTopHint)
+            #self.setWindowFlags(Qt.WindowType.FramelessWindowHint ) #| Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         
     '''def ShowCursorBusy(self):
@@ -62,14 +62,15 @@ class SpyderPlayer(QWidget):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint )
         self.videoLabel = self.ui.CurrentlyPlaying_label
         self.videoLabel.setText("")
+
         #---------------------------
         # Setup Playlist Tree
         #---------------------------
-        self.playlistmanager = PlaylistManager(self.ui.Playlist_treeview, self)
+        self.playlistmanager = PlayListManager(self.ui.PlayList_tree, self)
         self.playlistmanager.installEventFilter(self)
-        
+                
         #---------------------------
-        # Setup Control Panel
+        # Setup Control Panels
         #---------------------------
         self.controlPanelFS = VideoControlPannel(self)  #FloatingControlPanel()
         self.controlPanelFS.hide() 
@@ -98,6 +99,9 @@ class SpyderPlayer(QWidget):
         self.ui.botomverticalLayout.addWidget(self.controlPanel)
         self.controlPanel.show()        
         
+
+        
+                
         # Install event filter to detect window state changes
         self.setMouseTracking(True)
         #self.videoWidget.setMouseTracking(True)
@@ -115,7 +119,8 @@ class SpyderPlayer(QWidget):
         #self.ui.Channels_table.cellClicked.connect(self.ShowFullChannelName)
               
         #self.Channels_table.cellDoubleClicked.connect(self.PlayChannel)
-        self.playlistmanager.treeItemSelectedSignal.connect(self.PlaySelectedChannel)
+        
+        #self.playlistmanager.treeItemSelectedSignal.connect(self.PlaySelectedChannel)
         
         # Play Button
         self.controlPanelFS.ui.Play_button.clicked.connect(self.PlayPausePlayer)

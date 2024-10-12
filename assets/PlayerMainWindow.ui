@@ -6,60 +6,23 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1207</width>
-    <height>781</height>
+    <width>1200</width>
+    <height>780</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="mouseTracking">
-   <bool>true</bool>
-  </property>
-  <property name="focusPolicy">
-   <enum>Qt::FocusPolicy::NoFocus</enum>
   </property>
   <property name="windowTitle">
    <string>SPYDER Player</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">/*color: rgb(255, 255, 255);*/
-
-/*QTreeView
-{
-	background-color: rgb(25, 25, 25);
-     color: rgb(255, 255, 255);
-     font-size: 14px;
-}
-
-QTreeView::indicator 
-{
-    	width: 16px;
-    	height: 16px;
-	color: rgba(0, 0, 0, 0)
-}
-
-QTreeView::indicator:unchecked
-{
-	image: url(&quot;icons/star-empty.png&quot;);
-}
-
-QTreeView::indicator:checked 
-{
-     image: url(&quot;icons/star-full.png&quot;);
-}
-
-
-QTreeView::indicator:indeterminate 
-{
-	image: url(&quot;icons/star-trans.png&quot;);
-}*/
-</string>
+   <string notr="true">color: white;</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1000">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,10">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -76,241 +39,234 @@ QTreeView::indicator:indeterminate
     <number>0</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
-     <property name="spacing">
-      <number>0</number>
+    <widget class="QFrame" name="Title_frame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <item>
-      <widget class="QFrame" name="Title_frame">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="mouseTracking">
-        <bool>true</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(42, 42, 42)</string>
-       </property>
-       <layout class="QGridLayout" name="WindowHeader_layout">
-        <property name="leftMargin">
+     <property name="mouseTracking">
+      <bool>true</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(42, 42, 42)</string>
+     </property>
+     <layout class="QGridLayout" name="WindowHeader_layout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item row="0" column="4">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="CurrentlyPlaying_label">
+        <property name="minimumSize">
+         <size>
+          <width>30</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>[ Channel Name ]</string>
+        </property>
+        <property name="indent">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Policy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>10</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="8">
+       <widget class="QPushButton" name="Close_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/close.png</normaloff>icons/close.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>12</width>
+          <height>12</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="Logo_label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>10</width>
+          <height>10</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>icons/spider.png</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
          <number>0</number>
         </property>
-        <property name="topMargin">
-         <number>0</number>
+        <property name="indent">
+         <number>50</number>
         </property>
-        <property name="rightMargin">
-         <number>0</number>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="WindowTitle_label">
+        <property name="minimumSize">
+         <size>
+          <width>30</width>
+          <height>0</height>
+         </size>
         </property>
-        <property name="bottomMargin">
-         <number>0</number>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
         </property>
-        <property name="spacing">
-         <number>0</number>
+        <property name="text">
+         <string>SPYDER Player </string>
         </property>
-        <item row="0" column="4">
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="3">
-         <widget class="QLabel" name="CurrentlyPlaying_label">
-          <property name="minimumSize">
-           <size>
-            <width>30</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>[ Channel Name ]</string>
-          </property>
-          <property name="indent">
-           <number>10</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Policy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>10</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="8">
-         <widget class="QPushButton" name="Close_button">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>30</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/close.png</normaloff>icons/close.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>12</width>
-            <height>12</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="Logo_label">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>10</width>
-            <height>10</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="pixmap">
-           <pixmap>icons/spider.png</pixmap>
-          </property>
-          <property name="scaledContents">
-           <bool>true</bool>
-          </property>
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <property name="indent">
-           <number>50</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="WindowTitle_label">
-          <property name="minimumSize">
-           <size>
-            <width>30</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>SPYDER Player </string>
-          </property>
-          <property name="indent">
-           <number>10</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="6">
-         <widget class="QPushButton" name="Minimize_button">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>30</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/minimize.png</normaloff>icons/minimize.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>12</width>
-            <height>12</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="7">
-         <widget class="QPushButton" name="Maximize_button">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>30</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/expand.png</normaloff>icons/expand.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>12</width>
-            <height>12</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
+        <property name="indent">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6">
+       <widget class="QPushButton" name="Minimize_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/minimize.png</normaloff>icons/minimize.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>12</width>
+          <height>12</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="7">
+       <widget class="QPushButton" name="Maximize_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/expand.png</normaloff>icons/expand.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>12</width>
+          <height>12</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="QSplitter" name="Horizontal_splitter">
@@ -390,88 +346,89 @@ border-color: rgb(0, 0, 0);</string>
           </layout>
          </item>
          <item>
-          <widget class="QTreeView" name="Playlist_treeview">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="mouseTracking">
-            <bool>true</bool>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::FocusPolicy::NoFocus</enum>
-           </property>
+          <widget class="QTreeWidget" name="PlayList_tree">
            <property name="styleSheet">
-            <string notr="true">/*background-color: rgb(15, 15, 15);*/
-
-/*
-QTreeView
+            <string notr="true">QTreeWidget
 {
-	background-color: rgb(25, 25, 25);
-     color: rgb(255, 255, 255);
-     font-size: 14px;
+	background-color: rgb(15, 15, 15);
+	color: white;
+	
+	font: 12pt &quot;Helvetica Neue&quot;;
+	
 }
 
-QTreeView::indicator 
+/*QTreeView::branch 	
 {
+   	height: 5px;
+	width: 5px;
+}*/
+
+QTreeView::branch:open 
+{
+    image: url(&quot;icons/expanded.png&quot;);
+}
+QTreeView::branch:closed:has-children 
+{
+    image: url(&quot;icons/collapsed.png&quot;);
+}
+
+QTreeWidget::item
+{	 
+	height: 50px; 
+}
+
+QTreeWidget::indicator {
     width: 16px;
     height: 16px;
+	/*padding: 10px;*/
+
 }
 
-
-QTreeView::indicator:checked 
+QTreeWidgetItem::indicator:enabled
 {
-     image: url(&quot;icons/star-full.png&quot;);
+        padding-right: 10px; /* adjust the spacing */
 }
 
-QTreeView::indicator:unchecked
+QTreeWidget::indicator:checked {
+    image: url(&quot;icons/star-full.png&quot;);
+}
+
+QTreeWidget::indicator:unchecked {
+    image: url(&quot;icons/star-empty.png&quot;);
+}
+
+QTreeView::item:selected
 {
-	image: url(&quot;icons/star-empty.png&quot;);
+    
+	background-color: rgb(35, 11, 63);
+    border: 1px solid rgb(82, 26, 149);
+    border-left-color: transparent;
+    border-right-color: transparent;
 }
-*/
 
 
-/*QTreeView::indicator:indeterminate 
-{
-	image: url(&quot;icons/star-trans.png&quot;);
-}
-*/
-</string>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::Shape::NoFrame</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Shadow::Plain</enum>
+/*QTreeWidgetItem[parent=1] 
+{ 
+	background-color: rgb(70, 22, 128);
+}*/
+
+
+
+/*QTreeView::indicator {
+    image: url(:/path/to/your/checkbox/image.png);
+}*/</string>
            </property>
            <property name="editTriggers">
-            <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+            <set>QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed|QAbstractItemView::EditTrigger::SelectedClicked</set>
            </property>
-           <property name="selectionBehavior">
-            <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+           <property name="indentation">
+            <number>25</number>
            </property>
-           <property name="iconSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
+           <property name="uniformRowHeights">
+            <bool>true</bool>
            </property>
-           <property name="autoExpandDelay">
-            <number>-1</number>
+           <property name="sortingEnabled">
+            <bool>false</bool>
            </property>
            <property name="animated">
             <bool>true</bool>
@@ -479,6 +436,14 @@ QTreeView::indicator:unchecked
            <property name="wordWrap">
             <bool>true</bool>
            </property>
+           <property name="headerHidden">
+            <bool>true</bool>
+           </property>
+           <column>
+            <property name="text">
+             <string notr="true">1</string>
+            </property>
+           </column>
           </widget>
          </item>
         </layout>
@@ -541,8 +506,6 @@ QTreeView::indicator:unchecked
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="."/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
