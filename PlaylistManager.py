@@ -58,6 +58,7 @@ class TreeItem(QTreeWidgetItem):
         return parent
         
 class PlayListManager(QWidget):
+    platform: str = ""
     treeItemSelectedSignal: pyqtSignal = pyqtSignal(str, str)
     currentSelectedItem: QStandardItem = None
     lastSelectedItem: QStandardItem = None
@@ -67,6 +68,10 @@ class PlayListManager(QWidget):
     
     def __init__(self, playlistTreefromUI: QTreeWidget, parent=None):
         super().__init__(parent)
+        
+        self.platform = parent.platform
+        
+        print("Platform: " + self.platform)
         
         # Setup The Playlist Tree
         self.playlistTree = playlistTreefromUI
@@ -95,15 +100,15 @@ class PlayListManager(QWidget):
         self.LoadPlayList("us.m3u")
         self.LoadPlayList("us_longlist.m3u")
         self.LoadPlayList("Movies.m3u")
-        
         self.LoadFavorites()
         
 
     def LoadStyleSheet(self):
-        
-        #iconPath = "C:/Temp/icons/" 
-        iconPath = os.getcwd() + "/assets/icons/"
-        #print(iconPath)
+
+        if self.platform.lower() == "windows":
+            iconPath = "C:/Temp/icons/" 
+        else:
+            iconPath = os.getcwd() + "/assets/icons/"
         
         icon_star_full = os.path.join(iconPath, 'star-full.png')
         icon_star_empty = os.path.join(iconPath, 'star-empty.png') 
