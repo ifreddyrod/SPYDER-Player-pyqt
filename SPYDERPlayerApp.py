@@ -115,12 +115,9 @@ class SpyderPlayer(QWidget):
         #----------------------------------------------------------------------------
         # Connect signals
         #----------------------------------------------------------------------------
-        # Connect signal to when cell is hovered show tooltip
-        #self.ui.Channels_table.cellClicked.connect(self.ShowFullChannelName)
-              
-        #self.Channels_table.cellDoubleClicked.connect(self.PlayChannel)
         
-        #self.playlistmanager.treeItemSelectedSignal.connect(self.PlaySelectedChannel)
+        # Channel Is DoubleClicked
+        self.playlistmanager.treeItemSelectedSignal.connect(self.PlaySelectedChannel)
         
         # Play Button
         self.controlPanelFS.ui.Play_button.clicked.connect(self.PlayPausePlayer)
@@ -283,7 +280,7 @@ class SpyderPlayer(QWidget):
                 
             elif event.key() == Qt.Key.Key_Return:
                 self.SearchChannels()
-                self.ui.Playlist_treeview.setFocus()
+                #self.ui.PlayList_tree.setFocus()
                 return True
             
             elif event.key() == Qt.Key.Key_Escape:

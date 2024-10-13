@@ -332,14 +332,26 @@
               <enum>Qt::FocusPolicy::ClickFocus</enum>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(15, 15, 15);
-border-color: rgb(0, 0, 0);</string>
+              <string notr="true">background-color: rgb(30, 30, 30);
+color: white;
+
+/*
+QLineEdit
+{
+	border: 1px solid black;
+	background-color: black;
+	border-radius: 10px;
+	padding-left: 50px;
+}*/</string>
              </property>
              <property name="maxLength">
               <number>1000</number>
              </property>
              <property name="frame">
-              <bool>true</bool>
+              <bool>false</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
              </property>
             </widget>
            </item>
