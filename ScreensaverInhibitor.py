@@ -64,6 +64,8 @@ class LinuxInhibitor:
 class MacOSInhibitor:
     def __init__(self):
         self.process = None
+        # Kill all caffeinate processes if running
+        subprocess.Popen(['killall', 'caffeinate'])
 
     def inhibit(self):
         if self.process is None:

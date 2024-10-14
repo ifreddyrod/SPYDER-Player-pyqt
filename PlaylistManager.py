@@ -650,4 +650,33 @@ class PlayListManager(QWidget):
         self.searchList.setExpanded(True)
         self.EmitTreeLayoutChanged()
         
+    def SortSearchResultsDescending(self):
+        
+        for i in range(self.searchList.childCount()):
+            searchList = self.searchList.child(i)
+            searchList.sortChildren(0, Qt.SortOrder.DescendingOrder)
+            
+    def SortSearchResultsAscending(self):
+        for i in range(self.searchList.childCount()):
+            searchList = self.searchList.child(i)     
+            searchList.sortChildren(0, Qt.SortOrder.AscendingOrder)
+                    
 
+    def GotoBottomOfList(self):
+        selectedItem = self.playlistTree.currentItem()
+        
+        if selectedItem and not selectedItem.isPlayList:
+            playlist = selectedItem.parent()
+            
+            bottomItem = playlist.child(playlist.childCount()-1)
+            self.playlistTree.setCurrentItem(bottomItem)
+            
+    def GotoTopOfList(self):
+        selectedItem = self.playlistTree.currentItem()
+        
+        if selectedItem and not selectedItem.isPlayList:
+            playlist = selectedItem.parent()
+            
+            topItem = playlist.child(0)
+            self.playlistTree.setCurrentItem(topItem)   
+                

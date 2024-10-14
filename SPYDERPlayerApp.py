@@ -8,7 +8,6 @@ from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PlaylistManager import PlayListManager
 from ScreensaverInhibitor import ScreensaverInhibitor
 import platform
-
                 
 class VideoControlPannel(QWidget):     
     def __init__(self, parent=None):
@@ -44,12 +43,9 @@ class SpyderPlayer(QWidget):
     channelList = []
     playListVisible: bool = True
     volume: int = 100
-    lastChannelIndex: int = -1
-    selectedChannelIndex: int = -1
-    cursorVisible: bool = True
     videoChangesPosition: bool = False
-    dragging: bool = False
     videoPosition: int = 0
+    isFullScreen: bool = False
     
     def __init__(self, parent=None):
 
@@ -59,6 +55,7 @@ class SpyderPlayer(QWidget):
         
         # Get Screensaver Inhibitor
         self.screensaverInhibitor = ScreensaverInhibitor()
+        self.screensaverInhibitor.uninhibit()
         
         # Get current directory and append GUI file     
         mainUIPath = os.getcwd() + "/assets/PlayerMainWindow.ui"
@@ -176,7 +173,8 @@ class SpyderPlayer(QWidget):
         # Set up a timer to detect inactivity
         self.inactivityTimer = QTimer(self)
         self.inactivityTimer.setInterval(3000)  # 3000ms = 3 seconds
-        self.inactivityTimer.timeout.connect(self.HideCursor)
+        self.inactivityTimer.timeout.connect(self.InactivityDetected)
+        #self.inactivityTimer.timeout.connect(self.HideCursor)
         #self.inactivityTimer.start()   
         
         self.ui.Close_button.clicked.connect(self.ExitApp)
@@ -198,7 +196,7 @@ class SpyderPlayer(QWidget):
         if event.type() == QEvent.Type.WindowStateChange:
             if self.windowState() == Qt.WindowState.WindowFullScreen or self.windowState() == Qt.WindowState.WindowMaximized:
                 self.PlayerFullScreen()
-                self.ShowCursor()
+                #self.ShowCursor()
                 print("Full Screen: ", QEvent.Type.WindowStateChange.name)
                 
             elif self.windowState() == Qt.WindowState.WindowMinimized:
@@ -209,15 +207,15 @@ class SpyderPlayer(QWidget):
                 #self.ShowCursor()
                 
         elif event.type() == QEvent.Type.KeyRelease:   
-            #self.ShowCursor()
+            self.UserActivityDetected()
             #print("Key Press: ", QEvent.Type.KeyPress.name)
             if self.ui.Query_input.hasFocus() == False:
-                if event.key() == Qt.Key.Key_Escape and self.windowState() == Qt.WindowState.WindowFullScreen:
+                if event.key() == Qt.Key.Key_Escape and self.isFullScreen: #self.windowState() == Qt.WindowState.WindowFullScreen:
                     self.PlayerNormalScreen()
                     print("Key Press: esc")
-                    #return True
+                    return True
                 elif event.key() == Qt.Key.Key_F:
-                    if self.windowState() == Qt.WindowState.WindowFullScreen:
+                    if self.isFullScreen:
                         self.PlayerNormalScreen()
                         print("Key Press: F")
                         return True
@@ -230,16 +228,20 @@ class SpyderPlayer(QWidget):
                     self.MutePlayer()
                 elif event.key() == Qt.Key.Key_Q:
                     print("Key Press: Q")
-                    #self.setFocus()
-                    #self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
-                    self.HideCursor()
+                    #self.activateWindow()
+                    #self.videoPanel.setFocus()
+                    self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
+                    #self.HideCursor()
                     #print("Hide cursor")
                     return True
                 elif event.key() == Qt.Key.Key_W:
                     print("Key Press: W")
+                    #self.activateWindow()
+                    #self.videoPanel.setFocus()
+                    self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
                     #self.setFocus()
                     #self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
-                    self.ShowCursor()
+                    #self.ShowCursor()
                     #print("Show cursor")
                     return True
                 elif event.key() == Qt.Key.Key_P:
@@ -260,10 +262,10 @@ class SpyderPlayer(QWidget):
                 elif event.key() == Qt.Key.Key_Right:
                     self.SkipForward()
                     
+                #elif event.key() == Qt.Key.Key_C:
+                    #if self.playlistmanager.isVisible():
+                        #self.playlistmanager.CollapseCurrentPlaylist()
                 elif event.key() == Qt.Key.Key_C:
-                    if self.playlistmanager.isVisible():
-                        self.playlistmanager.CollapseCurrentPlaylist()
-                elif event.key() == Qt.Key.Key_V:
                     if self.playlistmanager.isVisible():
                         self.playlistmanager.CollapseAllPlaylists()
                 elif event.key() == Qt.Key.Key_T: # or Qt.Key.Key_PageUp:
@@ -283,7 +285,7 @@ class SpyderPlayer(QWidget):
                         self.playlistmanager.SortSearchResultsAscending()                       
                     return True
                 else:   
-                    self.ShowCursor()
+                    #self.ShowCursor()
                     return True
                 
             elif event.key() == Qt.Key.Key_Return:
@@ -298,20 +300,23 @@ class SpyderPlayer(QWidget):
             
             
             else:
-                self.ShowCursor()
+                pass
+                #self.ShowCursor()
                 
         elif event.type() in [QEvent.Type.MouseMove, QEvent.Type.MouseButtonPress, QEvent.Type.Wheel]:
             #print("Event Filter: ", QEvent.Type.MouseMove.name)
-            if self.windowState() == Qt.WindowState.WindowFullScreen:
-                
-                self.ShowCursor()
+            self.UserActivityDetected()
+            #self.ShowCursor()  
+            '''if self.windowState() == Qt.WindowState.WindowFullScreen:
+                pass
+                #self.ShowCursor()
                 # Restart the timer on mouse move
                 #self.inactivityTimer.start()
             elif event.type() == QEvent.Type.MouseButtonPress:
                 self.dragging = True
             elif event.type() == QEvent.Type.MouseButtonRelease:
-                self.dragging = False
-                        
+                self.dragging = False'''
+                       
         return super().eventFilter(obj, event)
 
     def Format_ms_to_Time(self, ms: int):
@@ -418,14 +423,14 @@ class SpyderPlayer(QWidget):
         self.ui.Vertical_splitter.setSizes([500, 0])  
         self.playListVisible = False
         self.setWindowState(Qt.WindowState.WindowFullScreen)
-        self.controlPanelFS.show()
+        self.ShowControlPanel()
         self.setFocus()
         
         #self.videoStack.setCurrentWidget(self.videoPanel)
         self.inactivityTimer.start() 
         #self.ui.Playlist_treeview.setFocus()
         #self.ui.Horizontal_splitter.setEnabled(True)
-        
+        self.isFullScreen = True
             
     def PlayerNormalScreen(self):
         #if self.windowState() == Qt.WindowState.WindowFullScreen:
@@ -440,7 +445,7 @@ class SpyderPlayer(QWidget):
         self.inactivityTimer.stop()
         self.setFocus()
         self.videoPanel.activateWindow()
-        
+        self.isFullScreen = False
         #self.playerController.hide()  # Hide control panel in normal screen mode
             
     def TogglePlaylistView(self):
@@ -531,27 +536,7 @@ class SpyderPlayer(QWidget):
             #self.ui.Channels_table.setFocus()
             self.inactivityTimer.start()
             
-    def PlayChannel(self):
-        # Create Player Thread
-        #self.player_thread = threading.Thread(target=self.PlayerThread)
-        #self.player_thread.start()
-        self.PlayerThread()
-        
-    def PlayerThread(self):
-        self.lastChannelIndex = self.selectedChannelIndex
-        
-        # Get the selected row
-        self.selectedChannelIndex = self.ui.Channels_table.currentRow()
-
-        # Get the channel name and stream URL
-        channel_name, stream_url = self.channelList[self.selectedChannelIndex]   
-
-        self.videoLabel.setText(channel_name)
-        
-        # Play the stream
-        self.player.setSource(QUrl(stream_url))
-        self.player.play()
-        
+           
     def PlaySelectedChannel(self, channel_name, stream_url):
         self.player.stop()
         self.videoLabel.setText(channel_name)
@@ -561,10 +546,6 @@ class SpyderPlayer(QWidget):
         except Exception as e:
             print(e)
             self.player.stop()
-        #self.player.play()    
-        #duration = self.player.duration()
-        #position = self.player.position()
-        #print(f"Duration: {duration} Position: {position}")
         
         self.ChangePlayingUIStates(True)
             
@@ -585,8 +566,8 @@ class SpyderPlayer(QWidget):
         if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
             self.player.pause()
             self.ChangePlayingUIStates(False)
-            #self.player_thread.join()
-        else: # self.selectedChannelIndex >= 0:
+            
+        else: 
             self.setFocus()
             #self.player.setPosition(0)
             self.player.play()
@@ -607,7 +588,8 @@ class SpyderPlayer(QWidget):
     def HideCursor(self):
         #self.inactivityTimer.stop()
         #print(self.windowState())
-        
+        return
+    
         if self.windowState() != Qt.WindowState.WindowFullScreen: # or self.cursorVisible == False:
             return
         
@@ -629,10 +611,13 @@ class SpyderPlayer(QWidget):
         # self.controlPanelFS.ShowCursorBlank()
         self.controlPanelFS.hide()
         self.inactivityTimer.start()
-        self.videoPanel.activateWindow()
+        self.activateWindow()
+        self.videoPanel.setFocus() #.activateWindow()
+        
+        self.ShowCursorBlank()
         #self.controlPanel.setFocus()
         #self.setFocus()
-        QApplication.setOverrideCursor(Qt.CursorShape.BlankCursor)
+        #QApplication.setOverrideCursor(Qt.CursorShape.BlankCursor)
         #self.ShowCursorBlank()
         
         #self.ShowCursorBlank()
@@ -681,7 +666,9 @@ class SpyderPlayer(QWidget):
             self.controlPanelFullScreen.show()
         else:
             self.controlPanelFullScreen.hide()'''
-        
+            
+        return
+    
         if self.windowState() != Qt.WindowState.WindowFullScreen:
             return
         
@@ -690,6 +677,10 @@ class SpyderPlayer(QWidget):
         #self.controlContainer.show()
         #self.ShowCursor()
         # Restart the inactivity time
+        #print("Show cursor window state", self.windowState())
+        #if self.controlPanelFS.isVisible():
+            #self.inactivityTimer.start()
+        #else:
         if self.windowState() == Qt.WindowState.WindowFullScreen:
             self.ShowControlPanel()
             #self.videoPanel.setFocus()
@@ -707,28 +698,36 @@ class SpyderPlayer(QWidget):
         self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))  
         
     def ShowCursorBlank(self):
-        if self.platform == "Darwin":
+        self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
+        '''if self.platform == "Darwin":
             QCursor.setPos(self.mapToGlobal(QPoint(self.width() + 1, self.height() + 1)))
         
         else:
             QApplication.setOverrideCursor(Qt.CursorShape.BlankCursor)
-            #self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
+            #self.setCursor(QCursor(Qt.CursorShape.BlankCursor))'''
         
         
         
     def ExitApp(self):
+        self.screensaverInhibitor.uninhibit()
         self.close()
         app.exit()
        
     def mousePressEvent(self, event):
+        self.UserActivityDetected()
         if event.button() == QtCore.Qt.MouseButton.LeftButton:
             # Capture the global position where the mouse was pressed
             self.mousePressPos = event.globalPosition().toPoint()
-            self.mouseMoveActive = True
+            if not self.isFullScreen:
+                self.mouseMoveActive = True
+            #self.UserActivityDetected()
+            #print("Mouse pressed----->")
+        return super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):    
-        QApplication.setOverrideCursor(Qt.CursorShape.ArrowCursor) 
-        #print("Mouse move event")   
+        #QApplication.setOverrideCursor(Qt.CursorShape.ArrowCursor) 
+        #print("Mouse move event") 
+        self.UserActivityDetected()  
         if self.mouseMoveActive and self.mousePressPos:
             # Calculate how far the mouse moved
             delta = event.globalPosition().toPoint() - self.mousePressPos
@@ -739,11 +738,39 @@ class SpyderPlayer(QWidget):
         return super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
+        self.UserActivityDetected()
         if event.button() == QtCore.Qt.MouseButton.LeftButton:
             # Reset when the left mouse button is released
             self.mousePressPos = None
             self.mouseMoveActive = False      
-
+        return super().mouseReleaseEvent(event)
+    
+    def UserActivityDetected(self):
+        #if self.windowState() == Qt.WindowState.WindowFullScreen:
+        if self.isFullScreen:
+            #self.ShowCursorNormal()
+            QApplication.setOverrideCursor(Qt.CursorShape.ArrowCursor)
+            self.inactivityTimer.start()
+            if not self.controlPanelFS.isVisible():
+                self.controlPanelFS.show()
+                if self.playListVisible:
+                    self.playlistmanager.activateWindow()
+                else:
+                    self.videoPanel.activateWindow()
+                #self.ShowControlPanel()
+                
+    def InactivityDetected(self):
+        #print("Inactivity Detected:", self.windowState())
+        #if self.windowState() == Qt.WindowState.WindowFullScreen:
+        if self.isFullScreen:
+            self.controlPanelFS.hide()
+            self.videoPanel.activateWindow()
+            #self.ShowCursorBlank()
+            if not self.playListVisible:
+                QApplication.setOverrideCursor(Qt.CursorShape.BlankCursor)
+            
+            
+            
     def __del__(self):
         self.screensaverInhibitor.uninhibit()
         
