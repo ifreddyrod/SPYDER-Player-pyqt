@@ -52,6 +52,8 @@ class SpyderPlayer(QWidget):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint )
         self.videoLabel = self.ui.CurrentlyPlaying_label
         self.videoLabel.setText("")
+        self.statusLabel = self.ui.Status_label
+        self.statusLabel.setText("")
 
         #---------------------------
         # Setup Playlist Tree
@@ -231,11 +233,11 @@ class SpyderPlayer(QWidget):
                     #self.ShowCursor()
                     #print("Show cursor")
                     return True
-                elif event.key() == Qt.Key.Key_P:
-                    print("Key Press: P")
+                elif event.key() == Qt.Key.Key_L:
+                    #print("Key Press: P")
                     self.TogglePlaylistView()
                     return True
-                elif event.key() == Qt.Key.Key_L:
+                elif event.key() == Qt.Key.Key_Backspace:
                     self.PlayLastChannel()
                     return True
                 elif event.key() == Qt.Key.Key_Up:
@@ -374,12 +376,18 @@ class SpyderPlayer(QWidget):
         self.blockSignals(False)
         
     def on_media_status_changed(self, status):
+        message = str(status).split('.')[1]
+        
+        if message == "BufferedMedia":
+            self.statusLabel.setText('')
+        else:
+            self.statusLabel.setText(message + " .....")
+        
         if status == QMediaPlayer.MediaStatus.LoadedMedia:
             self.ShowCursorNormal()
         elif status == QMediaPlayer.MediaStatus.LoadingMedia:
             self.ShowCursorBusy()
         else: 
-            print("Media Player Status: ", status)
             self.ShowCursorNormal()    
              
         
@@ -428,7 +436,7 @@ class SpyderPlayer(QWidget):
             #self.ui.Horizontal_splitter.setEnabled(True)
             self.playListVisible = False
         else:
-            self.ui.Horizontal_splitter.setSizes([400, 1000])
+            self.ui.Horizontal_splitter.setSizes([300, 1000])
             self.playListVisible = True
             
     def MutePlayer(self):
