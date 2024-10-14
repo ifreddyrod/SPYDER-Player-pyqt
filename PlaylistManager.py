@@ -57,6 +57,7 @@ class TreeItem(QTreeWidgetItem):
         parent = parent.lstrip()
         return parent
         
+        
 class PlayListManager(QWidget):
     platform: str = ""
     treeItemSelectedSignal: pyqtSignal = pyqtSignal(str, str)
@@ -504,24 +505,6 @@ class PlayListManager(QWidget):
                 
             self.ToggleItemCheckedinList(playlist, item, True)
             self.ToggleItemCheckedinList(searchList, item, True)
-                
-            # Search Playlist for corresponding channel
-            '''for i in range(playlist.childCount()):
-                child = playlist.child(i)
-                if child.GetItemName() == channelName and child.GetSource() == channelSource:
-                    # If channel is found, uncheck it
-                    child.SetItemChecked(True)
-                    break
-                
-            # Search Playlist for corresponding channel if Search has been done
-            if searchList is not None:
-                for i in range(searchList.childCount()):
-                    child = searchList.child(i)
-                    if child.GetItemName() == channelName and child.GetSource() == channelSource:
-                        # If channel is found, uncheck it
-                        child.SetItemChecked(True)
-                        break'''
-                    
             
             self.playlistTree.blockSignals(False)  
             self.EmitTreeLayoutChanged()
@@ -564,34 +547,6 @@ class PlayListManager(QWidget):
                         self.EmitTreeLayoutChanged()
                     break
                   
-
-
-                    
-                '''for i in range(playlist.childCount()):
-                    child = playlist.child(i)
-                    if child.GetItemName() == channelName and child.GetSource() == channelSource:
-                        # If channel is found, uncheck it
-                        child.SetItemChecked(False)
-                        break'''
-                    
-                # If item is in favorites list, remove it
-                #self.favoritesList.removeChild(item)
-            
-            # Check if item is from a olaylist in the tree
-            '''else:
-                # Check if item is in favorites list
-                for i in range(self.favoritesList.childCount()):
-                    favItem = self.favoritesList.child(i)
-                    if favItem.GetItemName() == channelName and favItem.GetSource() == channelSource:
-                        # If item is in favorites list, remove it
-                        self.favoritesList.removeChild(favItem)
-                        break'''
-                    
-    
-            #self.UpdatePlayListChannelCount(self.favoritesList) 
-            #self.playlistTree.blockSignals(False)
-            
-            # Refresh Search Results if needed
             
     
     def SearchChannels(self, searchText: str):
