@@ -98,10 +98,10 @@ class PlayListManager(QWidget):
         
         
         # Load playlists
-        self.LoadPlayList("us.m3u")
+        '''self.LoadPlayList("us.m3u")
         self.LoadPlayList("us_longlist.m3u")
         self.LoadPlayList("Movies.m3u")
-        self.LoadFavorites()
+        self.LoadFavorites()'''
         
 
     def LoadStyleSheet(self):

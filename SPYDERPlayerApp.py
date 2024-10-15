@@ -2,12 +2,14 @@ import re, os
 from PyQt6 import uic, QtCore
 from PyQt6.QtGui import QCursor, QIcon
 from PyQt6.QtCore import Qt, QUrl, QEvent, QTimer, QPoint, pyqtSignal
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QToolTip, QWidget, QHeaderView,  QHBoxLayout, QVBoxLayout, QPushButton, QSlider
+from PyQt6.QtWidgets import QApplication, QSplashScreen, QWidget
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PlaylistManager import PlayListManager
 from ScreensaverInhibitor import ScreensaverInhibitor
 import platform
+import sys
+import time
                 
                 
                 
@@ -24,7 +26,23 @@ class VideoControlPannel(QWidget):
         self.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint )
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
                            
-              
+                           
+class SplashScreen(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        splashUIpath = os.getcwd() + "/assets/SplashScreen.ui"
+        self.ui = uic.loadUi(splashUIpath, self)
+        
+        self.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint )
+        
+        
+    def UpdateStatus(self, status: str, delay: int = 0):  
+        self.ui.Status_label.setText(status)
+        QApplication.processEvents()
+        time.sleep(delay)
+        
+        
 class SpyderPlayer(QWidget):
     platform: str = platform.system()
     channelList = []
@@ -38,13 +56,19 @@ class SpyderPlayer(QWidget):
     def __init__(self, parent=None):
 
         super().__init__(parent)
+        self.splashScreen = SplashScreen()
+        self.splashScreen.Status_label.setText("Initializing ...")
+        
         self.mousePressPos = None
         self.mouseMoveActive = False
         
         # Get Screensaver Inhibitor
         self.screensaverInhibitor = ScreensaverInhibitor()
         self.screensaverInhibitor.uninhibit()
-        
+     
+        #---------------------------
+        # Load UI Files
+        #---------------------------        
         # Get current directory and append GUI file     
         mainUIPath = os.getcwd() + "/assets/PlayerMainWindow.ui"
         
@@ -55,7 +79,8 @@ class SpyderPlayer(QWidget):
         self.videoLabel.setText("")
         self.statusLabel = self.ui.Status_label
         self.statusLabel.setText("")
-
+        self.setWindowOpacity(0)
+        
         #---------------------------
         # Setup Playlist Tree
         #---------------------------
@@ -182,11 +207,39 @@ class SpyderPlayer(QWidget):
 
         # Load Seattings
         # Show Splash Screen
+
+        self.InitializePlayer()
+        
         # Load Playlists
         # Load Favorites
         # Close Splash Screen
         # Allow App to Run
-             
+        
+    def InitializePlayer(self):
+        
+        self.splashScreen.show()
+        self.splashScreen.UpdateStatus("Loading Playlist ...", 3)
+        
+        # Load playlists
+        self.splashScreen.UpdateStatus("Loading us.m3u ....", 1)
+        self.playlistmanager.LoadPlayList("us.m3u")
+
+        self.splashScreen.UpdateStatus("Loading us_longlist.m3u ....", 1)
+        self.playlistmanager.LoadPlayList("us_longlist.m3u")
+
+        self.splashScreen.UpdateStatus("Loading Movies.m3u ....", 1)
+        self.playlistmanager.LoadPlayList("Movies.m3u")
+   
+        self.splashScreen.UpdateStatus("Loading Favorites ....", 3)
+        self.playlistmanager.LoadFavorites()
+        
+        self.splashScreen.UpdateStatus("Initialization Complete", 1)
+
+        self.splashScreen.close()
+        self.setWindowOpacity(1.0)
+               
+        
+                 
     def eventFilter(self, obj, event):
         #print("Event Filter: ", event.type().name )
         if event.type() == QEvent.Type.WindowStateChange:
@@ -701,9 +754,14 @@ class SpyderPlayer(QWidget):
             
     def __del__(self):
         self.screensaverInhibitor.uninhibit()
-        
+       
+       
 if __name__ == "__main__":
-    app = QApplication([])
-    spyderApp = SpyderPlayer()
-    spyderApp.show()
+    app = QApplication(sys.argv)
+
+    spyderPlayer = SpyderPlayer()
+    spyderPlayer.show()
+    
     app.exec()
+
+            
