@@ -164,12 +164,20 @@ class PlayListManager(QWidget):
 
         QTreeView::item:selected
         {{
-        background-color: rgb(35, 11, 63);
+        background-color: rgb(30, 30, 30);s
         border: 1px solid rgb(82, 26, 149);
         border-left-color: transparent;
         border-right-color: transparent;
         }}
         
+        QTreeView::item:hover
+        {{
+        background-color: rgb(35, 11, 63);
+        border: 1px solid rgb(82, 26, 149);
+        border-left-color: transparent;
+        border-right-color: transparent;
+        }}    
+            
         QScrollBar:vertical 
         {{
             border: 2px solid black;
@@ -634,4 +642,5 @@ class PlayListManager(QWidget):
             
             topItem = playlist.child(0)
             self.playlistTree.setCurrentItem(topItem)   
+                
                 

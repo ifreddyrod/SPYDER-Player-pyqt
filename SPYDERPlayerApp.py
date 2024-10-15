@@ -31,8 +31,9 @@ class SpyderPlayer(QWidget):
     playListVisible: bool = True
     volume: int = 100
     videoChangesPosition: bool = False
-    videoPosition: int = 0
+    videoDuration: int = 0
     isFullScreen: bool = False
+    controlPanelPosition: QPoint = QPoint(0, 0)
     
     def __init__(self, parent=None):
 
@@ -179,13 +180,18 @@ class SpyderPlayer(QWidget):
         self.controlPanelFS.ui.VideoPosition_slider.setEnabled(False)
         self.controlPanel.ui.VideoPosition_slider.setEnabled(False)
 
+        # Load Seattings
+        # Show Splash Screen
+        # Load Playlists
+        # Load Favorites
+        # Close Splash Screen
+        # Allow App to Run
              
     def eventFilter(self, obj, event):
         #print("Event Filter: ", event.type().name )
         if event.type() == QEvent.Type.WindowStateChange:
             if self.windowState() == Qt.WindowState.WindowFullScreen or self.windowState() == Qt.WindowState.WindowMaximized:
                 self.PlayerFullScreen()
-                #self.ShowCursor()
                 print("Full Screen: ", QEvent.Type.WindowStateChange.name)
                 
             elif self.windowState() == Qt.WindowState.WindowMinimized:
@@ -194,6 +200,7 @@ class SpyderPlayer(QWidget):
                 self.PlayerNormalScreen()
                 print("Normal Screen: ", QEvent.Type.WindowStateChange.name)
                 #self.ShowCursor()
+            #print("Window State: ", self.windowState())
                 
         elif event.type() == QEvent.Type.KeyRelease:   
             self.UserActivityDetected()
@@ -327,6 +334,7 @@ class SpyderPlayer(QWidget):
         videoLength = self.Format_ms_to_Time(duration)
         
         print("Duration Changed: ", videoLength)
+        self.videoDuration = duration
         
         if duration == 0:
             self.controlPanelFS.ui.Forward_button.setEnabled(False)
@@ -378,10 +386,17 @@ class SpyderPlayer(QWidget):
     def on_media_status_changed(self, status):
         message = str(status).split('.')[1]
         
-        if message == "BufferedMedia":
+        if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
             self.statusLabel.setText('')
         else:
             self.statusLabel.setText(message + " .....")
+            
+        #if message == "BufferedMedia":
+            #self.statusLabel.setText('')
+        #elif self.player.playbackState() == QMediaPlayer.PlaybackState.StoppedState and message != "InvalidMedia":
+            #self.statusLabel.setText('')
+        #else:
+            #self.statusLabel.setText(message + " .....")
         
         if status == QMediaPlayer.MediaStatus.LoadedMedia:
             self.ShowCursorNormal()
@@ -394,9 +409,12 @@ class SpyderPlayer(QWidget):
             
     def PlaybackStateChanged(self, state):
         if state == QMediaPlayer.PlaybackState.PlayingState:
+            self.ChangePlayingUIStates(True)
             self.screensaverInhibitor.inhibit()
         else:
+            self.ChangePlayingUIStates(False)
             self.screensaverInhibitor.uninhibit()
+            
             
     def PlayerFullScreen(self):
         self.ui.Title_frame.hide()
@@ -407,12 +425,15 @@ class SpyderPlayer(QWidget):
         self.setWindowState(Qt.WindowState.WindowFullScreen)
         self.ShowControlPanel()
         self.setFocus()
-        
-        #self.videoStack.setCurrentWidget(self.videoPanel)
+        self.isFullScreen = True  
+                    
+        if self.platform == "Linux":
+            # Initial postion is off when going to fullscreen in linux, so just hide it initially
+            self.controlPanelFS.hide()
+            
         self.inactivityTimer.start() 
-        #self.ui.Playlist_treeview.setFocus()
-        #self.ui.Horizontal_splitter.setEnabled(True)
-        self.isFullScreen = True
+
+
             
     def PlayerNormalScreen(self):
         #if self.windowState() == Qt.WindowState.WindowFullScreen:
@@ -433,11 +454,14 @@ class SpyderPlayer(QWidget):
     def TogglePlaylistView(self):
         if self.playListVisible:
             self.ui.Horizontal_splitter.setSizes([0, 1000])  # Hide left side 
-            #self.ui.Horizontal_splitter.setEnabled(True)
             self.playListVisible = False
         else:
             self.ui.Horizontal_splitter.setSizes([300, 1000])
             self.playListVisible = True
+            
+        if self.isFullScreen:
+            self.ShowControlPanel()
+
             
     def MutePlayer(self):
         if self.audioOutput.isMuted():
@@ -458,6 +482,7 @@ class SpyderPlayer(QWidget):
 
     def StopPlayer(self):
         self.player.stop()
+        self.statusLabel.setText('')
         
     
     def FullVolumePlayer(self):
@@ -495,10 +520,12 @@ class SpyderPlayer(QWidget):
         
       
     def SkipForward(self):
-        self.player.setPosition(self.player.position() + 10000)
+        if self.videoDuration > 0:
+            self.player.setPosition(self.player.position() + 10000)
         
     def SkipBackward(self):
-        self.player.setPosition(self.player.position() - 10000)
+        if self.videoDuration > 0:
+            self.player.setPosition(self.player.position() - 10000)
             
     def WindowChanged(self):
         if self.windowState() == QWidget.WindowState.WindowMaximized or self.windowState() == QWidget.WindowState.WindowFullScreen:
@@ -547,13 +574,13 @@ class SpyderPlayer(QWidget):
     def PlayPausePlayer(self):
         if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
             self.player.pause()
-            self.ChangePlayingUIStates(False)
+            #self.ChangePlayingUIStates(False)
             
         else: 
             self.setFocus()
             #self.player.setPosition(0)
             self.player.play()
-            self.ChangePlayingUIStates(True)
+            #self.ChangePlayingUIStates(True)
             #self.PlayChannel()
 
     def PlayLastChannel(self):
@@ -570,7 +597,7 @@ class SpyderPlayer(QWidget):
         panel_width = self.controlPanelFS.width()
         panel_height = self.controlPanelFS.height()
         
-        if self.windowState() == Qt.WindowState.WindowFullScreen:
+        if self.windowState() == self.isFullScreen:  #Qt.WindowState.WindowFullScreen:
             new_x = (self.width() - panel_width) // 2
             new_y = self.height() - panel_height - 20
             global_pos = self.mapToGlobal(QPoint(new_x, new_y))
@@ -579,9 +606,12 @@ class SpyderPlayer(QWidget):
             new_y = self.videoPanel.height() - panel_height - 20
             global_pos = self.videoPanel.mapToGlobal(QPoint(new_x, new_y))
         
-        self.controlPanelFS.move(global_pos)
-        
-        if self.windowState() == Qt.WindowState.WindowFullScreen:
+        if self.controlPanelPosition != global_pos:
+            self.controlPanelPosition = global_pos
+            self.controlPanelFS.move(global_pos)
+            
+        #if self.windowState() == Qt.WindowState.WindowFullScreen:
+        if self.isFullScreen:
             self.controlPanelFS.show()
         else:
             self.controlPanelFS.hide()
@@ -651,12 +681,13 @@ class SpyderPlayer(QWidget):
             
             self.inactivityTimer.start()
             if not self.controlPanelFS.isVisible():
-                self.controlPanelFS.show()
+                self.ShowControlPanel()
+                    
                 if self.playListVisible:
                     self.playlistmanager.activateWindow()
                 else:
                     self.videoPanel.activateWindow()
-                #self.ShowControlPanel()
+                
                 
     def InactivityDetected(self):
         if self.isFullScreen:

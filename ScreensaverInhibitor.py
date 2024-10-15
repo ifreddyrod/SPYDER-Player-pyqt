@@ -44,22 +44,19 @@ class WindowsInhibitor:
 
 class LinuxInhibitor:
     def __init__(self):
-        self.method = None
-        self.process = None
-        
-        subprocess.run(['xdg-screensaver', '--version'], check=True, capture_output=True)
-        self.method = 'xdg-screensaver'
+        import dbus
+        self.bus = dbus.SessionBus()
+        self.saver = self.bus.get_object('org.freedesktop.ScreenSaver', '/ScreenSaver')
+        self.cookie = None
 
     def inhibit(self):
-        if self.method == 'xdg-screensaver':
-            self.process = subprocess.Popen(['xdg-screensaver', 'suspend', str(os.getpid())])
-            
+        if self.cookie is None:
+            self.cookie = self.saver.Inhibit("VideoPlayer", "Playing video")
 
     def uninhibit(self):
-        if self.method == 'xdg-screensaver':
-            subprocess.run(['xdg-screensaver', 'resume', str(os.getpid())])
-            self.process.terminate()
-            self.process = None
+        if self.cookie is not None:
+            self.saver.UnInhibit(self.cookie)
+            self.cookie = None
 
 class MacOSInhibitor:
     def __init__(self):
