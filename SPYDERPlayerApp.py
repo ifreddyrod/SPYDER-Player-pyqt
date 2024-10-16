@@ -2,7 +2,7 @@ import re, os
 from PyQt6 import uic, QtCore
 from PyQt6.QtGui import QCursor, QIcon
 from PyQt6.QtCore import Qt, QUrl, QEvent, QTimer, QPoint, pyqtSignal
-from PyQt6.QtWidgets import QApplication, QSplashScreen, QWidget
+from PyQt6.QtWidgets import QApplication, QWidget
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PlaylistManager import PlayListManager
@@ -12,7 +12,7 @@ import sys
 import time
                 
                 
-                
+                        
 class VideoControlPannel(QWidget):     
     def __init__(self, parent=None):
 
@@ -36,12 +36,34 @@ class SplashScreen(QWidget):
         
         self.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint )
         
+        self.CenterSplashScreen()
         
-    def UpdateStatus(self, status: str, delay: int = 0):  
+        self.splashTimer = QTimer()
+        self.splashTimerCompleted = False
+        self.splashTimer.setInterval(5000)
+        self.splashTimer.timeout.connect(self.SetTimeout)
+        
+    def CenterSplashScreen(self):
+        """ Center the splash screen on the primary screen """
+        screen = QApplication.primaryScreen()  # Get primary screen
+        screen_geometry = screen.geometry()  # Get screen geometry
+        splash_size = self.size()  # Get splash screen size
+
+        # Calculate the center position
+        x = (screen_geometry.width() - splash_size.width()) // 2
+        y = (screen_geometry.height() - splash_size.height()) // 2
+
+        # Move the splash screen to the center
+        self.move(x, y)    
+        
+        
+    def UpdateStatus(self, status: str, delay: int = 0.1):  
         self.ui.Status_label.setText(status)
         QApplication.processEvents()
         time.sleep(delay)
         
+    def SetTimeout(self):
+        self.splashTimerCompleted = True
         
 class SpyderPlayer(QWidget):
     platform: str = platform.system()
@@ -58,6 +80,7 @@ class SpyderPlayer(QWidget):
         super().__init__(parent)
         self.splashScreen = SplashScreen()
         self.splashScreen.Status_label.setText("Initializing ...")
+        self.splashScreen.Version_label.setText("Version: 1.0.0 Beta")
         
         self.mousePressPos = None
         self.mouseMoveActive = False
@@ -108,6 +131,7 @@ class SpyderPlayer(QWidget):
         self.player.setAudioOutput(self.audioOutput)
         self.player.setVideoOutput(self.videoPanel)
         self.player.installEventFilter(self) 
+
         
         # Set the Left of vertical splitter to a fixed size
         self.ui.Horizontal_splitter.setSizes([400, 1000])
@@ -217,24 +241,34 @@ class SpyderPlayer(QWidget):
         
     def InitializePlayer(self):
         
-        self.splashScreen.show()
-        self.splashScreen.UpdateStatus("Loading Playlist ...", 3)
+        # Get Playlists
+        playLists = ["us", "us_longlist", "Movies"]
+        playListsSources = [
+            "us.m3u",
+            "us_longlist.m3u",
+            "Movies.m3u"
+        ]
         
-        # Load playlists
-        self.splashScreen.UpdateStatus("Loading us.m3u ....", 1)
-        self.playlistmanager.LoadPlayList("us.m3u")
-
-        self.splashScreen.UpdateStatus("Loading us_longlist.m3u ....", 1)
-        self.playlistmanager.LoadPlayList("us_longlist.m3u")
-
-        self.splashScreen.UpdateStatus("Loading Movies.m3u ....", 1)
-        self.playlistmanager.LoadPlayList("Movies.m3u")
-   
-        self.splashScreen.UpdateStatus("Loading Favorites ....", 3)
+        self.splashScreen.show()
+        self.splashScreen.splashTimer.start()
+        self.splashScreen.UpdateStatus("Loading Playlists:", 1)
+        
+        for i in range(len(playLists)):
+            self.splashScreen.UpdateStatus("Loading " + playLists[i] + " ....")
+            self.splashScreen.UpdateStatus("Loading " + playLists[i] + " ....")
+            self.playlistmanager.LoadPlayList(playListsSources[i])
+        
+        self.splashScreen.UpdateStatus("Loading Favorites ....")
+        self.splashScreen.UpdateStatus("Loading Favorites ....")
         self.playlistmanager.LoadFavorites()
         
-        self.splashScreen.UpdateStatus("Initialization Complete", 1)
-
+        self.splashScreen.UpdateStatus("Initialization Complete", 0.5)
+        self.splashScreen.UpdateStatus("Initialization Complete", 0.5)
+        
+        # Make sure Splash Screen is shown a minimum amount of time
+        while self.splashScreen.splashTimerCompleted == False:
+            QApplication.processEvents()
+        
         self.splashScreen.close()
         self.setWindowOpacity(1.0)
                
@@ -443,13 +477,6 @@ class SpyderPlayer(QWidget):
             self.statusLabel.setText('')
         else:
             self.statusLabel.setText(message + " .....")
-            
-        #if message == "BufferedMedia":
-            #self.statusLabel.setText('')
-        #elif self.player.playbackState() == QMediaPlayer.PlaybackState.StoppedState and message != "InvalidMedia":
-            #self.statusLabel.setText('')
-        #else:
-            #self.statusLabel.setText(message + " .....")
         
         if status == QMediaPlayer.MediaStatus.LoadedMedia:
             self.ShowCursorNormal()
@@ -471,7 +498,6 @@ class SpyderPlayer(QWidget):
             
     def PlayerFullScreen(self):
         self.ui.Title_frame.hide()
-        #if self.windowState() != Qt.WindowState.WindowFullScreen:
         self.ui.Horizontal_splitter.setSizes([0, 500])  # Hide left side    
         self.ui.Vertical_splitter.setSizes([500, 0])  
         self.playListVisible = False
