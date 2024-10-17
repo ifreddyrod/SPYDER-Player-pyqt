@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QTreeWidgetItem, QWidget, QTreeWidget
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor
 from PyQt6.QtCore import QSize, Qt, pyqtSignal, QModelIndex
 from m3u_parser import M3uParser
+from AppData import * 
 import tempfile
 import re
 import json
@@ -63,11 +64,10 @@ class PlayListManager(QWidget):
     treeItemSelectedSignal: pyqtSignal = pyqtSignal(str, str)
     currentSelectedItem: QStandardItem = None
     lastSelectedItem: QStandardItem = None
-    favoritesInfo: list = []
     searchResultsCount = 0
     currentItem = 0
     
-    def __init__(self, playlistTreefromUI: QTreeWidget, parent=None):
+    def __init__(self, playlistTreefromUI: QTreeWidget, appData: AppData, parent=None):
         super().__init__(parent)
         
         self.platform = parent.platform
@@ -77,6 +77,9 @@ class PlayListManager(QWidget):
         # Setup The Playlist Tree
         self.playlistTree = playlistTreefromUI
         self.playlistTree.setColumnCount(1)
+        
+        # Setup AppData
+        self.appData = appData
         
         # Load Custom Stylesheet
         self.playlistTree.setStyleSheet(self.LoadStyleSheet())
@@ -96,12 +99,6 @@ class PlayListManager(QWidget):
         self.playlistTree.itemClicked.connect(self.ItemClicked)
         self.playlistTree.itemChanged.connect(self.ChannelCheckBoxChanged)
         
-        
-        # Load playlists
-        '''self.LoadPlayList("us.m3u")
-        self.LoadPlayList("us_longlist.m3u")
-        self.LoadPlayList("Movies.m3u")
-        self.LoadFavorites()'''
         
 
     def LoadStyleSheet(self):
@@ -164,7 +161,7 @@ class PlayListManager(QWidget):
 
         QTreeView::item:selected
         {{
-        background-color: rgb(30, 30, 30);s
+        background-color: rgb(30, 30, 30);
         border: 1px solid rgb(82, 26, 149);
         border-left-color: transparent;
         border-right-color: transparent;
@@ -246,12 +243,13 @@ class PlayListManager(QWidget):
     def ExpandAllPlaylists(self):
         self.playlistTree.expandAll()
                        
-    def LoadPlayList(self, playlistPath):
+    def LoadPlayList(self, playlist: PlayListEntry):
         # Extract the file name without the extension
-        playListFile = os.path.basename(playlistPath)
+        playlistPath = playlist.source
+        #playListFile = os.path.basename(playlistPath)
 
-        playlistName, extension = os.path.splitext(os.path.basename(playListFile))
-
+        #playlistName, extension = os.path.splitext(os.path.basename(playListFile))
+        playlistName = playlist.name
         # Initialize the parser
         parser = M3uParser()
         
@@ -409,23 +407,16 @@ class PlayListManager(QWidget):
         return channel_name, source
     
     def SaveFavorites(self):
-        with open("favorites.json", "w") as file:
-            json.dump(self.favoritesInfo, file, indent=4)
+        self.appData.save()
             
     def LoadFavorites(self):
         self.playlistTree.blockSignals(True)  
-        self.favoritesInfo.clear()
-        self.ClearPlayListItems(self.favoritesList)
-
-        # Get Favorites from File
-        with open("favorites.json", "r") as file:
-            self.favoritesInfo = json.load(file)
-            
+        self.ClearPlayListItems(self.favoritesList)        
 
         # Find Corresponding Playlist Items
-        for item in self.favoritesInfo:
+        for item in self.appData.Favorites:  #self.favoritesInfo:
             # Find the item.playListName in the tree
-            favoriteItem = self.GetChannelFromTree(item['playListName'], item['channelName'], item['source'])
+            favoriteItem = self.GetChannelFromTree(item.parentName, item.name, item.source)  
             
             # If item is found, check it
             if favoriteItem:
@@ -451,6 +442,21 @@ class PlayListManager(QWidget):
         self.playlistTree.blockSignals(False)
              
         print("Favorites loaded successfully")
+        
+    def LoadLibrary(self):
+        
+        for item in self.appData.Library:
+            newEntry = TreeItem(item.name)
+            newEntry.SetPlayListName("")
+            newEntry.SetSource(item.source)
+            
+            newEntry.setFlags(newEntry.flags() | Qt.ItemFlag.ItemIsUserCheckable) 
+            newEntry.SetItemChecked(False)
+            
+            # Add the item to the library list
+            self.AppendChannel(self.libraryList, newEntry)
+            
+        
         
     def ToggleItemCheckedinList(self, playList: TreeItem, item: TreeItem, checked: bool):
         if item is None or playList is None:
@@ -499,12 +505,18 @@ class PlayListManager(QWidget):
             self.UpdatePlayListChannelCount(self.favoritesList)
             
             # Add to favorites info
-            self.favoritesInfo.append(
-                {
-                    'channelName': channelName,
-                    'source': channelSource,                    
-                    'playListName': channelPlaylist
-                })
+            isURL = channelSource.startswith("http")
+            if isURL:
+                sourceType = "url"
+            else:
+                sourceType = "file"
+                
+            self.appData.Favorites.append(PlayListEntry(
+                name=channelName,
+                parentName=channelPlaylist,
+                sourceType=sourceType,
+                source=channelSource))
+                
             self.SaveFavorites()
             
             # Update the Playlist and Search Channel (if Search has been done)
@@ -534,9 +546,11 @@ class PlayListManager(QWidget):
             #print("ChannelName: " + channelName) # + " Source: " + channelSource + " Playlist: " + channelPlaylist)
             
             # Remove from favoritsInfo
-            for i in range(len(self.favoritesInfo)):
-                if self.favoritesInfo[i]['channelName'] == channelName and self.favoritesInfo[i]['source'] == channelSource:
-                    self.favoritesInfo.pop(i)
+            for i in range(len(self.appData.Favorites)):
+                favItem = self.appData.Favorites[i]
+    
+                if favItem.name == channelName and favItem.parentName == channelPlaylist and favItem.source == channelSource:
+                    self.appData.Favorites.pop(i)
                     self.SaveFavorites() 
                     self.LoadFavorites() 
                     

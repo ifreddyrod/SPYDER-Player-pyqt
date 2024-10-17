@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>678</width>
+    <height>320</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/*background-color: rgb(42, 42, 42);*/
+
+QLabel
+{
+	color: rgb(216, 216, 216);
+}
+
+QPushButton 
+{	
+	color: rgb(216, 216, 216);
+	background-color: rgb(0, 0, 0);
+	border-radius: 10px;
+}
+
+QPushButton:hover 
+{
+	background-color: rgb(35, 11, 63);
+}
+
+QPushButton:disabled
+{
+	color: rgb(73, 73, 73);
+}
+
+QPushButton:pressed 
+{
+	background-color: rgb(82, 26, 149);
+}
+
+QTableWidget
+{
+	background-color: rgb(0, 0, 0);
+}
+
+QTableWidget::item::selected
+{
+	background-color: rgb(0, 58, 201);
+}
+
+QHeaderView::section
+{
+	background-color: rgb(20, 6, 36);
+}
+
+QHeaderView
+{
+	background-color: rgb(30, 30, 30);
+}
+
+QLineEdit
+{
+	color: rgb(216, 216, 216);
+	background-color: rgb(0, 0, 0);
+	padding-left:10px;
+}
+
+QTextEdit
+{
+	color: rgb(216, 216, 216);
+	background-color: rgb(0, 0, 0);
+	padding-left:25px;
+}
+
+QComboBox
+{
+	color: rgb(216, 216, 216);
+	background-color: rgb(0, 0, 0);
+}
+
+QComboBox QAbstractItemView {
+ 	border: 1px solid grey;
+ 	/*background: black;*/
+	selection-color: rgb(216, 216, 216);
+  	background-color: rgb(30, 30, 30);
+}
+</string>
+  </property>
+  <widget class="QWidget" name="Titlebar_widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>691</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(20, 6, 36);</string>
+   </property>
+   <widget class="QLabel" name="Titlebar_label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>0</y>
+      <width>251</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Entry Editor</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft</set>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="Back_button">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>270</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>  Back     </string>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/white-left-arrow.png</normaloff>icons/white-left-arrow.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>15</width>
+     <height>15</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="Name_textedit">
+   <property name="geometry">
+    <rect>
+     <x>179</x>
+     <y>60</y>
+     <width>471</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="EntryName_label">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>70</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PlayList Name:</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Save_button">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>270</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>  Save</string>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/white-diskette.png</normaloff>icons/white-diskette.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="OpenFiles_button">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>170</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border-radius: 0px;
+background-color: rgba(0, 0, 0, 0);
+</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../../HotKeyManager/GUI/resources/white-folder.png</normaloff>../../HotKeyManager/GUI/resources/white-folder.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Source_label">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>160</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Source:</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="Source_textedit">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>160</y>
+     <width>471</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Shadow::Plain</enum>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="SourceType_combobox">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>110</y>
+     <width>120</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Local</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Remote</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="SourceType_label">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>120</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Source Type:</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="background_widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>30</y>
+     <width>681</width>
+     <height>291</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: qlineargradient(spread:pad, x1:0.369, y1:0.182, x2:1, y2:1, stop:0 rgba(57, 9, 126, 255), stop:1 rgba(129, 18, 129, 255));</string>
+   </property>
+  </widget>
+  <zorder>background_widget</zorder>
+  <zorder>Titlebar_widget</zorder>
+  <zorder>Back_button</zorder>
+  <zorder>Name_textedit</zorder>
+  <zorder>EntryName_label</zorder>
+  <zorder>Save_button</zorder>
+  <zorder>Source_label</zorder>
+  <zorder>SourceType_combobox</zorder>
+  <zorder>SourceType_label</zorder>
+  <zorder>Source_textedit</zorder>
+  <zorder>OpenFiles_button</zorder>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

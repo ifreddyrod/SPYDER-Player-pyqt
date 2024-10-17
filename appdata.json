@@ -1,0 +1,116 @@
+{
+    "HotKeys": {
+        "playpause": "k",
+        "playpauseAlt": "space",
+        "toggleFullscreen": "f",
+        "escapeFullscreen": "esc",
+        "togglePlaylist": "l",
+        "volumeMute": "m",
+        "volumeUp": "up",
+        "volumeDown": "dn",
+        "seekForward": "right",
+        "seekBackward": "left",
+        "gotoTopofList": "t",
+        "gotoBottomofList": "b",
+        "collapseAllLists": "c",
+        "sortListAscending": "a",
+        "sortListDescending": "d",
+        "gotoLast": "back"
+    },
+    "Library": [
+        {
+            "name": "Releasing Fish",
+            "parentName": "Library",
+            "sourceType": "file",
+            "source": "/Users/freddy/Movies/fish-release.mp4"
+        },
+        {
+            "name": "Lava Flow at Night",
+            "parentName": "Library",
+            "sourceType": "file",
+            "source": "/Users/freddy/Movies/Lava_1920_1080_24fps.mp4"
+        },
+        {
+            "name": "Scuba Divers",
+            "parentName": "Library",
+            "sourceType": "file",
+            "source": "/Users/freddy/Movies/Scuba-uhd_3840_2160_60fps.mp4"
+        }
+    ],
+    "Favorites": [
+        {
+            "name": "Latin Zone TV (720p)",
+            "parentName": "US Free",
+            "sourceType": "url",
+            "source": "https://cdn.streamingcpanel.com:3784/live/latinzonetvlive.m3u8"
+        },
+        {
+            "name": "Tropical Music TV (720p)",
+            "parentName": "US Free",
+            "sourceType": "url",
+            "source": "http://68.235.37.11:1935/vallenato/vallenato/.m3u8"
+        },
+        {
+            "name": "Loupe 4K (2160p)",
+            "parentName": "US Free",
+            "sourceType": "url",
+            "source": "https://d2dw21aq0j0l5c.cloudfront.net/playlist.m3u8"
+        },
+        {
+            "name": "Newsmax TV (720p)",
+            "parentName": "US Free",
+            "sourceType": "url",
+            "source": "https://nmx1ota.akamaized.net/hls/live/2107010/Live_1/index.m3u8"
+        },
+        {
+            "name": "The Ultimate MUS Freeic Channel (1080p)",
+            "parentName": "US Free",
+            "sourceType": "url",
+            "source": "https://app.viloud.tv/hls/channel/0694b92d093cc2bd5438ff9bbccaf1a2.m3u8"
+        },
+        {
+            "name": "Radio Ritmo (1080p) [Not 24/7]",
+            "parentName": "US Free",
+            "sourceType": "url",
+            "source": "https://panel.tvstream.cl:1936/8046/8046/playlist.m3u8"
+        },
+        {
+            "name": "La Mega Mundial",
+            "parentName": "US Free",
+            "sourceType": "url",
+            "source": "https://server40.servistreaming.com:3477/stream/play.m3u8"
+        },
+        {
+            "name": "Clarity 4K (2160p)",
+            "parentName": "US Long List",
+            "sourceType": "url",
+            "source": "https://d6s2o8so4wk28.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-2vzmnn0zl3exh-prod/amgclarity4k/playlist.m3u8"
+        },
+        {
+            "name": "Adult Swim Primal (1080p) [Geo-blocked]",
+            "parentName": "US Free",
+            "sourceType": "url",
+            "source": "https://adultswim-vodlive.cdn.turner.com/live/primal/stream_de.m3u8"
+        },
+        {
+            "name": "AXS TV NOW",
+            "parentName": "US Free",
+            "sourceType": "url",
+            "source": "https://dikcfc9915kp8.cloudfront.net/hls/1080p/playlist.m3u8"
+        }
+    ],
+    "PlayLists": [
+        {
+            "name": "US Free",
+            "parentName": "",
+            "sourceType": "file",
+            "source": "us.m3u"
+        },
+        {
+            "name": "US Long List",
+            "parentName": "",
+            "sourceType": "file",
+            "source": "us_longlist.m3u"
+        }
+    ]
+}

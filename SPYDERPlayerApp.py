@@ -7,6 +7,8 @@ from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PlaylistManager import PlayListManager
 from ScreensaverInhibitor import ScreensaverInhibitor
+from SettingsManager import SettingsManager
+from AppData import * 
 import platform
 import sys
 import time
@@ -74,6 +76,7 @@ class SpyderPlayer(QWidget):
     videoDuration: int = 0
     isFullScreen: bool = False
     controlPanelPosition: QPoint = QPoint(0, 0)
+    dataFilePath: str = "appdata.json"
     
     def __init__(self, parent=None):
 
@@ -104,10 +107,13 @@ class SpyderPlayer(QWidget):
         self.statusLabel.setText("")
         self.setWindowOpacity(0)
         
+        # Load AppData
+        self.appData = AppData.load(self.dataFilePath)
+        
         #---------------------------
         # Setup Playlist Tree
         #---------------------------
-        self.playlistmanager = PlayListManager(self.ui.PlayList_tree, self)
+        self.playlistmanager = PlayListManager(self.ui.PlayList_tree, self.appData, self)
         self.playlistmanager.installEventFilter(self)
                 
         #---------------------------
@@ -153,6 +159,8 @@ class SpyderPlayer(QWidget):
         #self.videoStack.installEventFilter(self)
         #self.ui.Channels_table.installEventFilter(self)   
         
+        # Create Settings Manager
+        self.settingsManager = SettingsManager(self.appData)
         
         #----------------------------------------------------------------------------
         # Connect signals
@@ -205,8 +213,8 @@ class SpyderPlayer(QWidget):
         
         self.player.durationChanged.connect(self.PlayerDurationChanged)
         
-        #self.ui.Play_button.clicked.connect(self.PlayStopStream)
-        #self.LoadPlayList('us.m3u')
+        self.ui.Settings_button.setEnabled(True)
+        self.ui.Settings_button.clicked.connect(self.ShowSettings)
 
         
         # Set up a timer to detect inactivity
@@ -240,24 +248,23 @@ class SpyderPlayer(QWidget):
         # Allow App to Run
         
     def InitializePlayer(self):
-        
-        # Get Playlists
-        playLists = ["us", "us_longlist", "Movies"]
-        playListsSources = [
-            "us.m3u",
-            "us_longlist.m3u",
-            "Movies.m3u"
-        ]
-        
+        # Show Splash Screen
         self.splashScreen.show()
         self.splashScreen.splashTimer.start()
         self.splashScreen.UpdateStatus("Loading Playlists:", 1)
+                
+        # Load Playlists and Update Splash Screen        
+        for i in range(len(self.appData.PlayLists)):
+            self.splashScreen.UpdateStatus("Loading " + self.appData.PlayLists[i].name + " ....")
+            self.splashScreen.UpdateStatus("Loading " + self.appData.PlayLists[i].name + " ....")
+            self.playlistmanager.LoadPlayList(self.appData.PlayLists[i])
         
-        for i in range(len(playLists)):
-            self.splashScreen.UpdateStatus("Loading " + playLists[i] + " ....")
-            self.splashScreen.UpdateStatus("Loading " + playLists[i] + " ....")
-            self.playlistmanager.LoadPlayList(playListsSources[i])
+        # Load Library Playlist
+        self.splashScreen.UpdateStatus("Loading Library ....")
+        self.splashScreen.UpdateStatus("Loading Library ....")
+        self.playlistmanager.LoadLibrary()
         
+        # Load Favorites last to verify that items in other playlists have been loaded
         self.splashScreen.UpdateStatus("Loading Favorites ....")
         self.splashScreen.UpdateStatus("Loading Favorites ....")
         self.playlistmanager.LoadFavorites()
@@ -313,9 +320,10 @@ class SpyderPlayer(QWidget):
                     print("Key Press: Q")
                     #self.activateWindow()
                     #self.videoPanel.setFocus()
-                    self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
+                    #self.setCursor(QCursor(Qt.CursorShape.BlankCursor))
                     #self.HideCursor()
                     #print("Hide cursor")
+                    self.settingsManager.ShowSettings()
                     return True
                 elif event.key() == Qt.Key.Key_W:
                     print("Key Press: W")
@@ -776,7 +784,9 @@ class SpyderPlayer(QWidget):
             if not self.playListVisible:
                 QApplication.setOverrideCursor(Qt.CursorShape.BlankCursor)
             
-            
+    def ShowSettings(self):
+        print("Show Settings Button Pressed")
+        self.settingsManager.ShowSettings()        
             
     def __del__(self):
         self.screensaverInhibitor.uninhibit()

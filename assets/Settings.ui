@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>678</width>
+    <height>320</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/*background-color: rgb(42, 42, 42);*/
+
+QLabel
+{
+	color: rgb(216, 216, 216);
+}
+
+QPushButton 
+{	
+	color: rgb(216, 216, 216);
+	background-color: rgb(0, 0, 0);
+	border-radius: 10px;
+}
+
+QPushButton:hover 
+{
+	background-color: rgb(35, 11, 63);
+}
+
+QPushButton:disabled
+{
+	color: rgb(73, 73, 73);
+}
+
+QPushButton:pressed 
+{
+	background-color: rgb(82, 26, 149);
+}
+
+QTableWidget
+{
+	background-color: rgb(0, 0, 0);
+}
+
+QTableWidget::item::selected
+{
+	background-color: rgb(0, 58, 201);
+}
+
+QHeaderView::section
+{
+	background-color: rgb(20, 6, 36);
+}
+
+QHeaderView
+{
+	background-color: rgb(30, 30, 30);
+}</string>
+  </property>
+  <widget class="QWidget" name="Titlebar_widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>691</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(20, 6, 36);</string>
+   </property>
+   <widget class="QLabel" name="Titlebar_label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>0</y>
+      <width>251</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Settings</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft</set>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="PlayList_button">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>50</y>
+     <width>351</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string>   PlayList Settings</string>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/playlist.png</normaloff>icons/playlist.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Close_button">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>270</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>  Close     </string>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/white-left-arrow.png</normaloff>icons/white-left-arrow.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>15</width>
+     <height>15</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Library_button">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>120</y>
+     <width>351</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>   Library Settings</string>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/library.png</normaloff>icons/library.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="HotKeys_button">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>190</y>
+     <width>351</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>   Hot Keys</string>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/keyboard.png</normaloff>icons/keyboard.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QWidget" name="background_widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>30</y>
+     <width>681</width>
+     <height>291</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: qlineargradient(spread:pad, x1:0.369, y1:0.182, x2:1, y2:1, stop:0 rgba(57, 9, 126, 255), stop:1 rgba(129, 18, 129, 255));</string>
+   </property>
+  </widget>
+  <zorder>background_widget</zorder>
+  <zorder>Titlebar_widget</zorder>
+  <zorder>PlayList_button</zorder>
+  <zorder>Close_button</zorder>
+  <zorder>Library_button</zorder>
+  <zorder>HotKeys_button</zorder>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
