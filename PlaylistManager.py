@@ -86,6 +86,18 @@ class PlayListManager(QWidget):
         
         
         # Add core Playlists
+        self.ResetAllLists()
+        
+        # Setup Event Handlers
+        self.playlistTree.itemDoubleClicked.connect(self.ItemDoubleClicked)
+        self.playlistTree.itemClicked.connect(self.ItemClicked)
+        self.playlistTree.itemChanged.connect(self.ChannelCheckBoxChanged)
+        
+        
+    def ResetAllLists(self):
+        self.playlistTree.clear()
+        
+        # Add core Playlists
         self.searchList = TreeItem(pad("Search Results"), PLAYLIST_COLOR, True)
         self.favoritesList = TreeItem(pad("Favorites"), PLAYLIST_COLOR, True)
         self.libraryList = TreeItem(pad("Library"), PLAYLIST_COLOR, True)
@@ -94,13 +106,6 @@ class PlayListManager(QWidget):
         self.AppendPlayList(self.favoritesList)
         self.AppendPlayList(self.libraryList)
         
-        # Setup Event Handlers
-        self.playlistTree.itemDoubleClicked.connect(self.ItemDoubleClicked)
-        self.playlistTree.itemClicked.connect(self.ItemClicked)
-        self.playlistTree.itemChanged.connect(self.ChannelCheckBoxChanged)
-        
-        
-
     def LoadStyleSheet(self):
 
         if self.platform.lower() == "windows":
@@ -444,6 +449,7 @@ class PlayListManager(QWidget):
         print("Favorites loaded successfully")
         
     def LoadLibrary(self):
+        self.ClearPlayListItems(self.libraryList)
         
         for item in self.appData.Library:
             newEntry = TreeItem(item.name)
@@ -656,5 +662,4 @@ class PlayListManager(QWidget):
             
             topItem = playlist.child(0)
             self.playlistTree.setCurrentItem(topItem)   
-                
-                
+              

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>678</width>
-    <height>320</height>
+    <width>780</width>
+    <height>430</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -96,12 +96,12 @@ QComboBox QAbstractItemView {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>691</width>
+     <width>781</width>
      <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(20, 6, 36);</string>
+    <string notr="true">background-color: rgb(27, 27, 27);</string>
    </property>
    <widget class="QLabel" name="Titlebar_label">
     <property name="geometry">
@@ -124,7 +124,7 @@ QComboBox QAbstractItemView {
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>270</y>
+     <y>380</y>
      <width>141</width>
      <height>41</height>
     </rect>
@@ -146,9 +146,9 @@ QComboBox QAbstractItemView {
   <widget class="QLineEdit" name="Name_textedit">
    <property name="geometry">
     <rect>
-     <x>179</x>
-     <y>60</y>
-     <width>471</width>
+     <x>150</x>
+     <y>110</y>
+     <width>481</width>
      <height>31</height>
     </rect>
    </property>
@@ -159,8 +159,8 @@ QComboBox QAbstractItemView {
   <widget class="QLabel" name="EntryName_label">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>70</y>
+     <x>11</x>
+     <y>120</y>
      <width>131</width>
      <height>16</height>
     </rect>
@@ -175,8 +175,8 @@ QComboBox QAbstractItemView {
   <widget class="QPushButton" name="Save_button">
    <property name="geometry">
     <rect>
-     <x>510</x>
-     <y>270</y>
+     <x>630</x>
+     <y>380</y>
      <width>141</width>
      <height>41</height>
     </rect>
@@ -198,8 +198,8 @@ QComboBox QAbstractItemView {
   <widget class="QPushButton" name="OpenFiles_button">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>170</y>
+     <x>151</x>
+     <y>240</y>
      <width>31</width>
      <height>21</height>
     </rect>
@@ -226,8 +226,8 @@ background-color: rgba(0, 0, 0, 0);
   <widget class="QLabel" name="Source_label">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>160</y>
+     <x>11</x>
+     <y>230</y>
      <width>131</width>
      <height>16</height>
     </rect>
@@ -242,9 +242,9 @@ background-color: rgba(0, 0, 0, 0);
   <widget class="QTextEdit" name="Source_textedit">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>160</y>
-     <width>471</width>
+     <x>151</x>
+     <y>230</y>
+     <width>481</width>
      <height>51</height>
     </rect>
    </property>
@@ -255,28 +255,28 @@ background-color: rgba(0, 0, 0, 0);
   <widget class="QComboBox" name="SourceType_combobox">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>110</y>
+     <x>151</x>
+     <y>170</y>
      <width>120</width>
      <height>30</height>
     </rect>
    </property>
    <item>
     <property name="text">
-     <string>Local</string>
+     <string>file</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>Remote</string>
+     <string>url</string>
     </property>
    </item>
   </widget>
   <widget class="QLabel" name="SourceType_label">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>120</y>
+     <x>11</x>
+     <y>180</y>
      <width>131</width>
      <height>16</height>
     </rect>
@@ -293,8 +293,8 @@ background-color: rgba(0, 0, 0, 0);
     <rect>
      <x>0</x>
      <y>30</y>
-     <width>681</width>
-     <height>291</height>
+     <width>801</width>
+     <height>421</height>
     </rect>
    </property>
    <property name="styleSheet">

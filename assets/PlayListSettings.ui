@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>680</width>
-    <height>320</height>
+    <width>780</width>
+    <height>430</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,7 +50,7 @@ QTableWidget
 
 QTableWidget::item::selected
 {
-	background-color: rgb(0, 58, 201);
+	background-color: rgb(82, 26, 149);
 }
 
 QHeaderView::section
@@ -68,12 +68,12 @@ QHeaderView
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>691</width>
+     <width>781</width>
      <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(20, 6, 36);</string>
+    <string notr="true">background-color: rgb(27, 27, 27);</string>
    </property>
    <widget class="QLabel" name="Titlebar_label">
     <property name="geometry">
@@ -97,8 +97,8 @@ QHeaderView
     <rect>
      <x>160</x>
      <y>50</y>
-     <width>511</width>
-     <height>261</height>
+     <width>611</width>
+     <height>371</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -157,7 +157,7 @@ QHeaderView
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>60</y>
+     <y>110</y>
      <width>141</width>
      <height>41</height>
     </rect>
@@ -183,7 +183,7 @@ QHeaderView
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>270</y>
+     <y>380</y>
      <width>141</width>
      <height>41</height>
     </rect>
@@ -206,7 +206,7 @@ QHeaderView
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>200</y>
+     <y>230</y>
      <width>141</width>
      <height>41</height>
     </rect>
@@ -229,7 +229,7 @@ QHeaderView
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>130</y>
+     <y>170</y>
      <width>141</width>
      <height>41</height>
     </rect>
@@ -253,8 +253,8 @@ QHeaderView
     <rect>
      <x>0</x>
      <y>30</y>
-     <width>681</width>
-     <height>291</height>
+     <width>801</width>
+     <height>421</height>
     </rect>
    </property>
    <property name="styleSheet">
