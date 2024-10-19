@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>SettingsMain</class>
+ <widget class="QWidget" name="SettingsMain">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -109,8 +109,8 @@ background-color: rgb(27, 27, 27);</string>
     <string>   PlayList Settings</string>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>icons/playlist.png</normaloff>icons/playlist.png</iconset>
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/playlist.png</normaloff>:/icons/icons/playlist.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -132,8 +132,8 @@ background-color: rgb(27, 27, 27);</string>
     <string>  Close     </string>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>icons/white-left-arrow.png</normaloff>icons/white-left-arrow.png</iconset>
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/white-left-arrow.png</normaloff>:/icons/icons/white-left-arrow.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -155,8 +155,8 @@ background-color: rgb(27, 27, 27);</string>
     <string>   Library Settings</string>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>icons/library.png</normaloff>icons/library.png</iconset>
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/library.png</normaloff>:/icons/icons/library.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -178,8 +178,8 @@ background-color: rgb(27, 27, 27);</string>
     <string>   Hot Keys</string>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>icons/keyboard.png</normaloff>icons/keyboard.png</iconset>
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/keyboard.png</normaloff>:/icons/icons/keyboard.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -208,6 +208,8 @@ background-color: rgb(27, 27, 27);</string>
   <zorder>Library_button</zorder>
   <zorder>HotKeys_button</zorder>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

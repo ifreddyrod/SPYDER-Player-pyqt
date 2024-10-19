@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>PlayListSettings</class>
+ <widget class="QWidget" name="PlayListSettings">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -169,8 +169,8 @@ QHeaderView
     <string> Edit        </string>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>icons/white-edit.png</normaloff>icons/white-edit.png</iconset>
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/white-edit.png</normaloff>:/icons/icons/white-edit.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -192,8 +192,8 @@ QHeaderView
     <string>  Back     </string>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>icons/white-left-arrow.png</normaloff>icons/white-left-arrow.png</iconset>
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/white-left-arrow.png</normaloff>:/icons/icons/white-left-arrow.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -215,8 +215,8 @@ QHeaderView
     <string>  Delete       </string>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>icons/white-minus.png</normaloff>icons/white-minus.png</iconset>
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/white-minus.png</normaloff>:/icons/icons/white-minus.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -238,8 +238,8 @@ QHeaderView
     <string>Add New       </string>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>icons/white-plus-sign.png</normaloff>icons/white-plus-sign.png</iconset>
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/white-plus-sign.png</normaloff>:/icons/icons/white-plus-sign.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -269,6 +269,8 @@ QHeaderView
   <zorder>Delete_button</zorder>
   <zorder>AddNew_button</zorder>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

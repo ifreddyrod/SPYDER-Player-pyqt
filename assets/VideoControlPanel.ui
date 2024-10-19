@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ControlPanel_Form</class>
- <widget class="QWidget" name="ControlPanel_Form">
+ <class>VideoControlPanel</class>
+ <widget class="QWidget" name="VideoControlPanel">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -231,8 +231,8 @@ QSlider::handle:horizontal:disabled
               <string/>
              </property>
              <property name="icon">
-              <iconset>
-               <normaloff>icons/previous.png</normaloff>icons/previous.png</iconset>
+              <iconset resource="resources.qrc">
+               <normaloff>:/icons/icons/previous.png</normaloff>:/icons/icons/previous.png</iconset>
              </property>
             </widget>
            </item>
@@ -257,8 +257,8 @@ QSlider::handle:horizontal:disabled
               <string/>
              </property>
              <property name="icon">
-              <iconset>
-               <normaloff>icons/back.png</normaloff>icons/back.png</iconset>
+              <iconset resource="resources.qrc">
+               <normaloff>:/icons/icons/back.png</normaloff>:/icons/icons/back.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -297,8 +297,8 @@ QSlider::handle:horizontal:disabled
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normaloff>icons/mute.png</normaloff>icons/mute.png</iconset>
+                <iconset resource="resources.qrc">
+                 <normaloff>:/icons/icons/mute.png</normaloff>:/icons/icons/mute.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -332,8 +332,8 @@ QSlider::handle:horizontal:disabled
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normaloff>icons/volume.png</normaloff>icons/volume.png</iconset>
+                <iconset resource="resources.qrc">
+                 <normaloff>:/icons/icons/volume.png</normaloff>:/icons/icons/volume.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -382,8 +382,8 @@ QSlider::handle:horizontal:disabled
               <string/>
              </property>
              <property name="icon">
-              <iconset>
-               <normaloff>icons/list.png</normaloff>icons/list.png</iconset>
+              <iconset resource="resources.qrc">
+               <normaloff>:/icons/icons/list.png</normaloff>:/icons/icons/list.png</iconset>
              </property>
             </widget>
            </item>
@@ -415,8 +415,8 @@ border-radius: 35px;
             <string/>
            </property>
            <property name="icon">
-            <iconset>
-             <normaloff>icons/play.png</normaloff>icons/play.png</iconset>
+            <iconset resource="resources.qrc">
+             <normaloff>:/icons/icons/play.png</normaloff>:/icons/icons/play.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -452,8 +452,8 @@ border-radius: 35px;
               <string/>
              </property>
              <property name="icon">
-              <iconset>
-               <normaloff>icons/stop.png</normaloff>icons/stop.png</iconset>
+              <iconset resource="resources.qrc">
+               <normaloff>:/icons/icons/stop.png</normaloff>:/icons/icons/stop.png</iconset>
              </property>
             </widget>
            </item>
@@ -478,8 +478,8 @@ border-radius: 35px;
               <string/>
              </property>
              <property name="icon">
-              <iconset>
-               <normaloff>icons/forward.png</normaloff>icons/forward.png</iconset>
+              <iconset resource="resources.qrc">
+               <normaloff>:/icons/icons/forward.png</normaloff>:/icons/icons/forward.png</iconset>
              </property>
             </widget>
            </item>
@@ -504,8 +504,8 @@ border-radius: 35px;
               <string/>
              </property>
              <property name="icon">
-              <iconset>
-               <normaloff>icons/next.png</normaloff>icons/next.png</iconset>
+              <iconset resource="resources.qrc">
+               <normaloff>:/icons/icons/next.png</normaloff>:/icons/icons/next.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -536,8 +536,8 @@ border-radius: 35px;
               <string/>
              </property>
              <property name="icon">
-              <iconset>
-               <normaloff>icons/last.png</normaloff>icons/last.png</iconset>
+              <iconset resource="resources.qrc">
+               <normaloff>:/icons/icons/last.png</normaloff>:/icons/icons/last.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -638,6 +638,8 @@ background-color: rgba(255, 255, 255, 0);</string>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

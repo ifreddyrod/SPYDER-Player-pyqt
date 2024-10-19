@@ -1,0 +1,45 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>icons/back.png</file>
+    <file>icons/close.png</file>
+    <file>icons/collapsed.png</file>
+    <file>icons/expand.png</file>
+    <file>icons/expanded.png</file>
+    <file>icons/forward.png</file>
+    <file>icons/keyboard.png</file>
+    <file>icons/last.png</file>
+    <file>icons/library.png</file>
+    <file>icons/list.png</file>
+    <file>icons/minimize.png</file>
+    <file>icons/mute.png</file>
+    <file>icons/next.png</file>
+    <file>icons/pause.png</file>
+    <file>icons/play_empty.png</file>
+    <file>icons/play-pause.png</file>
+    <file>icons/play.png</file>
+    <file>icons/playlist.png</file>
+    <file>icons/previous.png</file>
+    <file>icons/repeat.png</file>
+    <file>icons/search.png</file>
+    <file>icons/settings-sliders.png</file>
+    <file>icons/spider-black.png</file>
+    <file>icons/spider-dark-icon-small.png</file>
+    <file>icons/spider-dark-icon.png</file>
+    <file>icons/spider-large-dark.png</file>
+    <file>icons/spider-large.png</file>
+    <file>icons/spider.png</file>
+    <file>icons/star-empty.png</file>
+    <file>icons/star-full.png</file>
+    <file>icons/star-trans.png</file>
+    <file>icons/stop.png</file>
+    <file>icons/volume.png</file>
+    <file>icons/white-diskette.png</file>
+    <file>icons/white-edit.png</file>
+    <file>icons/white-folder.png</file>
+    <file>icons/white-hide.png</file>
+    <file>icons/white-keyboard.png</file>
+    <file>icons/white-left-arrow.png</file>
+    <file>icons/white-minus.png</file>
+    <file>icons/white-plus-sign.png</file>
+  </qresource>
+</RCC>

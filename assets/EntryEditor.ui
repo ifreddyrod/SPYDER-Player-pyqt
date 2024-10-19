@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>EntryEditor</class>
+ <widget class="QWidget" name="EntryEditor">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -133,8 +133,8 @@ QComboBox QAbstractItemView {
     <string>  Back     </string>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>icons/white-left-arrow.png</normaloff>icons/white-left-arrow.png</iconset>
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/white-left-arrow.png</normaloff>:/icons/icons/white-left-arrow.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -185,8 +185,8 @@ QComboBox QAbstractItemView {
     <string>  Save</string>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>icons/white-diskette.png</normaloff>icons/white-diskette.png</iconset>
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/white-diskette.png</normaloff>:/icons/icons/white-diskette.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -213,8 +213,8 @@ background-color: rgba(0, 0, 0, 0);
     <string/>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>../../HotKeyManager/GUI/resources/white-folder.png</normaloff>../../HotKeyManager/GUI/resources/white-folder.png</iconset>
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/white-folder.png</normaloff>:/icons/icons/white-folder.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -313,6 +313,8 @@ background-color: rgba(0, 0, 0, 0);
   <zorder>Source_textedit</zorder>
   <zorder>OpenFiles_button</zorder>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

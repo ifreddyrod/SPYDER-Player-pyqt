@@ -9,7 +9,7 @@ import re
 import json
 import requests
 import os
-
+ 
 
 PLAYLIST_COLOR = QColor(20, 6, 36)
 
@@ -108,11 +108,24 @@ class PlayListManager(QWidget):
         
     def LoadStyleSheet(self):
 
-        if self.platform.lower() == "windows":
-            iconPath = "C:/Temp/icons/" 
+        '''if self.platform.lower() == "windows":
+            # Get the path of the current file
+            currentPath = os.path.abspath(__file__) 
+            # Reverse the backslash with forward slash
+            currentPath = os.path.normpath(currentPath).replace("\\", "/") 
+            # Remove the file name
+            iconPath = os.path.dirname(currentPath)
+            # Add the assets folder
+            iconPath = iconPath + "/assets/icons/"
+            #print(iconPath)
+
+            #iconPath = "C:/Temp/icons/" 
         else:
-            iconPath = os.getcwd() + "/assets/icons/"
+            #iconPath = os.getcwd() + "/assets/icons/"
+            iconPath = ":/icons/icons/"'''
         
+        iconPath = ":/icons/icons/"
+            
         icon_star_full = os.path.join(iconPath, 'star-full.png')
         icon_star_empty = os.path.join(iconPath, 'star-empty.png') 
         icon_collapsed = os.path.join(iconPath, 'collapsed.png')

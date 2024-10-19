@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>PlayerMainWindow</class>
+ <widget class="QWidget" name="PlayerMainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -86,8 +86,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>icons/settings-sliders.png</normaloff>icons/settings-sliders.png</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/icons/settings-sliders.png</normaloff>:/icons/icons/settings-sliders.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -137,7 +137,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>icons/spider.png</pixmap>
+         <pixmap resource="resources.qrc">:/icons/icons/spider.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -168,8 +168,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>icons/minimize.png</normaloff>icons/minimize.png</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/icons/minimize.png</normaloff>:/icons/icons/minimize.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -197,8 +197,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>icons/close.png</normaloff>icons/close.png</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/icons/close.png</normaloff>:/icons/icons/close.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -226,8 +226,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>icons/expand.png</normaloff>icons/expand.png</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/icons/expand.png</normaloff>:/icons/icons/expand.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -348,8 +348,8 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset>
-               <normaloff>icons/search.png</normaloff>icons/search.png</iconset>
+              <iconset resource="resources.qrc">
+               <normaloff>:/icons/icons/search.png</normaloff>:/icons/icons/search.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -586,6 +586,8 @@ color: rgb(20, 205, 255);  </string>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

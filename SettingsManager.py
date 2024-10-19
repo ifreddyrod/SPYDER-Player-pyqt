@@ -7,6 +7,11 @@ from DraggableWidget import DraggableWidget
 from enum import Enum
 from AppData import * 
 
+# Import Converted UI Files
+from Settings import Ui_SettingsMain
+from PlayListSettings import Ui_PlayListSettings
+from EntryEditor import Ui_EntryEditor
+
 class ENUM_SettingsViews(Enum):
     INTRO = 0
     PLAYLIST = 1 
@@ -19,7 +24,9 @@ class SettingsIntro(DraggableWidget):
     def __init__(self, SettingsManager):
         super().__init__()
         self.settingsManager = SettingsManager
-        self.ui = uic.loadUi("assets/Settings.ui", self)
+        self.ui = Ui_SettingsMain()
+        self.ui.setupUi(self)
+        #self.ui = uic.loadUi("assets/Settings.ui", self)
         
         self.ui.Close_button.clicked.connect(self.CloseButtonClicked)
         self.ui.PlayList_button.clicked.connect(self.PlayListButtonClicked)
@@ -49,7 +56,9 @@ class ListSettings(DraggableWidget):
         self.listType = ListType
         self.settingsManager = SettingsManager
         
-        self.ui = uic.loadUi("assets/PlayListSettings.ui", self)
+        self.ui = Ui_PlayListSettings()
+        self.ui.setupUi(self)
+        #self.ui = uic.loadUi("assets/PlayListSettings.ui", self)
         
         if self.listType == ENUM_SettingsViews.PLAYLIST:
             self.ui.Titlebar_label.setText("PlayList Settings")
@@ -75,6 +84,7 @@ class ListSettings(DraggableWidget):
         self.ui.Edit_button.clicked.connect(self.EditEntry)
         self.ui.Delete_button.clicked.connect(self.DeleteEntry)
         self.ui.PlayList_table.cellClicked.connect(self.RowSelected)
+        
         
     def BackButtonClicked(self):
         self.settingsManager.ShowSettings()
@@ -132,19 +142,19 @@ class ListSettings(DraggableWidget):
         elif self.listType == ENUM_SettingsViews.LIBRARY:   
             self.settingsManager.ShowEditLibraryEditor(self.editList, self.entryRow)           
     
-    def DeleteEntry(self):
-        self.entryRow = self.ui.PlayList_table.currentRow()
-        
+    def DeleteEntry(self): 
         if len(self.editList) == 0:
             return
+        
+        self.entryRow = self.ui.PlayList_table.currentRow()
         
         self.editList.pop(self.entryRow)
         self.SaveData()
         self.UpdateTable()
-              
     
     def SaveData(self):
         self.settingsManager.appData.save()
+        
         
 class EntryEditor(DraggableWidget):
     entryChanged = False
@@ -158,7 +168,10 @@ class EntryEditor(DraggableWidget):
         self.entryType = EntryType
         self.settingsManager = SettingsManager
         
-        self.ui = uic.loadUi("assets/EntryEditor.ui", self)
+        self.ui = Ui_EntryEditor()
+        self.ui.setupUi(self)
+        
+        #self.ui = uic.loadUi("assets/EntryEditor.ui", self)
         
         #self.ui.SourceType_combobox.currentIndexChanged.connect(self.SourceTypeChanged)
         self.ui.Back_button.clicked.connect(self.BackButtonClicked)
@@ -282,23 +295,18 @@ class EntryEditor(DraggableWidget):
         
     def SaveButtonClicked(self):
         if self.newEntry:
-            '''self.editEntry.name = self.ui.Name_textedit.text()
+            self.editEntry.name = self.ui.Name_textedit.text()
             self.editEntry.sourceType = self.ui.SourceType_combobox.currentText()
-            self.editEntry.source = self.ui.Source_textedit.toPlainText()'''
+            self.editEntry.source = self.ui.Source_textedit.toPlainText()
             
-            print("EditList size Before: " + str(len(self.editList)))
             if self.entryType == ENUM_SettingsViews.PLAYLIST_EDITOR:
                 parentName = '' 
             elif self.entryType == ENUM_SettingsViews.LIBRARY_EDITOR:
                 parentName = 'Library'
             
-            self.editList.append(PlayListEntry(
-                name=self.ui.Name_textedit.text(),
-                parentName=parentName,
-                sourceType=self.ui.SourceType_combobox.currentText(),
-                source=self.ui.Source_textedit.toPlainText()
-            ))
-            print("EditList size After: " + str(len(self.editList)))
+            self.editEntry.parentName = parentName
+            self.editList.append(self.editEntry)
+
         else:
             self.editList[self.editListIndex].name = self.ui.Name_textedit.text()
             self.editList[self.editListIndex].sourceType = self.ui.SourceType_combobox.currentText()
@@ -374,9 +382,10 @@ class SettingsManager(QObject):
         self.settingStack.show()
         
     def HideSettings(self):
+        self.settingStack.hide()
         if self.changesMade:
             self.reLoadAllPlayListsSignal.emit()
-        self.settingStack.hide()
+        
 
         
     def ShowPlayListSettings(self, changesMade: bool = False):
@@ -406,9 +415,7 @@ class SettingsManager(QObject):
     def ShowEditPlayListEditor(self, editList: List[PlayListEntry], row):
         self.PlayListEditor.LoadEntry(editList, row)
         self.settingStack.setCurrentIndex(ENUM_SettingsViews.PLAYLIST_EDITOR.value)
-        
-
-        
+          
     def SaveSettings(self):
         if self.changesMade:
             self.appData.save()

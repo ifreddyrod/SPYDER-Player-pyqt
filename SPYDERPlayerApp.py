@@ -12,8 +12,13 @@ from AppData import *
 import platform
 import sys
 import time
-                
-                
+
+# Import Converted UI Classes
+from resources_rc import *    
+from SplashScreen import Ui_SplashScreen 
+from VideoControlPanel import Ui_VideoControlPanel   
+from PlayerMainWindow import Ui_PlayerMainWindow
+     
                         
 class VideoControlPannel(QWidget):     
     def __init__(self, parent=None):
@@ -21,8 +26,10 @@ class VideoControlPannel(QWidget):
         super().__init__(parent)
         self.SpyderPlayer = parent
         
-        controllerUIpath = os.getcwd() + "/assets/VideoControlPanel.ui"
-        self.ui = uic.loadUi(controllerUIpath, self)
+        #controllerUIpath = os.getcwd() + "/assets/VideoControlPanel.ui"
+        #self.ui = uic.loadUi(controllerUIpath, self)
+        self.ui = Ui_VideoControlPanel()
+        self.ui.setupUi(self)
         
         # Make sure the control panel is frameless and transparent
         self.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint )
@@ -33,8 +40,10 @@ class SplashScreen(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         
-        splashUIpath = os.getcwd() + "/assets/SplashScreen.ui"
-        self.ui = uic.loadUi(splashUIpath, self)
+        #splashUIpath = os.getcwd() + "/assets/SplashScreen.ui"
+        #self.ui = uic.loadUi(splashUIpath, self)
+        self.ui = Ui_SplashScreen()
+        self.ui.setupUi(self)
         
         self.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint )
         
@@ -82,8 +91,8 @@ class SpyderPlayer(QWidget):
 
         super().__init__(parent)
         self.splashScreen = SplashScreen()
-        self.splashScreen.Status_label.setText("Initializing ...")
-        self.splashScreen.Version_label.setText("Version: 1.0.0 Beta")
+        self.splashScreen.ui.Status_label.setText("Initializing ...")
+        self.splashScreen.ui.Version_label.setText("Version: 1.0.0 Beta")
         
         self.mousePressPos = None
         self.mouseMoveActive = False
@@ -94,12 +103,14 @@ class SpyderPlayer(QWidget):
      
         #---------------------------
         # Load UI Files
-        #---------------------------        
+        #---------------------------    
+        self.ui = Ui_PlayerMainWindow()
+        self.ui.setupUi(self)    
         # Get current directory and append GUI file     
-        mainUIPath = os.getcwd() + "/assets/PlayerMainWindow.ui"
+        #mainUIPath = os.getcwd() + "/assets/PlayerMainWindow.ui"
         
         # Load the UI files
-        self.ui = uic.loadUi(mainUIPath, self)  
+        #self.ui = uic.loadUi(mainUIPath, self)  
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint )
         self.videoLabel = self.ui.CurrentlyPlaying_label
         self.videoLabel.setText("")
@@ -645,13 +656,13 @@ class SpyderPlayer(QWidget):
           
     def ChangePlayingUIStates(self, playing: bool):
         if playing:
-            self.controlPanelFS.ui.Play_button.setIcon(QIcon("assets/icons/pause.png"))
-            self.controlPanel.ui.Play_button.setIcon(QIcon("assets/icons/pause.png"))
+            self.controlPanelFS.ui.Play_button.setIcon(QIcon(":icons/icons/pause.png"))
+            self.controlPanel.ui.Play_button.setIcon(QIcon(":icons/icons/pause.png"))
             self.controlPanelFS.ui.VideoPosition_slider.setEnabled(False)
             self.controlPanel.ui.VideoPosition_slider.setEnabled(False)
         else:
-            self.controlPanelFS.ui.Play_button.setIcon(QIcon("assets/icons/play.png"))
-            self.controlPanel.ui.Play_button.setIcon(QIcon("assets/icons/play.png"))
+            self.controlPanelFS.ui.Play_button.setIcon(QIcon(":icons/icons/play.png"))
+            self.controlPanel.ui.Play_button.setIcon(QIcon(":icons/icons/play.png"))
             self.controlPanelFS.ui.VideoPosition_slider.setEnabled(self.videoChangesPosition)
             self.controlPanel.ui.VideoPosition_slider.setEnabled(self.videoChangesPosition)            
                 

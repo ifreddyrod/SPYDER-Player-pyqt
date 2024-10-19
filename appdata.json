@@ -35,6 +35,12 @@
             "parentName": "Library",
             "sourceType": "file",
             "source": "/Users/freddy/Movies/Scuba-uhd_3840_2160_60fps.mp4"
+        },
+        {
+            "name": "Drone over Green Marsh",
+            "parentName": "Library",
+            "sourceType": "file",
+            "source": "/Users/freddy/Movies/16898286-uhd_3840_2160_25fps.mp4"
         }
     ],
     "Favorites": [
@@ -116,7 +122,7 @@
             "name": "TheTVApp",
             "parentName": "",
             "sourceType": "file",
-            "source": "/Users/freddy/Projects/Python/SPYDER Player/TheTVApp.to.m3u8"
+            "source": "TheTVApp.to.m3u8"
         }
     ]
 }
