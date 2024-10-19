@@ -19,7 +19,7 @@
     },
     "Library": [
         {
-            "name": "Releasing Fish",
+            "name": "Releasing Fish in a River",
             "parentName": "Library",
             "sourceType": "file",
             "source": "/Users/freddy/Movies/fish-release.mp4"
@@ -111,6 +111,12 @@
             "parentName": "",
             "sourceType": "file",
             "source": "us_longlist.m3u"
+        },
+        {
+            "name": "TheTVApp",
+            "parentName": "",
+            "sourceType": "file",
+            "source": "/Users/freddy/Projects/Python/SPYDER Player/TheTVApp.to.m3u8"
         }
     ]
 }

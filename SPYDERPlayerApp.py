@@ -107,11 +107,13 @@ class SpyderPlayer(QWidget):
         self.statusLabel.setText("")
         self.setWindowOpacity(0)
         
-        # Load AppData
+        #---------------------------
+        # Load AppData from file
+        #---------------------------
         self.appData = AppData.load(self.dataFilePath)
         
         #---------------------------
-        # Setup Playlist Tree
+        # Setup Playlist Manager
         #---------------------------
         self.playlistmanager = PlayListManager(self.ui.PlayList_tree, self.appData, self)
         self.playlistmanager.installEventFilter(self)
@@ -146,8 +148,6 @@ class SpyderPlayer(QWidget):
         #self.ui.Channels_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self.ui.botomverticalLayout.addWidget(self.controlPanel)
         self.controlPanel.show()        
-        
-
         
                 
         # Install event filter to detect window state changes
@@ -213,9 +213,9 @@ class SpyderPlayer(QWidget):
         
         self.player.durationChanged.connect(self.PlayerDurationChanged)
         
-        self.ui.Settings_button.setEnabled(True)
+        #self.ui.Settings_button.setEnabled(True)
         self.ui.Settings_button.clicked.connect(self.ShowSettings)
-
+        self.settingsManager.reLoadAllPlayListsSignal.connect(self.InitializePlayer)
         
         # Set up a timer to detect inactivity
         self.inactivityTimer = QTimer(self)
@@ -237,15 +237,10 @@ class SpyderPlayer(QWidget):
         self.controlPanelFS.ui.VideoPosition_slider.setEnabled(False)
         self.controlPanel.ui.VideoPosition_slider.setEnabled(False)
 
-        # Load Seattings
-        # Show Splash Screen
-
+        #-----------------------------------------
+        # Show Splash Screen and Load Playlists
+        #-----------------------------------------
         self.InitializePlayer()
-        
-        # Load Playlists
-        # Load Favorites
-        # Close Splash Screen
-        # Allow App to Run
         
     def InitializePlayer(self):
         # Show Splash Screen
@@ -253,6 +248,8 @@ class SpyderPlayer(QWidget):
         self.splashScreen.splashTimer.start()
         self.splashScreen.UpdateStatus("Loading Playlists:", 1)
                 
+        self.playlistmanager.ResetAllLists()
+        
         # Load Playlists and Update Splash Screen        
         for i in range(len(self.appData.PlayLists)):
             self.splashScreen.UpdateStatus("Loading " + self.appData.PlayLists[i].name + " ....")
@@ -276,7 +273,7 @@ class SpyderPlayer(QWidget):
         while self.splashScreen.splashTimerCompleted == False:
             QApplication.processEvents()
         
-        self.splashScreen.close()
+        self.splashScreen.hide()
         self.setWindowOpacity(1.0)
                
         

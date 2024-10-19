@@ -50,8 +50,9 @@ class AppData(BaseModel):
 
     def save(self):
         """Saves the current AppData instance to a JSON file, excluding the _dataFile."""
+        #print("Saving data to: " + self._dataFile)
         data_to_save = self.dict()  # Get the Pydantic model data
         with open(self._dataFile, "w") as file:
             json.dump(data_to_save, file, indent=4)
-        
+    
         

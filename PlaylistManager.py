@@ -462,7 +462,7 @@ class PlayListManager(QWidget):
             # Add the item to the library list
             self.AppendChannel(self.libraryList, newEntry)
             
-        
+        self.UpdatePlayListChannelCount(self.libraryList) 
         
     def ToggleItemCheckedinList(self, playList: TreeItem, item: TreeItem, checked: bool):
         if item is None or playList is None:
