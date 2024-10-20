@@ -16,6 +16,7 @@
   <property name="styleSheet">
    <string notr="true">/*background-color: rgb(42, 42, 42);*/
 
+
 QLabel
 {
 	color: rgb(216, 216, 216);
@@ -102,8 +103,94 @@ QHeaderView
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(216, 216, 216);
-</string>
+    <string notr="true">
+/* Vertical Scrollbar */
+QScrollBar:vertical 
+{
+    border: 2px solid black;
+    background: black;
+    width: 15px;
+    margin: 22px 0 22px 0;
+}
+
+QScrollBar::handle:vertical 
+{
+    background: rgb(82, 26, 149);
+    min-height: 40px;
+    border-radius: 4px; 
+}
+
+QScrollBar::add-line:vertical 
+{
+    border: 2px solid rgb(35, 11, 63);
+    background: rgb(82, 26, 149);
+    height: 15px;
+    border-radius: 4px; 
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical 
+{
+    border: 2px solid rgb(35, 11, 63);
+    background: rgb(82, 26, 149);
+    height: 15px;
+    border-radius: 4px; 
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+
+/* Horizontal Scrollbar */
+QScrollBar:horizontal 
+{
+    border: 2px solid black;
+    background: black;
+    height: 15px;
+    margin: 0 22px 0 22px;
+}
+
+QScrollBar::handle:horizontal 
+{
+    background: rgb(82, 26, 149);
+    min-width: 40px;
+    border-radius: 4px; 
+}
+
+QScrollBar::add-line:horizontal 
+{
+    border: 2px solid rgb(35, 11, 63);
+    background: rgb(82, 26, 149);
+    width: 15px;
+    border-radius: 4px; 
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal 
+{
+    border: 2px solid rgb(35, 11, 63);
+    background: rgb(82, 26, 149);
+    width: 15px;
+    border-radius: 4px; 
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+}
+
+
+QHeaderView::section 
+{
+        color: white;  /* Font color for headers */
+}
+
+QTableWidget::item
+{
+       color: rgb(216, 216, 216);
+}
+
+QTableWidget 
+{
+        border: none;
+}</string>
    </property>
    <property name="autoScroll">
     <bool>false</bool>
@@ -138,7 +225,7 @@ QHeaderView
     </property>
     <property name="font">
      <font>
-      <pointsize>16</pointsize>
+      <pointsize>14</pointsize>
      </font>
     </property>
    </column>
@@ -148,7 +235,7 @@ QHeaderView
     </property>
     <property name="font">
      <font>
-      <pointsize>16</pointsize>
+      <pointsize>14</pointsize>
      </font>
     </property>
    </column>

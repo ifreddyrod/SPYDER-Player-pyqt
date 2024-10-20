@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string>SPYDER Player</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/icons/icons/spider.png</normaloff>:/icons/icons/spider.png</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">color: white;</string>
   </property>
@@ -68,38 +72,6 @@
       <property name="spacing">
        <number>0</number>
       </property>
-      <item row="0" column="8">
-       <widget class="QPushButton" name="Settings_button">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>40</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="resources.qrc">
-          <normaloff>:/icons/icons/settings-sliders.png</normaloff>:/icons/icons/settings-sliders.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>22</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="6">
        <spacer name="horizontalSpacer">
         <property name="orientation">
@@ -333,7 +305,7 @@
         <number>0</number>
        </property>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,100,5">
+        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,100,0">
          <property name="spacing">
           <number>0</number>
          </property>
@@ -344,6 +316,9 @@
            </property>
            <item>
             <widget class="QPushButton" name="Search_button">
+             <property name="toolTip">
+              <string>Search All Lists</string>
+             </property>
              <property name="text">
               <string/>
              </property>
@@ -379,6 +354,9 @@
              <property name="focusPolicy">
               <enum>Qt::FocusPolicy::ClickFocus</enum>
              </property>
+             <property name="toolTip">
+              <string>Enter Search Query (multiple phrases can be searched with + separator.  Example search: sports + 4K)</string>
+             </property>
              <property name="styleSheet">
               <string notr="true">background-color: rgb(30, 30, 30);
 color: rgb(20, 205, 255); 
@@ -408,75 +386,98 @@ QLineEdit
          <item>
           <widget class="QTreeWidget" name="PlayList_tree">
            <property name="styleSheet">
-            <string notr="true">QTreeWidget
-{
-	background-color: rgb(15, 15, 15);
-	color: white;
-	
-	font: 12pt &quot;Helvetica Neue&quot;;
-	
-}
+            <string notr="true">        QTreeWidget
+        {
+        background-color: rgb(15, 15, 15);
+        background: black;
+        color: white;
+        }
 
-/*QTreeView::branch 	
-{
-   	height: 5px;
-	width: 5px;
-}*/
+        QTreeView::branch:open
+        {
+        image: url(&quot;:/icons/icons/expanded.png&quot;);
+        }
+        QTreeView::branch:closed:has-children
+        {
+        image: url(&quot;:/icons/icons/collapsed.png&quot;);
+        }
 
-QTreeView::branch:open 
-{
-    image: url(&quot;icons/expanded.png&quot;);
-}
-QTreeView::branch:closed:has-children 
-{
-    image: url(&quot;icons/collapsed.png&quot;);
-}
+        QTreeWidget::item
+        {
+        height: 50px;
+        }
 
-QTreeWidget::item
-{	 
-	height: 50px; 
-}
+        QTreeWidget::indicator
+        {
+        width: 16px;
+        height: 16px;
+        }
 
-QTreeWidget::indicator {
-    width: 16px;
-    height: 16px;
-	/*padding: 10px;*/
+        QTreeWidgetItem::indicator:enabled
+        {
+        padding-right: 10px;
+        }
 
-}
+        QTreeWidget::indicator:checked
+        {
+        image: url(&quot;:/icons/icons/star-full.png&quot;);
+        }
 
-QTreeWidgetItem::indicator:enabled
-{
-        padding-right: 10px; /* adjust the spacing */
-}
+        QTreeWidget::indicator:unchecked
+        {
+        image: url(&quot;:/icons/icons/star-empty.png&quot;);
+        }
 
-QTreeWidget::indicator:checked {
-    image: url(&quot;icons/star-full.png&quot;);
-}
-
-QTreeWidget::indicator:unchecked {
-    image: url(&quot;icons/star-empty.png&quot;);
-}
-
-QTreeView::item:selected
-{
-    
-	background-color: rgb(35, 11, 63);
-    border: 1px solid rgb(82, 26, 149);
-    border-left-color: transparent;
-    border-right-color: transparent;
-}
-
-
-/*QTreeWidgetItem[parent=1] 
-{ 
-	background-color: rgb(70, 22, 128);
-}*/
-
-
-
-/*QTreeView::indicator {
-    image: url(:/path/to/your/checkbox/image.png);
-}*/</string>
+        QTreeView::item:selected
+        {
+        background-color: rgb(30, 30, 30);
+        border: 1px solid rgb(82, 26, 149);
+        border-left-color: transparent;
+        border-right-color: transparent;
+        }
+        
+        QTreeView::item:hover
+        {
+        background-color: rgb(35, 11, 63);
+        border: 1px solid rgb(82, 26, 149);
+        border-left-color: transparent;
+        border-right-color: transparent;
+        }    
+            
+        QScrollBar:vertical 
+        {
+            border: 2px solid black;
+            background: black;
+            width: 15px;
+            margin: 22px 0 22px 0;
+        }
+        QScrollBar::handle:vertical 
+        {
+            /*border: 1px solid rgb(35, 11, 63);*/
+            background: rgb(82, 26, 149);
+            min-height: 40px;
+            border-radius: 4px; 
+        }
+        QScrollBar::add-line:vertical 
+        {
+            border: 2px solid rgb(35, 11, 63);
+            background: rgb(82, 26, 149);
+            height: 15px;
+            border-radius: 4px; 
+            subcontrol-position: bottom;
+            subcontrol-origin: margin;
+        }
+        QScrollBar::sub-line:vertical 
+        {
+            border: 2px solid rgb(35, 11, 63);
+            background: rgb(82, 26, 149);
+            height: 15px;
+            border-radius: 4px; 
+            subcontrol-position: top;
+            subcontrol-origin: margin;
+        }  
+        background-color: rgb(15, 15, 15);
+        border: 1px solid transparent;</string>
            </property>
            <property name="editTriggers">
             <set>QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed|QAbstractItemView::EditTrigger::SelectedClicked</set>
@@ -507,24 +508,66 @@ QTreeView::item:selected
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="Status_label">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>30</height>
-            </size>
+          <layout class="QHBoxLayout" name="bottomhorizontalLayout">
+           <property name="spacing">
+            <number>0</number>
            </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(30, 30, 30);
+           <item>
+            <widget class="QPushButton" name="Settings_button">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>32</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Settings</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/icons/icons/settings-sliders.png</normaloff>:/icons/icons/settings-sliders.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>22</width>
+               <height>22</height>
+              </size>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="Status_label">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(30, 30, 30);
 color: rgb(20, 205, 255);  </string>
-           </property>
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="indent">
-            <number>30</number>
-           </property>
-          </widget>
+             </property>
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+             <property name="indent">
+              <number>30</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>

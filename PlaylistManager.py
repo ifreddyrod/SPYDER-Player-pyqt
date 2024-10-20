@@ -107,23 +107,6 @@ class PlayListManager(QWidget):
         self.AppendPlayList(self.libraryList)
         
     def LoadStyleSheet(self):
-
-        '''if self.platform.lower() == "windows":
-            # Get the path of the current file
-            currentPath = os.path.abspath(__file__) 
-            # Reverse the backslash with forward slash
-            currentPath = os.path.normpath(currentPath).replace("\\", "/") 
-            # Remove the file name
-            iconPath = os.path.dirname(currentPath)
-            # Add the assets folder
-            iconPath = iconPath + "/assets/icons/"
-            #print(iconPath)
-
-            #iconPath = "C:/Temp/icons/" 
-        else:
-            #iconPath = os.getcwd() + "/assets/icons/"
-            iconPath = ":/icons/icons/"'''
-        
         iconPath = ":/icons/icons/"
             
         icon_star_full = os.path.join(iconPath, 'star-full.png')

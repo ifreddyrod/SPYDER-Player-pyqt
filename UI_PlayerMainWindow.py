@@ -18,6 +18,9 @@ class Ui_PlayerMainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(PlayerMainWindow.sizePolicy().hasHeightForWidth())
         PlayerMainWindow.setSizePolicy(sizePolicy)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/icons/icons/spider.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        PlayerMainWindow.setWindowIcon(icon)
         PlayerMainWindow.setStyleSheet("color: white;")
         self.verticalLayout = QtWidgets.QVBoxLayout(PlayerMainWindow)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -36,21 +39,6 @@ class Ui_PlayerMainWindow(object):
         self.WindowHeader_layout.setContentsMargins(0, 0, 0, 0)
         self.WindowHeader_layout.setSpacing(0)
         self.WindowHeader_layout.setObjectName("WindowHeader_layout")
-        self.Settings_button = QtWidgets.QPushButton(parent=self.Title_frame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.Settings_button.sizePolicy().hasHeightForWidth())
-        self.Settings_button.setSizePolicy(sizePolicy)
-        self.Settings_button.setMaximumSize(QtCore.QSize(40, 30))
-        self.Settings_button.setText("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/icons/icons/settings-sliders.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
-        self.Settings_button.setIcon(icon)
-        self.Settings_button.setIconSize(QtCore.QSize(22, 22))
-        self.Settings_button.setFlat(True)
-        self.Settings_button.setObjectName("Settings_button")
-        self.WindowHeader_layout.addWidget(self.Settings_button, 0, 8, 1, 1)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.WindowHeader_layout.addItem(spacerItem, 0, 6, 1, 1)
         self.Logo_label = QtWidgets.QLabel(parent=self.Title_frame)
@@ -179,75 +167,98 @@ class Ui_PlayerMainWindow(object):
         self.searchLayout.setStretch(1, 30)
         self.verticalLayout_2.addLayout(self.searchLayout)
         self.PlayList_tree = QtWidgets.QTreeWidget(parent=self.horizontalLayoutWidget_2)
-        self.PlayList_tree.setStyleSheet("QTreeWidget\n"
-"{\n"
-"    background-color: rgb(15, 15, 15);\n"
-"    color: white;\n"
-"    \n"
-"    font: 12pt \"Helvetica Neue\";\n"
-"    \n"
-"}\n"
+        self.PlayList_tree.setStyleSheet("        QTreeWidget\n"
+"        {\n"
+"        background-color: rgb(15, 15, 15);\n"
+"        background: black;\n"
+"        color: white;\n"
+"        }\n"
 "\n"
-"/*QTreeView::branch     \n"
-"{\n"
-"       height: 5px;\n"
-"    width: 5px;\n"
-"}*/\n"
+"        QTreeView::branch:open\n"
+"        {\n"
+"        image: url(\":/icons/icons/expanded.png\");\n"
+"        }\n"
+"        QTreeView::branch:closed:has-children\n"
+"        {\n"
+"        image: url(\":/icons/icons/collapsed.png\");\n"
+"        }\n"
 "\n"
-"QTreeView::branch:open \n"
-"{\n"
-"    image: url(\"icons/expanded.png\");\n"
-"}\n"
-"QTreeView::branch:closed:has-children \n"
-"{\n"
-"    image: url(\"icons/collapsed.png\");\n"
-"}\n"
+"        QTreeWidget::item\n"
+"        {\n"
+"        height: 50px;\n"
+"        }\n"
 "\n"
-"QTreeWidget::item\n"
-"{     \n"
-"    height: 50px; \n"
-"}\n"
+"        QTreeWidget::indicator\n"
+"        {\n"
+"        width: 16px;\n"
+"        height: 16px;\n"
+"        }\n"
 "\n"
-"QTreeWidget::indicator {\n"
-"    width: 16px;\n"
-"    height: 16px;\n"
-"    /*padding: 10px;*/\n"
+"        QTreeWidgetItem::indicator:enabled\n"
+"        {\n"
+"        padding-right: 10px;\n"
+"        }\n"
 "\n"
-"}\n"
+"        QTreeWidget::indicator:checked\n"
+"        {\n"
+"        image: url(\":/icons/icons/star-full.png\");\n"
+"        }\n"
 "\n"
-"QTreeWidgetItem::indicator:enabled\n"
-"{\n"
-"        padding-right: 10px; /* adjust the spacing */\n"
-"}\n"
+"        QTreeWidget::indicator:unchecked\n"
+"        {\n"
+"        image: url(\":/icons/icons/star-empty.png\");\n"
+"        }\n"
 "\n"
-"QTreeWidget::indicator:checked {\n"
-"    image: url(\"icons/star-full.png\");\n"
-"}\n"
-"\n"
-"QTreeWidget::indicator:unchecked {\n"
-"    image: url(\"icons/star-empty.png\");\n"
-"}\n"
-"\n"
-"QTreeView::item:selected\n"
-"{\n"
-"    \n"
-"    background-color: rgb(35, 11, 63);\n"
-"    border: 1px solid rgb(82, 26, 149);\n"
-"    border-left-color: transparent;\n"
-"    border-right-color: transparent;\n"
-"}\n"
-"\n"
-"\n"
-"/*QTreeWidgetItem[parent=1] \n"
-"{ \n"
-"    background-color: rgb(70, 22, 128);\n"
-"}*/\n"
-"\n"
-"\n"
-"\n"
-"/*QTreeView::indicator {\n"
-"    image: url(:/path/to/your/checkbox/image.png);\n"
-"}*/")
+"        QTreeView::item:selected\n"
+"        {\n"
+"        background-color: rgb(30, 30, 30);\n"
+"        border: 1px solid rgb(82, 26, 149);\n"
+"        border-left-color: transparent;\n"
+"        border-right-color: transparent;\n"
+"        }\n"
+"        \n"
+"        QTreeView::item:hover\n"
+"        {\n"
+"        background-color: rgb(35, 11, 63);\n"
+"        border: 1px solid rgb(82, 26, 149);\n"
+"        border-left-color: transparent;\n"
+"        border-right-color: transparent;\n"
+"        }    \n"
+"            \n"
+"        QScrollBar:vertical \n"
+"        {\n"
+"            border: 2px solid black;\n"
+"            background: black;\n"
+"            width: 15px;\n"
+"            margin: 22px 0 22px 0;\n"
+"        }\n"
+"        QScrollBar::handle:vertical \n"
+"        {\n"
+"            /*border: 1px solid rgb(35, 11, 63);*/\n"
+"            background: rgb(82, 26, 149);\n"
+"            min-height: 40px;\n"
+"            border-radius: 4px; \n"
+"        }\n"
+"        QScrollBar::add-line:vertical \n"
+"        {\n"
+"            border: 2px solid rgb(35, 11, 63);\n"
+"            background: rgb(82, 26, 149);\n"
+"            height: 15px;\n"
+"            border-radius: 4px; \n"
+"            subcontrol-position: bottom;\n"
+"            subcontrol-origin: margin;\n"
+"        }\n"
+"        QScrollBar::sub-line:vertical \n"
+"        {\n"
+"            border: 2px solid rgb(35, 11, 63);\n"
+"            background: rgb(82, 26, 149);\n"
+"            height: 15px;\n"
+"            border-radius: 4px; \n"
+"            subcontrol-position: top;\n"
+"            subcontrol-origin: margin;\n"
+"        }  \n"
+"        background-color: rgb(15, 15, 15);\n"
+"        border: 1px solid transparent;")
         self.PlayList_tree.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.DoubleClicked|QtWidgets.QAbstractItemView.EditTrigger.EditKeyPressed|QtWidgets.QAbstractItemView.EditTrigger.SelectedClicked)
         self.PlayList_tree.setIndentation(25)
         self.PlayList_tree.setUniformRowHeights(True)
@@ -257,16 +268,34 @@ class Ui_PlayerMainWindow(object):
         self.PlayList_tree.setObjectName("PlayList_tree")
         self.PlayList_tree.headerItem().setText(0, "1")
         self.verticalLayout_2.addWidget(self.PlayList_tree)
+        self.bottomhorizontalLayout = QtWidgets.QHBoxLayout()
+        self.bottomhorizontalLayout.setSpacing(0)
+        self.bottomhorizontalLayout.setObjectName("bottomhorizontalLayout")
+        self.Settings_button = QtWidgets.QPushButton(parent=self.horizontalLayoutWidget_2)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.Settings_button.sizePolicy().hasHeightForWidth())
+        self.Settings_button.setSizePolicy(sizePolicy)
+        self.Settings_button.setMaximumSize(QtCore.QSize(32, 30))
+        self.Settings_button.setText("")
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(":/icons/icons/settings-sliders.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        self.Settings_button.setIcon(icon5)
+        self.Settings_button.setIconSize(QtCore.QSize(22, 22))
+        self.Settings_button.setFlat(True)
+        self.Settings_button.setObjectName("Settings_button")
+        self.bottomhorizontalLayout.addWidget(self.Settings_button)
         self.Status_label = QtWidgets.QLabel(parent=self.horizontalLayoutWidget_2)
         self.Status_label.setMaximumSize(QtCore.QSize(16777215, 30))
         self.Status_label.setStyleSheet("background-color: rgb(30, 30, 30);\n"
 "color: rgb(20, 205, 255);  ")
         self.Status_label.setIndent(30)
         self.Status_label.setObjectName("Status_label")
-        self.verticalLayout_2.addWidget(self.Status_label)
+        self.bottomhorizontalLayout.addWidget(self.Status_label)
+        self.verticalLayout_2.addLayout(self.bottomhorizontalLayout)
         self.verticalLayout_2.setStretch(0, 1)
         self.verticalLayout_2.setStretch(1, 100)
-        self.verticalLayout_2.setStretch(2, 5)
         self.horizontalLayout_2.addLayout(self.verticalLayout_2)
         self.horizontalLayoutWidget_3 = QtWidgets.QWidget(parent=self.Horizontal_splitter)
         self.horizontalLayoutWidget_3.setObjectName("horizontalLayoutWidget_3")
@@ -306,6 +335,9 @@ class Ui_PlayerMainWindow(object):
         PlayerMainWindow.setWindowTitle(_translate("PlayerMainWindow", "SPYDER Player"))
         self.CurrentlyPlaying_label.setText(_translate("PlayerMainWindow", "[ Channel Name ]"))
         self.WindowTitle_label.setText(_translate("PlayerMainWindow", "SPYDER Player "))
+        self.Search_button.setToolTip(_translate("PlayerMainWindow", "Search All Lists"))
+        self.Query_input.setToolTip(_translate("PlayerMainWindow", "Enter Search Query (multiple phrases can be searched with + separator.  Example search: sports + 4K)"))
         self.PlayList_tree.setSortingEnabled(False)
+        self.Settings_button.setToolTip(_translate("PlayerMainWindow", "Settings"))
         self.Status_label.setText(_translate("PlayerMainWindow", "TextLabel"))
 from PyQt6.QtMultimediaWidgets import QVideoWidget

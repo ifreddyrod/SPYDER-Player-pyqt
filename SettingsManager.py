@@ -8,9 +8,9 @@ from enum import Enum
 from AppData import * 
 
 # Import Converted UI Files
-from Settings import Ui_SettingsMain
-from PlayListSettings import Ui_PlayListSettings
-from EntryEditor import Ui_EntryEditor
+from UI_Settings import Ui_SettingsMain
+from UI_PlayListSettings import Ui_PlayListSettings
+from UI_EntryEditor import Ui_EntryEditor
 
 class ENUM_SettingsViews(Enum):
     INTRO = 0
@@ -26,7 +26,6 @@ class SettingsIntro(DraggableWidget):
         self.settingsManager = SettingsManager
         self.ui = Ui_SettingsMain()
         self.ui.setupUi(self)
-        #self.ui = uic.loadUi("assets/Settings.ui", self)
         
         self.ui.Close_button.clicked.connect(self.CloseButtonClicked)
         self.ui.PlayList_button.clicked.connect(self.PlayListButtonClicked)
@@ -58,7 +57,6 @@ class ListSettings(DraggableWidget):
         
         self.ui = Ui_PlayListSettings()
         self.ui.setupUi(self)
-        #self.ui = uic.loadUi("assets/PlayListSettings.ui", self)
         
         if self.listType == ENUM_SettingsViews.PLAYLIST:
             self.ui.Titlebar_label.setText("PlayList Settings")
@@ -67,7 +65,7 @@ class ListSettings(DraggableWidget):
             self.ui.Titlebar_label.setText("Library Settings")
             self.editList = self.settingsManager.appData.Library
             columnFont = QFont()
-            columnFont.setPointSize(16)
+            columnFont.setPointSize(14)
             column0 = QTableWidgetItem("Item Name")
             column0.setFont(columnFont)
             self.ui.PlayList_table.setHorizontalHeaderItem(0, column0)
@@ -75,7 +73,7 @@ class ListSettings(DraggableWidget):
             
         # Set Column Settings 
         self.ui.PlayList_table.setColumnWidth(0, 250)
-        self.ui.PlayList_table.setColumnWidth(1, 361)
+        self.ui.PlayList_table.setColumnWidth(1, 360)
         self.ui.PlayList_table.setWordWrap(True)
         
         # Setup Slots
@@ -171,7 +169,6 @@ class EntryEditor(DraggableWidget):
         self.ui = Ui_EntryEditor()
         self.ui.setupUi(self)
         
-        #self.ui = uic.loadUi("assets/EntryEditor.ui", self)
         
         #self.ui.SourceType_combobox.currentIndexChanged.connect(self.SourceTypeChanged)
         self.ui.Back_button.clicked.connect(self.BackButtonClicked)

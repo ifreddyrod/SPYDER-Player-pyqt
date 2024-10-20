@@ -8,10 +8,11 @@
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
+
 class Ui_SplashScreen(object):
     def setupUi(self, SplashScreen):
         SplashScreen.setObjectName("SplashScreen")
-        SplashScreen.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
+        SplashScreen.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         SplashScreen.resize(479, 300)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)

@@ -15,6 +15,7 @@ class Ui_PlayListSettings(object):
         PlayListSettings.resize(780, 430)
         PlayListSettings.setStyleSheet("/*background-color: rgb(42, 42, 42);*/\n"
 "\n"
+"\n"
 "QLabel\n"
 "{\n"
 "    color: rgb(216, 216, 216);\n"
@@ -71,8 +72,94 @@ class Ui_PlayListSettings(object):
         self.Titlebar_label.setObjectName("Titlebar_label")
         self.PlayList_table = QtWidgets.QTableWidget(parent=PlayListSettings)
         self.PlayList_table.setGeometry(QtCore.QRect(160, 50, 611, 371))
-        self.PlayList_table.setStyleSheet("color: rgb(216, 216, 216);\n"
-"")
+        self.PlayList_table.setStyleSheet("\n"
+"/* Vertical Scrollbar */\n"
+"QScrollBar:vertical \n"
+"{\n"
+"    border: 2px solid black;\n"
+"    background: black;\n"
+"    width: 15px;\n"
+"    margin: 22px 0 22px 0;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical \n"
+"{\n"
+"    background: rgb(82, 26, 149);\n"
+"    min-height: 40px;\n"
+"    border-radius: 4px; \n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical \n"
+"{\n"
+"    border: 2px solid rgb(35, 11, 63);\n"
+"    background: rgb(82, 26, 149);\n"
+"    height: 15px;\n"
+"    border-radius: 4px; \n"
+"    subcontrol-position: bottom;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical \n"
+"{\n"
+"    border: 2px solid rgb(35, 11, 63);\n"
+"    background: rgb(82, 26, 149);\n"
+"    height: 15px;\n"
+"    border-radius: 4px; \n"
+"    subcontrol-position: top;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"/* Horizontal Scrollbar */\n"
+"QScrollBar:horizontal \n"
+"{\n"
+"    border: 2px solid black;\n"
+"    background: black;\n"
+"    height: 15px;\n"
+"    margin: 0 22px 0 22px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal \n"
+"{\n"
+"    background: rgb(82, 26, 149);\n"
+"    min-width: 40px;\n"
+"    border-radius: 4px; \n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal \n"
+"{\n"
+"    border: 2px solid rgb(35, 11, 63);\n"
+"    background: rgb(82, 26, 149);\n"
+"    width: 15px;\n"
+"    border-radius: 4px; \n"
+"    subcontrol-position: right;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal \n"
+"{\n"
+"    border: 2px solid rgb(35, 11, 63);\n"
+"    background: rgb(82, 26, 149);\n"
+"    width: 15px;\n"
+"    border-radius: 4px; \n"
+"    subcontrol-position: left;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"\n"
+"QHeaderView::section \n"
+"{\n"
+"        color: white;  /* Font color for headers */\n"
+"}\n"
+"\n"
+"QTableWidget::item\n"
+"{\n"
+"       color: rgb(216, 216, 216);\n"
+"}\n"
+"\n"
+"QTableWidget \n"
+"{\n"
+"        border: none;\n"
+"}")
         self.PlayList_table.setAutoScroll(False)
         self.PlayList_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.PlayList_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
@@ -81,12 +168,12 @@ class Ui_PlayListSettings(object):
         self.PlayList_table.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
         font = QtGui.QFont()
-        font.setPointSize(16)
+        font.setPointSize(14)
         item.setFont(font)
         self.PlayList_table.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
         font = QtGui.QFont()
-        font.setPointSize(16)
+        font.setPointSize(14)
         item.setFont(font)
         self.PlayList_table.setHorizontalHeaderItem(1, item)
         self.PlayList_table.horizontalHeader().setCascadingSectionResizes(False)
