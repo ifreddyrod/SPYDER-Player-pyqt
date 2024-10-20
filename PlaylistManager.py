@@ -166,14 +166,22 @@ class PlayListManager(QWidget):
         border: 1px solid rgb(82, 26, 149);
         border-left-color: transparent;
         border-right-color: transparent;
+        color: white;
         }}
         
+        QTreeView::item:unselected
+        {{
+        border: none;
+        color: white;
+        }}   
+                
         QTreeView::item:hover
         {{
         background-color: rgb(35, 11, 63);
         border: 1px solid rgb(82, 26, 149);
         border-left-color: transparent;
         border-right-color: transparent;
+        color: white;
         }}    
             
         QScrollBar:vertical 
@@ -211,6 +219,8 @@ class PlayListManager(QWidget):
         background-color: rgb(15, 15, 15);
         border: 1px solid transparent;
         """
+        
+        #self.playlistTree.setHorizontalScrollMode(QTreeWidget)
         return stylesheet   
     
     def EmitTreeLayoutChanged(self):

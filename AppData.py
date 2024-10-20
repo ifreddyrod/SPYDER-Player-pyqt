@@ -1,39 +1,40 @@
-from pydantic import BaseModel, PrivateAttr
+from pydantic import BaseModel, ValidationError, Field
+from pydantic.fields import PrivateAttr
 from typing import List, Literal
 import json
+import os
 
-    
 class PlayListEntry(BaseModel):
     name: str
     parentName: str
     sourceType: Literal["file", "url"]
     source: str
-        
-class HotKeys(BaseModel):
-    playpause: str
-    playpauseAlt: str
-    toggleFullscreen: str
-    escapeFullscreen: str
-    togglePlaylist: str
-    volumeMute: str
-    volumeUp: str
-    volumeDown: str
-    seekForward: str
-    seekBackward: str
-    gotoTopofList: str
-    gotoBottomofList: str
-    collapseAllLists: str
-    sortListAscending: str
-    sortListDescending: str
-    gotoLast: str        
-        
+
+class AppHotKeys(BaseModel):
+    playpause: str = "k"
+    playpauseAlt: str = "space"
+    toggleFullscreen: str = "f"
+    escapeFullscreen: str = "esc"
+    togglePlaylist: str = "l"
+    volumeMute: str = "m"
+    volumeUp: str = "up"
+    volumeDown: str = "down"
+    seekForward: str = "right"
+    seekBackward: str = "left"
+    gotoTopofList: str = "t"
+    gotoBottomofList: str = "b"
+    collapseAllLists: str = "c"
+    sortListAscending: str = "a"
+    sortListDescending: str = "d"
+    gotoLast: str = "backspace"
+    showOptions: str = "o"
+
 class AppData(BaseModel):
-    HotKeys: HotKeys
-    Library: List[PlayListEntry] 
-    Favorites: List[PlayListEntry]
-    PlayLists: List[PlayListEntry] 
+    HotKeys: AppHotKeys = AppHotKeys()
+    Library: List[PlayListEntry] = []
+    Favorites: List[PlayListEntry] = []
+    PlayLists: List[PlayListEntry] = []
     
-    # Private attribute to store file path
     _dataFile: str = PrivateAttr()
 
     def __init__(self, **data):
@@ -43,16 +44,29 @@ class AppData(BaseModel):
 
     @classmethod
     def load(cls, file_path: str) -> "AppData":
-        """Loads data from a JSON file into an AppData instance."""
-        with open(file_path, "r") as file:
-            data = json.load(file)
-        return cls(dataFilePath=file_path, **data)
+        """Loads data from a JSON file into an AppData instance. If file doesn't exist, creates one with default values."""
+        if not os.path.exists(file_path):
+            # Create file with default data
+            default_data = cls()
+            default_data._dataFile = file_path
+            default_data.save()
+            return default_data
+
+        try:
+            with open(file_path, "r") as file:
+                data = json.load(file)
+            return cls(dataFilePath=file_path, **data)
+        
+        except (json.JSONDecodeError, ValidationError) as e:
+            # Handle invalid JSON or validation error
+            print(f"Error loading config: {e}. Using default configuration.")
+            default_data = cls()
+            default_data._dataFile = file_path
+            default_data.save()
+            return default_data
 
     def save(self):
-        """Saves the current AppData instance to a JSON file, excluding the _dataFile."""
-        #print("Saving data to: " + self._dataFile)
+        """Saves the current AppData instance to a JSON file."""
         data_to_save = self.dict()  # Get the Pydantic model data
         with open(self._dataFile, "w") as file:
             json.dump(data_to_save, file, indent=4)
-    
-        

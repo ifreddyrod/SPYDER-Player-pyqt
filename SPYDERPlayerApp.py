@@ -2,7 +2,7 @@ import re, os
 from PyQt6 import uic, QtCore
 from PyQt6.QtGui import QCursor, QIcon, QMouseEvent
 from PyQt6.QtCore import Qt, QUrl, QEvent, QTimer, QPoint, pyqtSignal
-from PyQt6.QtWidgets import QApplication, QWidget, QSizeGrip
+from PyQt6.QtWidgets import QApplication, QWidget, QStyleFactory
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PlaylistManager import PlayListManager
@@ -103,16 +103,9 @@ class SpyderPlayer(QWidget):
         # Load UI Files
         #---------------------------    
         self.ui = Ui_PlayerMainWindow()
-        self.ui.setupUi(self)    
-
-        if self.platform == "Linux": # or self.platform == "Windows":
-            self.ui.Title_frame.hide()
-        else: 
-            self.setWindowFlags(Qt.WindowType.FramelessWindowHint )
+        self.ui.setupUi(self)   
             
-            
-        self.videoLabel = self.ui.CurrentlyPlaying_label
-        self.videoLabel.setText("")
+        
         self.statusLabel = self.ui.Status_label
         self.statusLabel.setText("")
         self.setWindowOpacity(0)
@@ -234,9 +227,10 @@ class SpyderPlayer(QWidget):
         #self.inactivityTimer.timeout.connect(self.HideCursor)
         #self.inactivityTimer.start()   
         
-        self.ui.Close_button.clicked.connect(self.ExitApp)
-        self.ui.Minimize_button.clicked.connect(lambda: self.showMinimized())
-        self.ui.Maximize_button.clicked.connect(self.PlayerFullScreen)
+        #self.ui.Close_button.clicked.connect(self.ExitApp)
+        #self.ui.Minimize_button.clicked.connect(lambda: self.showMinimized())
+        #self.ui.Maximize_button.clicked.connect(self.PlayerFullScreen)
+        
 
         self.player.mediaStatusChanged.connect(self.on_media_status_changed)
         self.player.positionChanged.connect(self.VideoTimePositionChanged)
@@ -507,7 +501,6 @@ class SpyderPlayer(QWidget):
             
             
     def PlayerFullScreen(self):
-        self.ui.Title_frame.hide()
         self.ui.Horizontal_splitter.setSizes([0, 500])  # Hide left side    
         self.ui.Vertical_splitter.setSizes([500, 0])  
         self.playListVisible = False
@@ -525,9 +518,6 @@ class SpyderPlayer(QWidget):
 
             
     def PlayerNormalScreen(self):
-        #if self.windowState() == Qt.WindowState.WindowFullScreen:
-        if self.platform != "Linux":
-            self.ui.Title_frame.show()
         self.controlPanelFS.hide()
         self.setWindowState(Qt.WindowState.WindowNoState)
         #self.ui.VideoView_widget.showNormal()  # Ensure the widget is visible
@@ -638,7 +628,6 @@ class SpyderPlayer(QWidget):
            
     def PlaySelectedChannel(self, channel_name, stream_url):
         self.player.stop()
-        self.videoLabel.setText(channel_name)
         self.setWindowTitle("SPYDER Player - " + channel_name)
         self.player.setSource(QUrl(stream_url))
         try:
@@ -680,7 +669,6 @@ class SpyderPlayer(QWidget):
         if channel_name is None or stream_url is None:
             return
         
-        self.videoLabel.setText(channel_name)
         self.setWindowTitle("SPYDER Player - " + channel_name)
         self.PlaySelectedChannel(channel_name, stream_url)
         
@@ -712,6 +700,10 @@ class SpyderPlayer(QWidget):
     def SearchChannels(self):
         searchText = self.ui.Query_input.text()
         self.playlistmanager.SearchChannels(searchText)
+        if self.isFullScreen:
+            self.controlPanelFS.setFocus()
+        else:
+            self.controlPanel.setFocus()
     
     def ShowCursorBusy(self):
         self.setCursor(QCursor(Qt.CursorShape.BusyCursor))      
@@ -796,7 +788,8 @@ class SpyderPlayer(QWidget):
        
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
+    app.setStyle(QStyleFactory.create('Fusion')) # Setting this fixes the odd scroll bar color in Windows
+    
     spyderPlayer = SpyderPlayer()
     spyderPlayer.show()
     
