@@ -115,15 +115,15 @@ QScrollBar:vertical
 
 QScrollBar::handle:vertical 
 {
-    background: rgb(82, 26, 149);
+    background: rgb(30, 30, 30);
     min-height: 40px;
     border-radius: 4px; 
 }
 
 QScrollBar::add-line:vertical 
 {
-    border: 2px solid rgb(35, 11, 63);
-    background: rgb(82, 26, 149);
+    border: 2px solid rgb(30, 30, 30);
+    background: rgb(30, 30, 30);
     height: 15px;
     border-radius: 4px; 
     subcontrol-position: bottom;
@@ -132,8 +132,8 @@ QScrollBar::add-line:vertical
 
 QScrollBar::sub-line:vertical 
 {
-    border: 2px solid rgb(35, 11, 63);
-    background: rgb(82, 26, 149);
+    border: 2px solid rgb(30, 30, 30);
+    background: rgb(30, 30, 30);
     height: 15px;
     border-radius: 4px; 
     subcontrol-position: top;
@@ -151,15 +151,15 @@ QScrollBar:horizontal
 
 QScrollBar::handle:horizontal 
 {
-    background: rgb(82, 26, 149);
+    background: rgb(30, 30, 30);
     min-width: 40px;
     border-radius: 4px; 
 }
 
 QScrollBar::add-line:horizontal 
 {
-    border: 2px solid rgb(35, 11, 63);
-    background: rgb(82, 26, 149);
+    border: 2px solid rgb(30, 30, 30);
+    background: rgb(30, 30, 30);
     width: 15px;
     border-radius: 4px; 
     subcontrol-position: right;
@@ -168,8 +168,8 @@ QScrollBar::add-line:horizontal
 
 QScrollBar::sub-line:horizontal 
 {
-    border: 2px solid rgb(35, 11, 63);
-    background: rgb(82, 26, 149);
+    border: 2px solid rgb(30, 30, 30);
+    background: rgb(30, 30, 30);
     width: 15px;
     border-radius: 4px; 
     subcontrol-position: left;
@@ -257,7 +257,8 @@ QTableWidget
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/icons/white-edit.png</normaloff>:/icons/icons/white-edit.png</iconset>
+     <normaloff>:/icons/icons/white-edit.png</normaloff>
+     <disabledoff>:/icons/icons/white-edit-disabled.png</disabledoff>:/icons/icons/white-edit.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -280,7 +281,8 @@ QTableWidget
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/icons/white-left-arrow.png</normaloff>:/icons/icons/white-left-arrow.png</iconset>
+     <normaloff>:/icons/icons/white-left-arrow.png</normaloff>
+     <disabledoff>:/icons/icons/white-left-arrow-disabled.png</disabledoff>:/icons/icons/white-left-arrow.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -303,7 +305,8 @@ QTableWidget
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/icons/white-minus.png</normaloff>:/icons/icons/white-minus.png</iconset>
+     <normaloff>:/icons/icons/white-minus.png</normaloff>
+     <disabledoff>:/icons/icons/white-minus-disabled.png</disabledoff>:/icons/icons/white-minus.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -326,7 +329,8 @@ QTableWidget
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/icons/white-plus-sign.png</normaloff>:/icons/icons/white-plus-sign.png</iconset>
+     <normaloff>:/icons/icons/white-plus-sign.png</normaloff>
+     <disabledoff>:/icons/icons/white-plus-sign-disabled.png</disabledoff>:/icons/icons/white-plus-sign.png</iconset>
    </property>
    <property name="iconSize">
     <size>

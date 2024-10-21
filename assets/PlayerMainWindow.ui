@@ -48,13 +48,18 @@
    <item>
     <widget class="QSplitter" name="Horizontal_splitter">
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(0, 0, 0);</string>
+      <string notr="true">background-color: rgb(0, 0, 0);
+
+QSplitter::handle
+{
+    background-color: transparent;
+}</string>
      </property>
      <property name="orientation">
       <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="handleWidth">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="horizontalLayoutWidget_2">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -143,10 +148,10 @@ QLineEdit
          <item>
           <widget class="QTreeWidget" name="PlayList_tree">
            <property name="focusPolicy">
-            <enum>Qt::FocusPolicy::NoFocus</enum>
+            <enum>Qt::FocusPolicy::ClickFocus</enum>
            </property>
            <property name="autoFillBackground">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="styleSheet">
             <string notr="true">        QTreeWidget
@@ -340,11 +345,17 @@ color: rgb(20, 205, 255);  </string>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QSplitter" name="Vertical_splitter">
+         <property name="styleSheet">
+          <string notr="true">QSplitter::handle
+{
+    background-color: transparent;
+}</string>
+         </property>
          <property name="orientation">
           <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="handleWidth">
-          <number>2</number>
+          <number>1</number>
          </property>
          <widget class="QVideoWidget" name="VideoView_widget" native="true">
           <property name="sizePolicy">
@@ -366,7 +377,7 @@ color: rgb(20, 205, 255);  </string>
            <bool>false</bool>
           </property>
           <property name="focusPolicy">
-           <enum>Qt::FocusPolicy::NoFocus</enum>
+           <enum>Qt::FocusPolicy::ClickFocus</enum>
           </property>
          </widget>
          <widget class="QWidget" name="verticalLayoutWidget_2">

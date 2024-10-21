@@ -1,7 +1,7 @@
 from PyQt6 import uic
 from PyQt6.QtWidgets import QTreeWidgetItem, QWidget, QTreeWidget
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor
-from PyQt6.QtCore import QSize, Qt, pyqtSignal, QModelIndex
+from PyQt6.QtCore import QEvent, Qt, pyqtSignal, QModelIndex
 from m3u_parser import M3uParser
 from AppData import * 
 import tempfile
@@ -89,6 +89,7 @@ class PlayListManager(QWidget):
         self.ResetAllLists()
         
         # Setup Event Handlers
+        self.playlistTree.installEventFilter(self)
         self.playlistTree.itemDoubleClicked.connect(self.ItemDoubleClicked)
         self.playlistTree.itemClicked.connect(self.ItemClicked)
         self.playlistTree.itemChanged.connect(self.ChannelCheckBoxChanged)
@@ -123,6 +124,7 @@ class PlayListManager(QWidget):
         background-color: rgb(15, 15, 15);
         background: black;
         color: white;
+        border-right-color: rgb(45, 45, 45);
         }}
 
         QTreeView::branch:open
@@ -169,11 +171,11 @@ class PlayListManager(QWidget):
         color: white;
         }}
         
-        QTreeView::item:unselected
+        /*QTreeView::item:unselected
         {{
         border: none;
         color: white;
-        }}   
+        }} */  
                 
         QTreeView::item:hover
         {{
@@ -194,14 +196,14 @@ class PlayListManager(QWidget):
         QScrollBar::handle:vertical 
         {{
             /*border: 1px solid rgb(35, 11, 63);*/
-            background: rgb(82, 26, 149);
+            background: rgb(30, 30, 30);
             min-height: 40px;
             border-radius: 4px; 
         }}
         QScrollBar::add-line:vertical 
         {{
-            border: 2px solid rgb(35, 11, 63);
-            background: rgb(82, 26, 149);
+            border: 1px solid  rgb(30, 30, 30);
+            background:  transparent; /*rgb(30, 30, 30); */
             height: 15px;
             border-radius: 4px; 
             subcontrol-position: bottom;
@@ -209,8 +211,8 @@ class PlayListManager(QWidget):
         }}
         QScrollBar::sub-line:vertical 
         {{
-            border: 2px solid rgb(35, 11, 63);
-            background: rgb(82, 26, 149);
+            border: 1px solid  rgb(30, 30, 30);
+            background:  transparent; /*rgb(30, 30, 30); */
             height: 15px;
             border-radius: 4px; 
             subcontrol-position: top;
@@ -218,6 +220,7 @@ class PlayListManager(QWidget):
         }}  
         background-color: rgb(15, 15, 15);
         border: 1px solid transparent;
+        color: white;
         """
         
         #self.playlistTree.setHorizontalScrollMode(QTreeWidget)
@@ -343,7 +346,7 @@ class PlayListManager(QWidget):
         self.currentSelectedItem = item
         
         self.lastSelectedItem = temp
-        
+        self.playlistTree.setFocus()
         self.treeItemSelectedSignal.emit(channel_name, source)
         
     def ItemClicked(self, item: TreeItem):
@@ -352,8 +355,18 @@ class PlayListManager(QWidget):
         
         # Expand a Playlist if selected
         if item.isPlayList:
+            self.playlistTree.setFocus()
             item.setExpanded(not item.isExpanded())
             return
+        
+    def ItemManuallyEntered(self):
+        selectedItem = self.playlistTree.currentItem()
+        
+        if selectedItem.isPlayList:
+            selectedItem.setExpanded(not selectedItem.isExpanded())
+            return
+        
+        self.ItemDoubleClicked(selectedItem, -1)
         
     def GetChannelFromTree(self, playListName, channelName, source):
         # Index through the Playlists of the tree
@@ -459,7 +472,7 @@ class PlayListManager(QWidget):
         
         for item in self.appData.Library:
             newEntry = TreeItem(item.name)
-            newEntry.SetPlayListName("")
+            newEntry.SetPlayListName("Library")
             newEntry.SetSource(item.source)
             
             newEntry.setFlags(newEntry.flags() | Qt.ItemFlag.ItemIsUserCheckable) 
@@ -555,12 +568,12 @@ class PlayListManager(QWidget):
             
             self.playlistTree.blockSignals(True)  
             
-            #print("ChannelName: " + channelName) # + " Source: " + channelSource + " Playlist: " + channelPlaylist)
+            #print("ChannelName: " + channelName + " Source: " + channelSource + " Playlist: " + channelPlaylist)
             
             # Remove from favoritsInfo
             for i in range(len(self.appData.Favorites)):
                 favItem = self.appData.Favorites[i]
-    
+                
                 if favItem.name == channelName and favItem.parentName == channelPlaylist and favItem.source == channelSource:
                     self.appData.Favorites.pop(i)
                     self.SaveFavorites() 
@@ -668,4 +681,13 @@ class PlayListManager(QWidget):
             
             topItem = playlist.child(0)
             self.playlistTree.setCurrentItem(topItem)   
-              
+           
+           
+    def eventFilter(self, obj, event):
+        if obj == self.playlistTree and event.type() == QEvent.Type.KeyPress and event.key() == Qt.Key.Key_Space:
+            # Ignore the space bar as it triggers the itemSelect event
+            return True
+            
+        return super().eventFilter(obj, event)
+            
+        

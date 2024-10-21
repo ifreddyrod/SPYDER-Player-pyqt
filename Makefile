@@ -25,12 +25,17 @@ ui:
 		$(PYUIC6) $$ui_file -o UI_$$base_name.py; \
 	done
 
-# Clean __pycache__ directories
+# Clean all build directories
 clean:
 	@echo "Cleaning build directories..."
 	-rm -rf __pycache__ 
 	-rm -rf build
 	-rm -rf dist
+
+# Build with the terminal enabled to view debug messages
+build-debug: clean
+	@echo "Building Debug project with PyInstaller..."
+	$(PYINSTALLER) --name $(EXE_NAME) --onefile --icon=$(IMAGE_DIR)/spider_dark_icon.ico $(MAIN_SCRIPT) 
 
 # Build with pyinstaller
 build: clean

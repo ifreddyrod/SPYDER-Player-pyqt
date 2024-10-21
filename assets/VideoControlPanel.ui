@@ -22,10 +22,13 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
+  </property>
   <property name="styleSheet">
    <string notr="true">QFrame
 {
-	background-color: rgba(0, 0, 0, 128);  /*rgba(0, 0, 0, 150);*/
+	background-color: rgba(0, 0, 0, 200);  /*rgba(0, 0, 0, 150);*/
 	border: 1px solid rgb(128, 128, 128); /*white;*/
 	border-radius: 10px;  
 }
@@ -45,7 +48,7 @@ QPushButton:hover
 
 QPushButton:disabled
 {
-	color: rgb(15, 15, 15);
+	color: rgb(128, 128, 128);
 	/*color: rgb(21, 21, 21)*/
 }
 
@@ -107,9 +110,9 @@ QSlider::handle:horizontal
 {
     /*background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);*/
 	background: white;
-    border: 2px solid white;
+    border: 0px solid white;
     	height: 5px;
-    	width: 2px;
+    	width: 6px;
     	margin: -5px 0px;
 }
 
@@ -342,7 +345,8 @@ border-radius: 35px;
            </property>
            <property name="icon">
             <iconset resource="resources.qrc">
-             <normaloff>:/icons/icons/forward.png</normaloff>:/icons/icons/forward.png</iconset>
+             <normaloff>:/icons/icons/forward.png</normaloff>
+             <disabledoff>:/icons/icons/forward-disabled.png</disabledoff>:/icons/icons/forward.png</iconset>
            </property>
           </widget>
          </item>
@@ -397,7 +401,8 @@ border-radius: 35px;
            </property>
            <property name="icon">
             <iconset resource="resources.qrc">
-             <normaloff>:/icons/icons/last.png</normaloff>:/icons/icons/last.png</iconset>
+             <normaloff>:/icons/icons/last.png</normaloff>
+             <disabledoff>:/icons/icons/last-disabled.png</disabledoff>:/icons/icons/last.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -445,7 +450,8 @@ border-radius: 35px;
            </property>
            <property name="icon">
             <iconset resource="resources.qrc">
-             <normaloff>:/icons/icons/stop.png</normaloff>:/icons/icons/stop.png</iconset>
+             <normaloff>:/icons/icons/stop.png</normaloff>
+             <disabledoff>:/icons/icons/stop-disabled.png</disabledoff>:/icons/icons/stop.png</iconset>
            </property>
           </widget>
          </item>
@@ -492,7 +498,8 @@ border-radius: 35px;
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
-               <normaloff>:/icons/icons/mute.png</normaloff>:/icons/icons/mute.png</iconset>
+               <normaloff>:/icons/icons/mute.png</normaloff>
+               <disabledoff>:/icons/icons/mute-disabled.png</disabledoff>:/icons/icons/mute.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -527,7 +534,8 @@ border-radius: 35px;
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
-               <normaloff>:/icons/icons/volume.png</normaloff>:/icons/icons/volume.png</iconset>
+               <normaloff>:/icons/icons/volume.png</normaloff>
+               <disabledoff>:/icons/icons/volume-disabled.png</disabledoff>:/icons/icons/volume.png</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -574,7 +582,8 @@ border-radius: 35px;
            </property>
            <property name="icon">
             <iconset resource="resources.qrc">
-             <normaloff>:/icons/icons/next.png</normaloff>:/icons/icons/next.png</iconset>
+             <normaloff>:/icons/icons/next.png</normaloff>
+             <disabledoff>:/icons/icons/next-disabled.png</disabledoff>:/icons/icons/next.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -622,7 +631,8 @@ border-radius: 35px;
            </property>
            <property name="icon">
             <iconset resource="resources.qrc">
-             <normaloff>:/icons/icons/previous.png</normaloff>:/icons/icons/previous.png</iconset>
+             <normaloff>:/icons/icons/previous.png</normaloff>
+             <disabledoff>:/icons/icons/previous-disabled.png</disabledoff>:/icons/icons/previous.png</iconset>
            </property>
           </widget>
          </item>
@@ -664,7 +674,8 @@ border-radius: 35px;
            </property>
            <property name="icon">
             <iconset resource="resources.qrc">
-             <normaloff>:/icons/icons/back.png</normaloff>:/icons/icons/back.png</iconset>
+             <normaloff>:/icons/icons/back.png</normaloff>
+             <disabledoff>:/icons/icons/back-disabled.png</disabledoff>:/icons/icons/back.png</iconset>
            </property>
            <property name="iconSize">
             <size>

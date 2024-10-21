@@ -28,9 +28,14 @@ class Ui_PlayerMainWindow(object):
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.Horizontal_splitter = QtWidgets.QSplitter(parent=PlayerMainWindow)
-        self.Horizontal_splitter.setStyleSheet("background-color: rgb(0, 0, 0);")
+        self.Horizontal_splitter.setStyleSheet("background-color: rgb(0, 0, 0);\n"
+"\n"
+"QSplitter::handle\n"
+"{\n"
+"    background-color: transparent;\n"
+"}")
         self.Horizontal_splitter.setOrientation(QtCore.Qt.Orientation.Horizontal)
-        self.Horizontal_splitter.setHandleWidth(2)
+        self.Horizontal_splitter.setHandleWidth(1)
         self.Horizontal_splitter.setObjectName("Horizontal_splitter")
         self.horizontalLayoutWidget_2 = QtWidgets.QWidget(parent=self.Horizontal_splitter)
         self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
@@ -80,8 +85,8 @@ class Ui_PlayerMainWindow(object):
         self.searchLayout.setStretch(1, 30)
         self.verticalLayout_2.addLayout(self.searchLayout)
         self.PlayList_tree = QtWidgets.QTreeWidget(parent=self.horizontalLayoutWidget_2)
-        self.PlayList_tree.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.PlayList_tree.setAutoFillBackground(True)
+        self.PlayList_tree.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+        self.PlayList_tree.setAutoFillBackground(False)
         self.PlayList_tree.setStyleSheet("        QTreeWidget\n"
 "        {\n"
 "        background-color: rgb(15, 15, 15);\n"
@@ -218,8 +223,12 @@ class Ui_PlayerMainWindow(object):
         self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.Vertical_splitter = QtWidgets.QSplitter(parent=self.horizontalLayoutWidget_3)
+        self.Vertical_splitter.setStyleSheet("QSplitter::handle\n"
+"{\n"
+"    background-color: transparent;\n"
+"}")
         self.Vertical_splitter.setOrientation(QtCore.Qt.Orientation.Vertical)
-        self.Vertical_splitter.setHandleWidth(2)
+        self.Vertical_splitter.setHandleWidth(1)
         self.Vertical_splitter.setObjectName("Vertical_splitter")
         self.VideoView_widget = QVideoWidget(parent=self.Vertical_splitter)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
@@ -230,7 +239,7 @@ class Ui_PlayerMainWindow(object):
         self.VideoView_widget.setMinimumSize(QtCore.QSize(300, 0))
         self.VideoView_widget.setMouseTracking(True)
         self.VideoView_widget.setTabletTracking(False)
-        self.VideoView_widget.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.VideoView_widget.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
         self.VideoView_widget.setObjectName("VideoView_widget")
         self.verticalLayoutWidget_2 = QtWidgets.QWidget(parent=self.Vertical_splitter)
         self.verticalLayoutWidget_2.setObjectName("verticalLayoutWidget_2")

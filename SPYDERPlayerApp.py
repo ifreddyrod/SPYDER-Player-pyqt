@@ -80,6 +80,7 @@ class SpyderPlayer(QWidget):
     volume: int = 100
     videoChangesPosition: bool = False
     videoDuration: int = 0
+    videoPosition: int = 0
     isFullScreen: bool = False
     controlPanelPosition: QPoint = QPoint(0, 0)
     dataFilePath: str = "appdata.json"
@@ -126,24 +127,23 @@ class SpyderPlayer(QWidget):
         #---------------------------
         self.controlPanelFS = VideoControlPannel(self)  
         self.controlPanelFS.hide() 
-        self.controlPanelFS.installEventFilter(self)
+        #self.controlPanelFS.installEventFilter(self)
         self.controlPanel = VideoControlPannel(self)
         self.ui.Bottom_widget = self.controlPanel
-        self.controlPanel.installEventFilter(self)
+        #self.controlPanel.installEventFilter(self)
         
 
         #---------------------------           
         # Setup player      
         #---------------------------   
         self.videoPanel = self.ui.VideoView_widget 
-        self.videoPanel.installEventFilter(self)
+        #self.videoPanel.installEventFilter(self)
         self.player = QMediaPlayer()
         self.audioOutput = QAudioOutput()
         self.player.setAudioOutput(self.audioOutput)
         self.player.setVideoOutput(self.videoPanel)
         self.player.installEventFilter(self) 
 
-        
         # Set the Left of vertical splitter to a fixed size
         self.ui.Horizontal_splitter.setSizes([400, 1000])
         self.ui.Vertical_splitter.setSizes([800, 1])
@@ -238,9 +238,14 @@ class SpyderPlayer(QWidget):
         self.controlPanelFS.ui.VideoPosition_slider.sliderReleased.connect(self.ChangeVideoPosition)
         self.controlPanel.ui.VideoPosition_slider.sliderReleased.connect(self.ChangeVideoPosition)
         
+        
         self.controlPanelFS.ui.VideoPosition_slider.setEnabled(False)
         self.controlPanel.ui.VideoPosition_slider.setEnabled(False)
 
+        #self.player.audioOutputChanged.connect(self.ResetAudioOutput)
+        #self.audioOutput..connect(self.AudioOutputError)
+        self.player.errorOccurred.connect(self.PlayerError)
+        
         #-----------------------------------------
         # Show Splash Screen and Load Playlists
         #-----------------------------------------
@@ -313,8 +318,12 @@ class SpyderPlayer(QWidget):
                     else:
                         self.PlayerFullScreen()
                         return True
+                #elif event.key() == Qt.Key.Key_Space and self.playlistmanager.playlistTree.hasFocus():
+                    #self.PlayPausePlayer()
+                    #return True
                 elif event.key() == Qt.Key.Key_K or event.key() == Qt.Key.Key_Space:
                     self.PlayPausePlayer()
+                    return True
                 elif event.key() == Qt.Key.Key_M:
                     self.MutePlayer()
                 elif event.key() == Qt.Key.Key_O:
@@ -338,10 +347,10 @@ class SpyderPlayer(QWidget):
                 elif event.key() == Qt.Key.Key_Backspace:
                     self.PlayLastChannel()
                     return True
-                elif event.key() == Qt.Key.Key_Up:
+                elif event.key() == Qt.Key.Key_Up and not self.playlistmanager.playlistTree.hasFocus():
                     self.IncreaseVolume()
                     return True
-                elif event.key() == Qt.Key.Key_Down:
+                elif event.key() == Qt.Key.Key_Down and not self.playlistmanager.playlistTree.hasFocus():
                     self.DecreaseVolume()
                     return True
                 elif event.key() == Qt.Key.Key_Left:
@@ -371,6 +380,8 @@ class SpyderPlayer(QWidget):
                     if self.playlistmanager.isVisible():
                         self.playlistmanager.SortSearchResultsAscending()                       
                     return True
+                elif event.key() == Qt.Key.Key_Return and self.playlistmanager.playlistTree.hasFocus():
+                    self.playlistmanager.ItemManuallyEntered()
                 else:   
                     #self.ShowCursor()
                     return True
@@ -455,6 +466,7 @@ class SpyderPlayer(QWidget):
 
     def VideoTimePositionChanged(self, position):
         if self.videoChangesPosition == True:
+            self.videoPosition = position
             self.controlPanelFS.ui.VideoPosition_slider.setValue(position)
             self.controlPanel.ui.VideoPosition_slider.setValue(position)
             self.controlPanelFS.ui.CurrentTime_label.setText(self.Format_ms_to_Time(position))
@@ -467,6 +479,7 @@ class SpyderPlayer(QWidget):
         slider = self.sender()
         position = slider.value()
             
+        self.videoPosition = position
         self.player.setPosition(position)
             
         self.videoChangesPosition == True
@@ -506,7 +519,7 @@ class SpyderPlayer(QWidget):
         self.playListVisible = False
         self.setWindowState(Qt.WindowState.WindowFullScreen)
         self.ShowControlPanel()
-        self.setFocus()
+        self.videoPanel.activateWindow()
         self.isFullScreen = True  
                     
         if self.platform == "Linux":
@@ -659,6 +672,8 @@ class SpyderPlayer(QWidget):
         else: 
             self.setFocus()
             #self.player.setPosition(0)
+            if self.videoDuration > 0:
+                self.player.setPosition(self.videoPosition)
             self.player.play()
             #self.ChangePlayingUIStates(True)
             #self.PlayChannel()
@@ -700,11 +715,20 @@ class SpyderPlayer(QWidget):
     def SearchChannels(self):
         searchText = self.ui.Query_input.text()
         self.playlistmanager.SearchChannels(searchText)
-        if self.isFullScreen:
+        self.playlistmanager.playlistTree.setFocus()
+        '''if self.isFullScreen:
             self.controlPanelFS.setFocus()
         else:
-            self.controlPanel.setFocus()
+            self.controlPanel.setFocus()'''
     
+    def ResetAudioOutput(self, error):
+        print("Audio device error: " + error)
+        #self.audioOutput = QAudioOutput()
+        
+    
+    def PlayerError(self):
+        print("[Player Error] -- " + self.player.errorString())
+        
     def ShowCursorBusy(self):
         self.setCursor(QCursor(Qt.CursorShape.BusyCursor))      
         

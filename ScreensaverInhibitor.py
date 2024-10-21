@@ -38,6 +38,7 @@ class WindowsInhibitor:
 
     def uninhibit(self):
         self.timer.stop()
+        self.ctypes.windll.kernel32.SetThreadExecutionState(0x80000000)
 
     def reset_screensaver(self):
         self.ctypes.windll.kernel32.SetThreadExecutionState(0x80000002)
@@ -46,17 +47,31 @@ class LinuxInhibitor:
     def __init__(self):
         import dbus
         self.bus = dbus.SessionBus()
-        self.saver = self.bus.get_object('org.freedesktop.ScreenSaver', '/ScreenSaver')
-        self.cookie = None
+        try:
+            self.saver = self.bus.get_object('org.freedesktop.ScreenSaver', '/ScreenSaver')
+            self.iface = dbus.Interface(self.saver, 'org.freedesktop.ScreenSaver')
+            self.cookie = None
+        except dbus.DBusException as e:
+            print(f"Error initializing screensaver inhibitor: {e}")
+            self.saver = None
 
     def inhibit(self):
-        if self.cookie is None:
-            self.cookie = self.saver.Inhibit("VideoPlayer", "Playing video")
+        if self.saver and self.cookie is None:
+            try:
+                self.cookie = self.iface.Inhibit("VideoPlayer", "Playing video")
+                print(f"Screensaver inhibited with cookie {self.cookie}")
+            except dbus.DBusException as e:
+                print(f"Error inhibiting screensaver: {e}")
 
     def uninhibit(self):
-        if self.cookie is not None:
-            self.saver.UnInhibit(self.cookie)
-            self.cookie = None
+        if self.saver and self.cookie is not None:
+            try:
+                self.iface.UnInhibit(self.cookie)
+                print(f"Screensaver uninhibited, cookie {self.cookie} released")
+                self.cookie = None
+            except dbus.DBusException as e:
+                print(f"Error uninhibiting screensaver: {e}")
+
 
 class MacOSInhibitor:
     def __init__(self):

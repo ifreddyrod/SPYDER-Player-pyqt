@@ -19,9 +19,10 @@ class Ui_VideoControlPanel(object):
         sizePolicy.setHeightForWidth(VideoControlPanel.sizePolicy().hasHeightForWidth())
         VideoControlPanel.setSizePolicy(sizePolicy)
         VideoControlPanel.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+        VideoControlPanel.setWindowOpacity(1.0)
         VideoControlPanel.setStyleSheet("QFrame\n"
 "{\n"
-"    background-color: rgba(0, 0, 0, 128);  /*rgba(0, 0, 0, 150);*/\n"
+"    background-color: rgba(0, 0, 0, 200);  /*rgba(0, 0, 0, 150);*/\n"
 "    border: 1px solid rgb(128, 128, 128); /*white;*/\n"
 "    border-radius: 10px;  \n"
 "}\n"
@@ -41,7 +42,7 @@ class Ui_VideoControlPanel(object):
 "\n"
 "QPushButton:disabled\n"
 "{\n"
-"    color: rgb(15, 15, 15);\n"
+"    color: rgb(128, 128, 128);\n"
 "    /*color: rgb(21, 21, 21)*/\n"
 "}\n"
 "\n"
@@ -103,9 +104,9 @@ class Ui_VideoControlPanel(object):
 "{\n"
 "    /*background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);*/\n"
 "    background: white;\n"
-"    border: 2px solid white;\n"
+"    border: 0px solid white;\n"
 "        height: 5px;\n"
-"        width: 2px;\n"
+"        width: 6px;\n"
 "        margin: -5px 0px;\n"
 "}\n"
 "\n"
@@ -208,6 +209,7 @@ class Ui_VideoControlPanel(object):
         self.Forward_button.setText("")
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(":/icons/icons/forward.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon1.addPixmap(QtGui.QPixmap(":/icons/icons/forward-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.Forward_button.setIcon(icon1)
         self.Forward_button.setObjectName("Forward_button")
         self.gridLayout.addWidget(self.Forward_button, 0, 4, 1, 1)
@@ -237,6 +239,7 @@ class Ui_VideoControlPanel(object):
         self.Last_button.setText("")
         icon3 = QtGui.QIcon()
         icon3.addPixmap(QtGui.QPixmap(":/icons/icons/last.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon3.addPixmap(QtGui.QPixmap(":/icons/icons/last-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.Last_button.setIcon(icon3)
         self.Last_button.setIconSize(QtCore.QSize(24, 24))
         self.Last_button.setObjectName("Last_button")
@@ -254,6 +257,7 @@ class Ui_VideoControlPanel(object):
         self.Stop_button.setText("")
         icon4 = QtGui.QIcon()
         icon4.addPixmap(QtGui.QPixmap(":/icons/icons/stop.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon4.addPixmap(QtGui.QPixmap(":/icons/icons/stop-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.Stop_button.setIcon(icon4)
         self.Stop_button.setObjectName("Stop_button")
         self.gridLayout.addWidget(self.Stop_button, 1, 5, 1, 1)
@@ -278,6 +282,7 @@ class Ui_VideoControlPanel(object):
         self.Mute_button.setText("")
         icon5 = QtGui.QIcon()
         icon5.addPixmap(QtGui.QPixmap(":/icons/icons/mute.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon5.addPixmap(QtGui.QPixmap(":/icons/icons/mute-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.Mute_button.setIcon(icon5)
         self.Mute_button.setIconSize(QtCore.QSize(20, 20))
         self.Mute_button.setObjectName("Mute_button")
@@ -294,6 +299,7 @@ class Ui_VideoControlPanel(object):
         self.FullVolume_button.setText("")
         icon6 = QtGui.QIcon()
         icon6.addPixmap(QtGui.QPixmap(":/icons/icons/volume.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon6.addPixmap(QtGui.QPixmap(":/icons/icons/volume-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.FullVolume_button.setIcon(icon6)
         self.FullVolume_button.setIconSize(QtCore.QSize(20, 20))
         self.FullVolume_button.setObjectName("FullVolume_button")
@@ -312,6 +318,7 @@ class Ui_VideoControlPanel(object):
         self.Next_button.setText("")
         icon7 = QtGui.QIcon()
         icon7.addPixmap(QtGui.QPixmap(":/icons/icons/next.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon7.addPixmap(QtGui.QPixmap(":/icons/icons/next-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.Next_button.setIcon(icon7)
         self.Next_button.setIconSize(QtCore.QSize(14, 14))
         self.Next_button.setObjectName("Next_button")
@@ -329,6 +336,7 @@ class Ui_VideoControlPanel(object):
         self.Backward_button.setText("")
         icon8 = QtGui.QIcon()
         icon8.addPixmap(QtGui.QPixmap(":/icons/icons/previous.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon8.addPixmap(QtGui.QPixmap(":/icons/icons/previous-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.Backward_button.setIcon(icon8)
         self.Backward_button.setObjectName("Backward_button")
         self.gridLayout.addWidget(self.Backward_button, 0, 2, 1, 1)
@@ -345,6 +353,7 @@ class Ui_VideoControlPanel(object):
         self.Previous_button.setText("")
         icon9 = QtGui.QIcon()
         icon9.addPixmap(QtGui.QPixmap(":/icons/icons/back.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon9.addPixmap(QtGui.QPixmap(":/icons/icons/back-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.Previous_button.setIcon(icon9)
         self.Previous_button.setIconSize(QtCore.QSize(14, 14))
         self.Previous_button.setObjectName("Previous_button")

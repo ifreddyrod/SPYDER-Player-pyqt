@@ -1,5 +1,22 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/white-plus-sign-disabled.png</file>
+    <file>icons/white-minus-disabled.png</file>
+    <file>icons/white-left-arrow-disabled.png</file>
+    <file>icons/white-hide-disabled.png</file>
+    <file>icons/white-folder-disabled.png</file>
+    <file>icons/white-edit-disabled.png</file>
+    <file>icons/white-diskette-disabled.png</file>
+    <file>icons/back-disabled.png</file>
+    <file>icons/forward-disabled.png</file>
+    <file>icons/last-disabled.png</file>
+    <file>icons/mute-disabled.png</file>
+    <file>icons/next-disabled.png</file>
+    <file>icons/pause-disabled.png</file>
+    <file>icons/play-disabled.png</file>
+    <file>icons/stop-disabled.png</file>
+    <file>icons/volume-disabled.png</file>
+    <file>icons/previous-disabled.png</file>
     <file>icons/back.png</file>
     <file>icons/close.png</file>
     <file>icons/collapsed.png</file>

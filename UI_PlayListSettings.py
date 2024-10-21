@@ -84,15 +84,15 @@ class Ui_PlayListSettings(object):
 "\n"
 "QScrollBar::handle:vertical \n"
 "{\n"
-"    background: rgb(82, 26, 149);\n"
+"    background: rgb(30, 30, 30);\n"
 "    min-height: 40px;\n"
 "    border-radius: 4px; \n"
 "}\n"
 "\n"
 "QScrollBar::add-line:vertical \n"
 "{\n"
-"    border: 2px solid rgb(35, 11, 63);\n"
-"    background: rgb(82, 26, 149);\n"
+"    border: 2px solid rgb(30, 30, 30);\n"
+"    background: rgb(30, 30, 30);\n"
 "    height: 15px;\n"
 "    border-radius: 4px; \n"
 "    subcontrol-position: bottom;\n"
@@ -101,8 +101,8 @@ class Ui_PlayListSettings(object):
 "\n"
 "QScrollBar::sub-line:vertical \n"
 "{\n"
-"    border: 2px solid rgb(35, 11, 63);\n"
-"    background: rgb(82, 26, 149);\n"
+"    border: 2px solid rgb(30, 30, 30);\n"
+"    background: rgb(30, 30, 30);\n"
 "    height: 15px;\n"
 "    border-radius: 4px; \n"
 "    subcontrol-position: top;\n"
@@ -120,15 +120,15 @@ class Ui_PlayListSettings(object):
 "\n"
 "QScrollBar::handle:horizontal \n"
 "{\n"
-"    background: rgb(82, 26, 149);\n"
+"    background: rgb(30, 30, 30);\n"
 "    min-width: 40px;\n"
 "    border-radius: 4px; \n"
 "}\n"
 "\n"
 "QScrollBar::add-line:horizontal \n"
 "{\n"
-"    border: 2px solid rgb(35, 11, 63);\n"
-"    background: rgb(82, 26, 149);\n"
+"    border: 2px solid rgb(30, 30, 30);\n"
+"    background: rgb(30, 30, 30);\n"
 "    width: 15px;\n"
 "    border-radius: 4px; \n"
 "    subcontrol-position: right;\n"
@@ -137,8 +137,8 @@ class Ui_PlayListSettings(object):
 "\n"
 "QScrollBar::sub-line:horizontal \n"
 "{\n"
-"    border: 2px solid rgb(35, 11, 63);\n"
-"    background: rgb(82, 26, 149);\n"
+"    border: 2px solid rgb(30, 30, 30);\n"
+"    background: rgb(30, 30, 30);\n"
 "    width: 15px;\n"
 "    border-radius: 4px; \n"
 "    subcontrol-position: left;\n"
@@ -186,6 +186,7 @@ class Ui_PlayListSettings(object):
         self.Edit_button.setStyleSheet("")
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/icons/icons/white-edit.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon.addPixmap(QtGui.QPixmap(":/icons/icons/white-edit-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.Edit_button.setIcon(icon)
         self.Edit_button.setIconSize(QtCore.QSize(24, 24))
         self.Edit_button.setObjectName("Edit_button")
@@ -193,6 +194,7 @@ class Ui_PlayListSettings(object):
         self.Back_button.setGeometry(QtCore.QRect(10, 380, 141, 41))
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(":/icons/icons/white-left-arrow.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon1.addPixmap(QtGui.QPixmap(":/icons/icons/white-left-arrow-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.Back_button.setIcon(icon1)
         self.Back_button.setIconSize(QtCore.QSize(15, 15))
         self.Back_button.setObjectName("Back_button")
@@ -200,6 +202,7 @@ class Ui_PlayListSettings(object):
         self.Delete_button.setGeometry(QtCore.QRect(10, 230, 141, 41))
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap(":/icons/icons/white-minus.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon2.addPixmap(QtGui.QPixmap(":/icons/icons/white-minus-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.Delete_button.setIcon(icon2)
         self.Delete_button.setIconSize(QtCore.QSize(24, 24))
         self.Delete_button.setObjectName("Delete_button")
@@ -207,6 +210,7 @@ class Ui_PlayListSettings(object):
         self.AddNew_button.setGeometry(QtCore.QRect(10, 170, 141, 41))
         icon3 = QtGui.QIcon()
         icon3.addPixmap(QtGui.QPixmap(":/icons/icons/white-plus-sign.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon3.addPixmap(QtGui.QPixmap(":/icons/icons/white-plus-sign-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.AddNew_button.setIcon(icon3)
         self.AddNew_button.setIconSize(QtCore.QSize(24, 24))
         self.AddNew_button.setObjectName("AddNew_button")
