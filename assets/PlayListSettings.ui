@@ -184,13 +184,15 @@ QHeaderView::section
 
 QTableWidget::item
 {
-       color: rgb(216, 216, 216);
+       color: rgb(20, 205, 255); 
 }
 
 QTableWidget 
 {
-        border: none;
-}</string>
+	border: none;
+	border-radius: 10px;
+}
+</string>
    </property>
    <property name="autoScroll">
     <bool>false</bool>

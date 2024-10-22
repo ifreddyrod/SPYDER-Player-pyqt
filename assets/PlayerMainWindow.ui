@@ -120,17 +120,18 @@ QSplitter::handle
               <string>Enter Search Query (multiple phrases can be searched with + separator.  Example search: sports + 4K)</string>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(30, 30, 30);
-color: rgb(20, 205, 255); 
+              <string notr="true">/*background-color: rgb(30, 30, 30);
+color: rgb(20, 205, 255); */
 
-/*
+
 QLineEdit
 {
-	border: 1px solid black;
+	border: 1px solid rgb(30, 30, 30);
 	background-color: black;
 	border-radius: 10px;
-	padding-left: 50px;
-}*/</string>
+	padding-left: 25px;
+	color: rgb(20, 205, 255); 
+}</string>
              </property>
              <property name="maxLength">
               <number>1000</number>
@@ -324,8 +325,17 @@ QLineEdit
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(30, 30, 30);
-color: rgb(20, 205, 255);  </string>
+              <string notr="true">/*background-color: rgb(30, 30, 30);
+color: rgb(20, 205, 255);  */
+
+QLabel
+{
+	border: 1px solid rgb(30, 30, 30);
+	background-color: black;
+	border-radius: 10px;
+	padding-left: 0px;
+	color: rgb(20, 205, 255); 
+}</string>
              </property>
              <property name="text">
               <string>TextLabel</string>

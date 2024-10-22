@@ -66,17 +66,18 @@ class Ui_PlayerMainWindow(object):
         self.Query_input.setSizePolicy(sizePolicy)
         self.Query_input.setMinimumSize(QtCore.QSize(0, 30))
         self.Query_input.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
-        self.Query_input.setStyleSheet("background-color: rgb(30, 30, 30);\n"
-"color: rgb(20, 205, 255); \n"
+        self.Query_input.setStyleSheet("/*background-color: rgb(30, 30, 30);\n"
+"color: rgb(20, 205, 255); */\n"
 "\n"
-"/*\n"
+"\n"
 "QLineEdit\n"
 "{\n"
-"    border: 1px solid black;\n"
+"    border: 1px solid rgb(30, 30, 30);\n"
 "    background-color: black;\n"
 "    border-radius: 10px;\n"
-"    padding-left: 50px;\n"
-"}*/")
+"    padding-left: 25px;\n"
+"    color: rgb(20, 205, 255); \n"
+"}")
         self.Query_input.setMaxLength(1000)
         self.Query_input.setFrame(False)
         self.Query_input.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeading|QtCore.Qt.AlignmentFlag.AlignLeft|QtCore.Qt.AlignmentFlag.AlignVCenter)
@@ -208,8 +209,17 @@ class Ui_PlayerMainWindow(object):
         self.bottomhorizontalLayout.addWidget(self.Settings_button)
         self.Status_label = QtWidgets.QLabel(parent=self.horizontalLayoutWidget_2)
         self.Status_label.setMaximumSize(QtCore.QSize(16777215, 30))
-        self.Status_label.setStyleSheet("background-color: rgb(30, 30, 30);\n"
-"color: rgb(20, 205, 255);  ")
+        self.Status_label.setStyleSheet("/*background-color: rgb(30, 30, 30);\n"
+"color: rgb(20, 205, 255);  */\n"
+"\n"
+"QLabel\n"
+"{\n"
+"    border: 1px solid rgb(30, 30, 30);\n"
+"    background-color: black;\n"
+"    border-radius: 10px;\n"
+"    padding-left: 0px;\n"
+"    color: rgb(20, 205, 255); \n"
+"}")
         self.Status_label.setIndent(30)
         self.Status_label.setObjectName("Status_label")
         self.bottomhorizontalLayout.addWidget(self.Status_label)

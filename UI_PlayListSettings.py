@@ -153,13 +153,15 @@ class Ui_PlayListSettings(object):
 "\n"
 "QTableWidget::item\n"
 "{\n"
-"       color: rgb(216, 216, 216);\n"
+"       color: rgb(20, 205, 255); \n"
 "}\n"
 "\n"
 "QTableWidget \n"
 "{\n"
-"        border: none;\n"
-"}")
+"    border: none;\n"
+"    border-radius: 10px;\n"
+"}\n"
+"")
         self.PlayList_table.setAutoScroll(False)
         self.PlayList_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.PlayList_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)

@@ -3,13 +3,14 @@ from PyQt6 import uic, QtCore
 from PyQt6.QtGui import QCursor, QIcon, QMouseEvent
 from PyQt6.QtCore import Qt, QUrl, QEvent, QTimer, QPoint, pyqtSignal
 from PyQt6.QtWidgets import QApplication, QWidget, QStyleFactory
-from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QMediaMetaData
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PlaylistManager import PlayListManager
 from ScreensaverInhibitor import ScreensaverInhibitor
 from SettingsManager import SettingsManager
 from AppData import * 
 import platform
+from pathlib import Path
 import sys
 import time
 
@@ -114,6 +115,7 @@ class SpyderPlayer(QWidget):
         #---------------------------
         # Load AppData from file
         #---------------------------
+        self.dataFilePath = os.path.join(self.GetUserAppDataDirectory("SpyderPlayer"), self.dataFilePath)
         self.appData = AppData.load(self.dataFilePath)
         
         #---------------------------
@@ -136,6 +138,9 @@ class SpyderPlayer(QWidget):
         #---------------------------           
         # Setup player      
         #---------------------------   
+        #if self.platform == "Windows":
+            #os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
+            
         self.videoPanel = self.ui.VideoView_widget 
         #self.videoPanel.installEventFilter(self)
         self.player = QMediaPlayer()
@@ -246,10 +251,28 @@ class SpyderPlayer(QWidget):
         #self.audioOutput..connect(self.AudioOutputError)
         self.player.errorOccurred.connect(self.PlayerError)
         
+        
+        # Get the current font
+        font = self.font()
+
+        # Get the font family and size
+        font_family = font.family()
+        font_size = font.pointSize()
+        print("Window Font: " + font_family + " " + str(font_size))
+        
+        # Check if the point size is smaller than 11 and increase it if necessary
+        if font.pointSize() < 11:
+            self.setStyleSheet("color: white; font:11pt;")
+            #font.setPointSize(10)  # Set the font size to 12
+            #self.setFont(font)  # Set the font for the widget'''
+    
         #-----------------------------------------
         # Show Splash Screen and Load Playlists
         #-----------------------------------------
         self.InitializePlayer()
+        
+        #print("User App Data Directory: " + str(self.GetUserAppDataDirectory("SpyderPlayer")))
+        
         
     def InitializePlayer(self):
         # Show Splash Screen
@@ -431,7 +454,7 @@ class SpyderPlayer(QWidget):
           
       
     def PlayerDurationChanged(self, duration):
-        print("Duration type", type(duration))
+        #print("Duration type", type(duration))
         
         videoLength = self.Format_ms_to_Time(duration)
         
@@ -489,7 +512,13 @@ class SpyderPlayer(QWidget):
         
     def on_media_status_changed(self, status):
         message = str(status).split('.')[1]
-        
+        codec_info = self.player.metaData().value(QMediaMetaData.Key.AudioCodec)
+        if codec_info:
+            print(f"Audio codec: {codec_info}")
+        else:
+            print("Audio codec information not available")
+
+
         if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
             self.statusLabel.setText('')
         else:
@@ -643,6 +672,7 @@ class SpyderPlayer(QWidget):
         self.player.stop()
         self.setWindowTitle("SPYDER Player - " + channel_name)
         self.player.setSource(QUrl(stream_url))
+
         try:
             self.player.play()
         except Exception as e:
@@ -672,7 +702,10 @@ class SpyderPlayer(QWidget):
         else: 
             self.setFocus()
             #self.player.setPosition(0)
-            if self.videoDuration > 0:
+            if self.videoDuration > 0 and self.videoPosition == self.videoDuration:
+                self.videoPosition = 0
+                self.player.stop()
+            if self.videoDuration > 0 and self.videoPosition > 0:
                 self.player.setPosition(self.videoPosition)
             self.player.play()
             #self.ChangePlayingUIStates(True)
@@ -728,6 +761,7 @@ class SpyderPlayer(QWidget):
     
     def PlayerError(self):
         print("[Player Error] -- " + self.player.errorString())
+        self.statusLabel.setText("Error: " + self.player.errorString())
         
     def ShowCursorBusy(self):
         self.setCursor(QCursor(Qt.CursorShape.BusyCursor))      
@@ -805,6 +839,19 @@ class SpyderPlayer(QWidget):
     def ShowSettings(self):
         print("Show Settings Button Pressed")
         self.settingsManager.ShowSettings()        
+            
+    def GetUserAppDataDirectory(self, app_name):
+        
+        if self.platform == 'Windows':  
+            settings_dir = Path(os.getenv('APPDATA')) / app_name
+        elif self.platform  == 'Linux':  
+            settings_dir = Path.home() / '.config' / app_name
+        elif self.platform == 'Darwin': 
+            settings_dir = Path.home() / 'Library' / 'Application Support' / app_name
+
+        # Create the directory if it doesn't exist
+        settings_dir.mkdir(parents=True, exist_ok=True)
+        return settings_dir        
             
     def __del__(self):
         self.screensaverInhibitor.uninhibit()

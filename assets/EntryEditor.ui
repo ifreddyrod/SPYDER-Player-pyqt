@@ -153,6 +153,16 @@ QComboBox QAbstractItemView {
      <height>31</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QLineEdit
+{
+	border: 1px solid rgb(30, 30, 30);
+	background-color: black;
+	border-radius: 10px;
+	padding-left: 10px;
+	color: rgb(20, 205, 255); 
+}</string>
+   </property>
    <property name="text">
     <string/>
    </property>
@@ -254,6 +264,10 @@ background-color: rgba(0, 0, 0, 0);
      <height>51</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">border-radius: 10px;
+color: rgb(20, 205, 255); </string>
+   </property>
    <property name="frameShape">
     <enum>QFrame::Shape::NoFrame</enum>
    </property>
@@ -269,6 +283,10 @@ background-color: rgba(0, 0, 0, 0);
      <width>120</width>
      <height>30</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(20, 205, 255); 
+</string>
    </property>
    <item>
     <property name="text">

@@ -11,7 +11,10 @@ import requests
 import os
  
 
-PLAYLIST_COLOR = QColor(20, 6, 36)
+PLAYLIST_COLOR = QColor(20, 6, 36)   #QColor(20, 6, 36)
+LIBRARY_COLOR = QColor(20, 6, 36)
+FAVORITES_COLOR = QColor(20, 6, 36)
+SEARCH_COLOR = QColor(20, 6, 36)  #QColor(0, 35, 63)
 
 def pad(string: str) -> str:
     return "  " + string
@@ -99,9 +102,9 @@ class PlayListManager(QWidget):
         self.playlistTree.clear()
         
         # Add core Playlists
-        self.searchList = TreeItem(pad("Search Results"), PLAYLIST_COLOR, True)
-        self.favoritesList = TreeItem(pad("Favorites"), PLAYLIST_COLOR, True)
-        self.libraryList = TreeItem(pad("Library"), PLAYLIST_COLOR, True)
+        self.searchList = TreeItem(pad("Search Results"), SEARCH_COLOR, True)
+        self.favoritesList = TreeItem(pad("Favorites"), FAVORITES_COLOR, True)
+        self.libraryList = TreeItem(pad("Library"), LIBRARY_COLOR, True)
         
         self.AppendPlayList(self.searchList)
         self.AppendPlayList(self.favoritesList)
@@ -124,7 +127,7 @@ class PlayListManager(QWidget):
         background-color: rgb(15, 15, 15);
         background: black;
         color: white;
-        border-right-color: rgb(45, 45, 45);
+        border-right-color: rgb(30, 30, 30);
         }}
 
         QTreeView::branch:open
@@ -165,7 +168,7 @@ class PlayListManager(QWidget):
         QTreeView::item:selected
         {{
         background-color: rgb(30, 30, 30);
-        border: 1px solid rgb(82, 26, 149);
+        border: 1px solid black; /*rgb(82, 26, 149);*/
         border-left-color: transparent;
         border-right-color: transparent;
         color: white;
@@ -188,15 +191,15 @@ class PlayListManager(QWidget):
             
         QScrollBar:vertical 
         {{
-            border: 2px solid black;
+            border: 1px solid black;
             background: black;
             width: 15px;
             margin: 22px 0 22px 0;
         }}
         QScrollBar::handle:vertical 
         {{
-            /*border: 1px solid rgb(35, 11, 63);*/
-            background: rgb(30, 30, 30);
+            border: 1px solid rgb(30, 30, 30); /*rgb(35, 11, 63);*/
+            background: black; /*rgb(30, 30, 30);*/
             min-height: 40px;
             border-radius: 4px; 
         }}

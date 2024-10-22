@@ -107,6 +107,14 @@ class Ui_EntryEditor(object):
         self.Back_button.setObjectName("Back_button")
         self.Name_textedit = QtWidgets.QLineEdit(parent=EntryEditor)
         self.Name_textedit.setGeometry(QtCore.QRect(150, 110, 481, 31))
+        self.Name_textedit.setStyleSheet("QLineEdit\n"
+"{\n"
+"    border: 1px solid rgb(30, 30, 30);\n"
+"    background-color: black;\n"
+"    border-radius: 10px;\n"
+"    padding-left: 10px;\n"
+"    color: rgb(20, 205, 255); \n"
+"}")
         self.Name_textedit.setText("")
         self.Name_textedit.setFrame(False)
         self.Name_textedit.setObjectName("Name_textedit")
@@ -140,11 +148,15 @@ class Ui_EntryEditor(object):
         self.Source_label.setObjectName("Source_label")
         self.Source_textedit = QtWidgets.QTextEdit(parent=EntryEditor)
         self.Source_textedit.setGeometry(QtCore.QRect(151, 230, 481, 51))
+        self.Source_textedit.setStyleSheet("border-radius: 10px;\n"
+"color: rgb(20, 205, 255); ")
         self.Source_textedit.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         self.Source_textedit.setFrameShadow(QtWidgets.QFrame.Shadow.Plain)
         self.Source_textedit.setObjectName("Source_textedit")
         self.SourceType_combobox = QtWidgets.QComboBox(parent=EntryEditor)
         self.SourceType_combobox.setGeometry(QtCore.QRect(151, 170, 120, 30))
+        self.SourceType_combobox.setStyleSheet("color: rgb(20, 205, 255); \n"
+"")
         self.SourceType_combobox.setObjectName("SourceType_combobox")
         self.SourceType_combobox.addItem("")
         self.SourceType_combobox.addItem("")
