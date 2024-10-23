@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/external-link.png</file>
+    <file>icons/external-link-disabled.png</file>
+    <file>icons/videofile.png</file>
+    <file>icons/playlists.png</file>
     <file>icons/white-plus-sign-disabled.png</file>
     <file>icons/white-minus-disabled.png</file>
     <file>icons/white-left-arrow-disabled.png</file>

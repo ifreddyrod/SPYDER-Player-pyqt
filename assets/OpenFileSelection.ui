@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EntryEditor</class>
- <widget class="QWidget" name="EntryEditor">
+ <class>OpenFileSelection</class>
+ <widget class="QWidget" name="OpenFileSelection">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -113,7 +113,7 @@ QComboBox QAbstractItemView {
      </rect>
     </property>
     <property name="text">
-     <string>Entry Editor</string>
+     <string>Open Local File or Paste URL</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft</set>
@@ -144,52 +144,7 @@ QComboBox QAbstractItemView {
     </size>
    </property>
   </widget>
-  <widget class="QLineEdit" name="Name_textedit">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>110</y>
-     <width>481</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLineEdit
-{
-	border: 1px solid rgb(30, 30, 30);
-	background-color: black;
-	border-radius: 10px;
-	padding-left: 10px;
-	color: rgb(20, 205, 255); 
-}</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="frame">
-    <bool>false</bool>
-   </property>
-   <property name="placeholderText">
-    <string>Name your entry</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="EntryName_label">
-   <property name="geometry">
-    <rect>
-     <x>11</x>
-     <y>120</y>
-     <width>131</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>PlayList Name:</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="Save_button">
+  <widget class="QPushButton" name="Open_button">
    <property name="geometry">
     <rect>
      <x>630</x>
@@ -199,12 +154,12 @@ QComboBox QAbstractItemView {
     </rect>
    </property>
    <property name="text">
-    <string>  Save</string>
+    <string>  Open</string>
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/icons/white-diskette.png</normaloff>
-     <disabledoff>:/icons/icons/white-diskette-disabled.png</disabledoff>:/icons/icons/white-diskette.png</iconset>
+     <normaloff>:/icons/icons/external-link.png</normaloff>
+     <disabledoff>:/icons/icons/external-link-disabled.png</disabledoff>:/icons/icons/external-link.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -216,8 +171,8 @@ QComboBox QAbstractItemView {
   <widget class="QPushButton" name="OpenFiles_button">
    <property name="geometry">
     <rect>
-     <x>151</x>
-     <y>240</y>
+     <x>150</x>
+     <y>120</y>
      <width>31</width>
      <height>21</height>
     </rect>
@@ -246,7 +201,7 @@ background-color: rgba(0, 0, 0, 0);
    <property name="geometry">
     <rect>
      <x>11</x>
-     <y>230</y>
+     <y>120</y>
      <width>131</width>
      <height>16</height>
     </rect>
@@ -262,7 +217,7 @@ background-color: rgba(0, 0, 0, 0);
    <property name="geometry">
     <rect>
      <x>151</x>
-     <y>230</y>
+     <y>110</y>
      <width>481</width>
      <height>51</height>
     </rect>
@@ -278,14 +233,14 @@ color: rgb(20, 205, 255); </string>
     <enum>QFrame::Shadow::Plain</enum>
    </property>
    <property name="placeholderText">
-    <string>Paste full link here (https://myplaylistlink.com/list) or select a File</string>
+    <string>Paste full link here (https://myplaylistlink.com/list) or select a File in Dialog</string>
    </property>
   </widget>
   <widget class="QComboBox" name="SourceType_combobox">
    <property name="geometry">
     <rect>
      <x>151</x>
-     <y>170</y>
+     <y>182</y>
      <width>120</width>
      <height>30</height>
     </rect>
@@ -309,7 +264,7 @@ color: rgb(20, 205, 255); </string>
    <property name="geometry">
     <rect>
      <x>11</x>
-     <y>180</y>
+     <y>192</y>
      <width>131</width>
      <height>16</height>
     </rect>
@@ -337,9 +292,7 @@ color: rgb(20, 205, 255); </string>
   <zorder>background_widget</zorder>
   <zorder>Titlebar_widget</zorder>
   <zorder>Back_button</zorder>
-  <zorder>Name_textedit</zorder>
-  <zorder>EntryName_label</zorder>
-  <zorder>Save_button</zorder>
+  <zorder>Open_button</zorder>
   <zorder>Source_label</zorder>
   <zorder>SourceType_combobox</zorder>
   <zorder>SourceType_label</zorder>

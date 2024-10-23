@@ -97,7 +97,7 @@ background-color: rgb(27, 27, 27);</string>
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>70</y>
+     <y>40</y>
      <width>351</width>
      <height>51</height>
     </rect>
@@ -106,7 +106,7 @@ background-color: rgb(27, 27, 27);</string>
     <string notr="true"/>
    </property>
    <property name="text">
-    <string>   PlayList Settings</string>
+    <string>   PlayList Editor</string>
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
@@ -146,13 +146,13 @@ background-color: rgb(27, 27, 27);</string>
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>140</y>
+     <y>110</y>
      <width>351</width>
      <height>51</height>
     </rect>
    </property>
    <property name="text">
-    <string>   Library Settings</string>
+    <string>   Library Editor</string>
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
@@ -169,7 +169,7 @@ background-color: rgb(27, 27, 27);</string>
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>210</y>
+     <y>320</y>
      <width>351</width>
      <height>51</height>
     </rect>
@@ -192,7 +192,7 @@ background-color: rgb(27, 27, 27);</string>
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>30</y>
+     <y>10</y>
      <width>801</width>
      <height>421</height>
     </rect>
@@ -201,12 +201,60 @@ background-color: rgb(27, 27, 27);</string>
     <string notr="true">background-color: qlineargradient(spread:pad, x1:0.369, y1:0.182, x2:1, y2:1, stop:0 rgba(57, 9, 126, 255), stop:1 rgba(129, 18, 129, 255));</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="OpenMediaFile_button">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>250</y>
+     <width>351</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>   Open Media File</string>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/videofile.png</normaloff>:/icons/icons/videofile.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="OpenPlayList_button">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>180</y>
+     <width>351</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>   Open PlayList</string>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/playlists.png</normaloff>:/icons/icons/playlists.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+  </widget>
   <zorder>background_widget</zorder>
   <zorder>Titlebar_widget</zorder>
   <zorder>PlayList_button</zorder>
   <zorder>Close_button</zorder>
   <zorder>Library_button</zorder>
   <zorder>HotKeys_button</zorder>
+  <zorder>OpenMediaFile_button</zorder>
+  <zorder>OpenPlayList_button</zorder>
  </widget>
  <resources>
   <include location="resources.qrc"/>

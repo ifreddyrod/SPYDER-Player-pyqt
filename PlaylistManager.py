@@ -433,6 +433,41 @@ class PlayListManager(QWidget):
         
         return channel_name, source
     
+    def GoToAdjacentItem(self, isForward: bool = True):
+        if self.currentSelectedItem is None or self.currentSelectedItem.isPlayList:
+            return None, None
+        
+        temp = self.currentSelectedItem
+        
+        # Check if selection is from Search List, if so goto next item in that list 
+        if self.currentSelectedItem.parent().parent() == self.searchList:     
+            currentList = self.GetPlayListFromSearch(self.currentSelectedItem.GetPlayListName())
+        else:
+            currentList = self.currentSelectedItem.parent()  
+                    
+        currentListCount = currentList.childCount()
+        currentIndex = currentList.indexOfChild(self.currentSelectedItem)
+        
+        if isForward:
+            nextItemIndex = (currentIndex + 1) % currentListCount
+        else:
+            nextItemIndex = (currentIndex - 1) % currentListCount
+        
+        self.currentSelectedItem = currentList.child(nextItemIndex)
+        
+        self.lastSelectedItem = temp
+        
+        # Retrieve the channel name (displayed)
+        channel_name = self.currentSelectedItem.GetItemName()
+
+        # Retrieve the hidden URL (stored in UserRole)
+        source = self.currentSelectedItem.GetSource()
+        
+        # Set Tree to Selected Item
+        self.playlistTree.setCurrentItem(self.currentSelectedItem)
+        
+        return channel_name, source
+    
     def SaveFavorites(self):
         self.appData.save()
             
@@ -656,7 +691,6 @@ class PlayListManager(QWidget):
         self.EmitTreeLayoutChanged()
         
     def SortSearchResultsDescending(self):
-        
         for i in range(self.searchList.childCount()):
             searchList = self.searchList.child(i)
             searchList.sortChildren(0, Qt.SortOrder.DescendingOrder)

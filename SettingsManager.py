@@ -11,6 +11,7 @@ from AppData import *
 from UI_Settings import Ui_SettingsMain
 from UI_PlayListSettings import Ui_PlayListSettings
 from UI_EntryEditor import Ui_EntryEditor
+from UI_OpenFileSelection import Ui_OpenFileSelection
 
 class ENUM_SettingsViews(Enum):
     INTRO = 0
@@ -18,6 +19,8 @@ class ENUM_SettingsViews(Enum):
     LIBRARY  = 2
     PLAYLIST_EDITOR = 3
     LIBRARY_EDITOR = 4
+    OPEN_PLAYLIST = 5
+    OPEN_FILE = 6
     
     
 class SettingsIntro(DraggableWidget):
@@ -27,23 +30,33 @@ class SettingsIntro(DraggableWidget):
         self.ui = Ui_SettingsMain()
         self.ui.setupUi(self)
         
-        self.ui.Close_button.clicked.connect(self.CloseButtonClicked)
-        self.ui.PlayList_button.clicked.connect(self.PlayListButtonClicked)
-        self.ui.Library_button.clicked.connect(self.LibraryButtonClicked)
+        self.ui.Close_button.clicked.connect(self.settingsManager.HideSettings)
+        self.ui.PlayList_button.clicked.connect(self.settingsManager.ShowPlayListSettings)
+        self.ui.Library_button.clicked.connect(self.settingsManager.ShowLibrarySettings)
         self.ui.HotKeys_button.clicked.connect(self.HotKeysButtonClicked)
-        
-    def CloseButtonClicked(self):
-        self.settingsManager.HideSettings()
-        
-    def PlayListButtonClicked(self):
-        self.settingsManager.ShowPlayListSettings()
-        
-    def LibraryButtonClicked(self):
-        self.settingsManager.ShowLibrarySettings()
-        
+        self.ui.OpenMediaFile_button.clicked.connect(self.settingsManager.ShowOpenFileSelector)
+        self.ui.OpenPlayList_button.clicked.connect(self.settingsManager.ShowOpenPlayListSelector)
+  
     def HotKeysButtonClicked(self):
         #self.SettingsManager.ShowHotKeySettings()
         pass
+        
+    ''' def BackButtonClicked(self):
+        self.settingsManager.HideSettings()
+        
+    def ShowPlayListSettings(self):
+        self.settingsManager.ShowPlayListSettings()
+        
+    def ShowLibrarySettings(self):
+        self.settingsManager.ShowLibrarySettings()
+        
+    def ShowOpenFileSelector(self):
+        self.settingsManager.ShowOpenFileSelector()
+        
+    def ShowOpenPlayListSelector(self):
+        self.settingsManager.ShowOpenPlayListSelector()'''
+        
+
          
 
 class ListSettings(DraggableWidget):
@@ -343,9 +356,113 @@ class EntryEditor(DraggableWidget):
         if filename:
             self.ui.Source_textedit.setPlainText(filename)             
 
+
+class OpenFileSelection(DraggableWidget):
+    entryChanged = False
+    newEntry: PlayListEntry = None
+        
+    def __init__(self, SettingsManager, EntryType: ENUM_SettingsViews):
+        super().__init__()
+        self.entryType = EntryType
+        self.settingsManager = SettingsManager
+        
+        self.ui = Ui_OpenFileSelection()
+        self.ui.setupUi(self)
+        
+        self.ui.Open_button.setEnabled(False)    
+        
+        self.ui.Back_button.clicked.connect(self.BackButtonClicked)
+        self.ui.Open_button.clicked.connect(self.OpenButtonClicked)
+        self.ui.OpenFiles_button.clicked.connect(self.OpenFilesButtonClicked)
+        self.ui.Source_textedit.textChanged.connect(self.EntryChanged)
+        self.ui.SourceType_combobox.currentIndexChanged.connect(self.EntryChanged)
+        
+    def ShowEmptyFileSelection(self):  
+        # Create new entry
+        self.blockSignals(True)
+        
+        self.newEntry = PlayListEntry(
+                name='',
+                parentName='',
+                sourceType='file',
+                source='')
+        
+        if self.entryType == ENUM_SettingsViews.OPEN_FILE:
+            self.ui.Titlebar_label.setText("Open Local File or Paste URL")  
+             
+        elif self.entryType == ENUM_SettingsViews.OPEN_PLAYLIST:
+            self.ui.Titlebar_label.setText("Enter a PlayList File or Paste URL")
+
+        self.ui.SourceType_combobox.setCurrentIndex(0)
+        self.ui.Source_textedit.setText("")
+        self.ui.OpenFiles_button.setEnabled(True)
+        self.ui.OpenFiles_button.show()
+        self.blockSignals(False)
+        self.entryChanged = False
+        
+    def BackButtonClicked(self):    
+        if self.newEntry != None:
+            del self.newEntry
+            
+        self.settingsManager.ShowSettings()
+             
+    def EntryChanged(self):
+        if  self.ui.SourceType_combobox.currentText() != self.newEntry.sourceType or self.ui.Source_textedit.toPlainText() != self.newEntry.source:
+            self.entryChanged = True
+            self.SourceTypeChanged()
+            self.ui.Open_button.setEnabled(True)
+        else:
+            self.entryChanged = False
+            self.ui.Open_button.setEnabled(False)    
+    
+    def SourceTypeChanged(self):
+        if self.ui.SourceType_combobox.currentIndex() == 0:
+            self.ui.OpenFiles_button.setEnabled(True)
+            self.ui.OpenFiles_button.show()
+        elif self.ui.SourceType_combobox.currentIndex() == 1:
+            self.ui.OpenFiles_button.setEnabled(False)
+            self.ui.OpenFiles_button.hide()
+                
+    def OpenFilesButtonClicked(self):
+         # Open File Dialog
+        if self.entryType == ENUM_SettingsViews.OPEN_PLAYLIST:
+            filename, _ = QFileDialog.getOpenFileName(self, "Select PlayList File", "", "PlayList Files (*.m3u *.m3u8)")
+        elif self.entryType == ENUM_SettingsViews.OPEN_FILE:
+            filename, _ = QFileDialog.getOpenFileName(self, "Select a Media File", "", "Media Files (*.mkv *.mp4 *.avi *.mov *.mp3 *.wmv *.wav *.mpg, *.mpeg *.m4v)")
+        
+        if filename:
+            self.ui.Source_textedit.setPlainText(filename)   
+            self.ui.Open_button.setEnabled(True)   
+            
+    def OpenButtonClicked(self):
+        if self.entryChanged == True and self.entryType == ENUM_SettingsViews.OPEN_FILE:             
+            self.newEntry.parentName = "Opened"
+            self.newEntry.sourceType = self.ui.SourceType_combobox.currentText()
+            self.newEntry.source = self.ui.Source_textedit.toPlainText()
+            
+            if self.newEntry.sourceType == 'file':
+                name, extension = os.path.splitext(os.path.basename(self.newEntry.source))
+                self.newEntry.name = name
+            elif self.newEntry.sourceType == 'url':
+                if self.newEntry.source.startswith('http://'):
+                    name = self.newEntry.source.split('http://')[1]  
+                    self.newEntry.name = name
+                elif self.newEntry.source.startswith('https://'):
+                    name = self.newEntry.source.split('https://')[1]  
+                    self.newEntry.name = name
+                else:
+                    self.newEntry.name = self.newEntry.source
+
+            self.settingsManager.LoadMediaFile(self.newEntry)
+        elif self.entryChanged == True and self.entryType == ENUM_SettingsViews.OPEN_PLAYLIST:
+            #self.newEntry.parentName = "Opened"
+            pass  
+        
 class SettingsManager(QObject):
     changesMade = False
     reLoadAllPlayListsSignal = pyqtSignal()
+    loadMediaFileSignal = pyqtSignal(PlayListEntry)
+    loadPlayListSignal = pyqtSignal(PlayListEntry)
     
     def __init__(self, appData: AppData):
         super().__init__()
@@ -359,6 +476,8 @@ class SettingsManager(QObject):
         self.LibrarySettings = ListSettings(self, ENUM_SettingsViews.LIBRARY)
         self.PlayListEditor = EntryEditor(self, ENUM_SettingsViews.PLAYLIST_EDITOR)
         self.LibraryEditor = EntryEditor(self, ENUM_SettingsViews.LIBRARY_EDITOR)
+        self.OpenFileSelector = OpenFileSelection(self, ENUM_SettingsViews.OPEN_FILE)
+        self.OpenPlayListSelector = OpenFileSelection(self, ENUM_SettingsViews.OPEN_PLAYLIST)
         
         
         self.settingStack.addWidget(self.SettingsIntro)
@@ -366,12 +485,14 @@ class SettingsManager(QObject):
         self.settingStack.addWidget(self.LibrarySettings)
         self.settingStack.addWidget(self.PlayListEditor)
         self.settingStack.addWidget(self.LibraryEditor)
+        self.settingStack.addWidget(self.OpenPlayListSelector)
+        self.settingStack.addWidget(self.OpenFileSelector)
         
         self.settingStack.setFixedWidth(780)
         self.settingStack.setFixedHeight(430) 
         
-        self.settingStack.setWindowFlags(Qt.WindowType.FramelessWindowHint)  
-        self.settingStack.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.settingStack.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)  
+        #self.settingStack.setWindowModality(Qt.WindowModality.ApplicationModal)
         
         
     def ShowSettings(self):
@@ -382,8 +503,14 @@ class SettingsManager(QObject):
         self.settingStack.hide()
         if self.changesMade:
             self.reLoadAllPlayListsSignal.emit()
+            
+    def ShowOpenFileSelector(self):
+        self.OpenFileSelector.ShowEmptyFileSelection()
+        self.settingStack.setCurrentIndex(ENUM_SettingsViews.OPEN_FILE.value)
         
-
+    def ShowOpenPlayListSelector(self):
+        self.OpenPlayListSelector.ShowEmptyFileSelection()
+        self.settingStack.setCurrentIndex(ENUM_SettingsViews.OPEN_PLAYLIST.value)
         
     def ShowPlayListSettings(self, changesMade: bool = False):
         self.changesMade |= changesMade
@@ -416,6 +543,15 @@ class SettingsManager(QObject):
     def SaveSettings(self):
         if self.changesMade:
             self.appData.save()
+            
+    def LoadMediaFile(self, fileEntry: PlayListEntry):
+        self.loadMediaFileSignal.emit(fileEntry)
+        self.HideSettings()
+    
+    def LoadPlayList(self, playListEntry: PlayListEntry):
+        self.loadPlayListSignal.emit(playListEntry)
+        self.HideSettings()
+        
             
 
         
