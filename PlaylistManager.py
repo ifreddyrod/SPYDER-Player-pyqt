@@ -15,6 +15,7 @@ PLAYLIST_COLOR = QColor(20, 6, 36)   #QColor(20, 6, 36)
 LIBRARY_COLOR = QColor(20, 6, 36)
 FAVORITES_COLOR = QColor(20, 6, 36)
 SEARCH_COLOR = QColor(20, 6, 36)  #QColor(0, 35, 63)
+SESSION_COLOR = QColor(0, 35, 63)
 
 def pad(string: str) -> str:
     return "  " + string
@@ -22,11 +23,12 @@ def pad(string: str) -> str:
 
 
 class TreeItem(QTreeWidgetItem):
-    def __init__(self, nameText, bgColor:QColor = None, isPlayList: bool = False):
+    def __init__(self, nameText, bgColor:QColor = None, isPlayList: bool = False, isPersistent: bool = True):
         super().__init__([nameText])
         self.itemName = nameText.lstrip()
         self.playListName = ""
         self.isPlayList = isPlayList
+        self.isPersistent = isPersistent
         
         if bgColor != None:
             self.setBackground(0, bgColor)
@@ -55,6 +57,9 @@ class TreeItem(QTreeWidgetItem):
     def IsItemChecked(self) -> bool:
         return self.checkState(0) == Qt.CheckState.Checked
     
+    def IsItemPersistent(self) -> bool:
+        return self.isPersistent
+    
     def GetParentName(self) -> str:
         parent = self.parent().text(0)
         parent = parent.split("  (")[0]
@@ -69,6 +74,8 @@ class PlayListManager(QWidget):
     lastSelectedItem: QStandardItem = None
     searchResultsCount = 0
     currentItem = 0
+    openedFilesList: TreeItem = None
+    openedSessionPlayLists: List[TreeItem] = []
     
     def __init__(self, playlistTreefromUI: QTreeWidget, appData: AppData, parent=None):
         super().__init__(parent)
@@ -110,6 +117,19 @@ class PlayListManager(QWidget):
         self.AppendPlayList(self.favoritesList)
         self.AppendPlayList(self.libraryList)
         
+        '''if self.openedFilesList != None:
+            self.AppendPlayList(self.openedFilesList)
+        else:
+            self.openedFilesList = None'''
+        
+    def ReAddOpenFilesList(self):
+        if self.openedFilesList != None:
+            self.AppendPlayList(self.openedFilesList)
+            
+    def ReAddOpenSessionPlayLists(self):
+        for item in self.openedSessionPlayLists:
+            self.AppendPlayList(item)
+            
     def LoadStyleSheet(self):
         iconPath = ":/icons/icons/"
             
@@ -260,7 +280,7 @@ class PlayListManager(QWidget):
     def ExpandAllPlaylists(self):
         self.playlistTree.expandAll()
                        
-    def LoadPlayList(self, playlist: PlayListEntry):
+    def LoadPlayList(self, playlist: PlayListEntry, isPersistent: bool = True):
         # Extract the file name without the extension
         playlistPath = playlist.source
         #playListFile = os.path.basename(playlistPath)
@@ -303,9 +323,15 @@ class PlayListManager(QWidget):
             print("The playlist is empty.")
             return
         
-        # Create a Playlist Entry to the Tree and add it 
-        playlistTreeItem = TreeItem(pad(playlistName), PLAYLIST_COLOR, True)
-        self.AppendPlayList(playlistTreeItem)
+        self.playlistTree.blockSignals(True)
+        if isPersistent:
+            # Create a Playlist Entry to the Tree and add it 
+            playlistTreeItem = TreeItem(pad(playlistName), PLAYLIST_COLOR, True)
+            self.AppendPlayList(playlistTreeItem)
+        else:
+            playlistTreeItem = TreeItem(pad(playlistName), SESSION_COLOR, True, False)
+            self.openedSessionPlayLists.append(playlistTreeItem)
+            self.AppendPlayList(playlistTreeItem)
                 
         #------------------------------
         # Process the parsed entries
@@ -316,18 +342,40 @@ class PlayListManager(QWidget):
             
             if channel_name and source:
                 # Create a new item for the channel and add it as a child to the playlist item
-                channelItem = TreeItem(pad(channel_name))
+                channelItem = TreeItem(pad(channel_name), None, False, isPersistent)
                 channelItem.SetPlayListName(playlistName) 
                 channelItem.SetSource(source)
 
-                channelItem.setFlags(channelItem.flags() | Qt.ItemFlag.ItemIsUserCheckable) 
-                channelItem.SetItemChecked(False)
+                if isPersistent:
+                    channelItem.setFlags(channelItem.flags() | Qt.ItemFlag.ItemIsUserCheckable) 
+                    channelItem.SetItemChecked(False)
                 
                 self.AppendChannel(playlistTreeItem, channelItem) 
                 
         # Rename the playlist item
         self.UpdatePlayListChannelCount(playlistTreeItem)
+        self.playlistTree.blockSignals(False)
         
+    def AddSessionFile(self, fileEntry: PlayListEntry):
+        if fileEntry is None:
+            return
+        
+        self.playlistTree.blockSignals(True)  
+        # If not files have been opened yet, create the root item
+        if self.openedFilesList is None:
+            self.openedFilesList = TreeItem(pad("Opened Files"), SESSION_COLOR, True, False)
+            self.AppendPlayList(self.openedFilesList)
+            
+        item = TreeItem(pad(fileEntry.name), None, False, False)
+        item.SetSource(fileEntry.source)
+        item.SetPlayListName("Opened Files")
+        
+        self.AppendChannel(self.openedFilesList, item)
+        self.UpdatePlayListChannelCount(self.openedFilesList)
+        self.playlistTree.blockSignals(False)  
+        self.openedFilesList.setExpanded(True)
+        #self.EmitTreeLayoutChanged()
+            
     def ItemDoubleClicked(self, item: TreeItem, column):
         # If item is a playlist, return
         if item.isPlayList:
@@ -675,8 +723,10 @@ class PlayListManager(QWidget):
                     foundChannel = TreeItem(channel.GetItemName())
                     foundChannel.SetSource(channel.GetSource())
                     foundChannel.SetPlayListName(channel.GetPlayListName())
-                    foundChannel.setFlags(foundChannel.flags() | Qt.ItemFlag.ItemIsUserCheckable)
-                    foundChannel.SetItemChecked(channel.IsItemChecked())
+                    
+                    if channel.IsItemPersistent():
+                        foundChannel.setFlags(foundChannel.flags() | Qt.ItemFlag.ItemIsUserCheckable)
+                        foundChannel.SetItemChecked(channel.IsItemChecked())
                     
                     self.AppendChannel(playlistResults, foundChannel)
                     searchResultsCount += 1

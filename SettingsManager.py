@@ -160,11 +160,13 @@ class ListSettings(DraggableWidget):
         self.entryRow = self.ui.PlayList_table.currentRow()
         
         self.editList.pop(self.entryRow)
+        self.settingsManager.changesMade = True
         self.SaveData()
         self.UpdateTable()
     
     def SaveData(self):
         self.settingsManager.appData.save()
+        
         
         
 class EntryEditor(DraggableWidget):
@@ -436,13 +438,13 @@ class OpenFileSelection(DraggableWidget):
             
     def OpenButtonClicked(self):
         if self.entryChanged == True and self.entryType == ENUM_SettingsViews.OPEN_FILE:             
-            self.newEntry.parentName = "Opened"
+            self.newEntry.parentName = "Opened Files"
             self.newEntry.sourceType = self.ui.SourceType_combobox.currentText()
             self.newEntry.source = self.ui.Source_textedit.toPlainText()
             
             if self.newEntry.sourceType == 'file':
                 name, extension = os.path.splitext(os.path.basename(self.newEntry.source))
-                self.newEntry.name = name
+                self.newEntry.name = name + extension
             elif self.newEntry.sourceType == 'url':
                 if self.newEntry.source.startswith('http://'):
                     name = self.newEntry.source.split('http://')[1]  
@@ -455,8 +457,38 @@ class OpenFileSelection(DraggableWidget):
 
             self.settingsManager.LoadMediaFile(self.newEntry)
         elif self.entryChanged == True and self.entryType == ENUM_SettingsViews.OPEN_PLAYLIST:
-            #self.newEntry.parentName = "Opened"
-            pass  
+            
+            self.newEntry.sourceType = self.ui.SourceType_combobox.currentText()
+            self.newEntry.source = self.ui.Source_textedit.toPlainText()
+            
+            if self.newEntry.sourceType == 'file':
+                name, extension = os.path.splitext(os.path.basename(self.newEntry.source))
+                self.newEntry.name = name
+                self.newEntry.parentName = name
+            elif self.newEntry.sourceType == 'url':
+                if self.newEntry.source.startswith('http://'):
+                    name = self.newEntry.source.split('http://')[1]  
+                    name = name.split('/')
+                    if len(name) > 0:
+                        name = name[len(name)-1]
+                    else:
+                        name = name[0]
+                    self.newEntry.name = name
+                    self.newEntry.parentName = name
+                elif self.newEntry.source.startswith('https://'):
+                    name = self.newEntry.source.split('https://')[1]  
+                    name = name.split('/')
+                    if len(name) > 0:
+                        name = name[len(name)-1]
+                    else:
+                        name = name[0]
+                    self.newEntry.name = name
+                    self.newEntry.parentName = name
+                else:
+                    self.newEntry.name = self.newEntry.source
+                    self.newEntry.parentName = self.newEntry.name
+            self.settingsManager.LoadPlayList(self.newEntry)
+              
         
 class SettingsManager(QObject):
     changesMade = False
@@ -494,7 +526,11 @@ class SettingsManager(QObject):
         self.settingStack.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)  
         #self.settingStack.setWindowModality(Qt.WindowModality.ApplicationModal)
         
-        
+      
+    def ShowSettingsFirst(self):
+        self.changesMade = False
+        self.ShowSettings()
+            
     def ShowSettings(self):
         self.settingStack.setCurrentIndex(ENUM_SettingsViews.INTRO.value)
         self.settingStack.show()
@@ -545,12 +581,13 @@ class SettingsManager(QObject):
             self.appData.save()
             
     def LoadMediaFile(self, fileEntry: PlayListEntry):
+        self.settingStack.hide()
         self.loadMediaFileSignal.emit(fileEntry)
-        self.HideSettings()
-    
+        
     def LoadPlayList(self, playListEntry: PlayListEntry):
+        self.settingStack.hide()
         self.loadPlayListSignal.emit(playListEntry)
-        self.HideSettings()
+        
         
             
 
