@@ -367,7 +367,7 @@ QLabel
          <property name="handleWidth">
           <number>1</number>
          </property>
-         <widget class="QVideoWidget" name="VideoView_widget" native="true">
+         <widget class="QWidget" name="VideoView_widget" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>10</horstretch>
@@ -405,14 +405,6 @@ QLabel
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QVideoWidget</class>
-   <extends>QWidget</extends>
-   <header>PyQt6.QtMultimediaWidgets</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>

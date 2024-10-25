@@ -240,7 +240,7 @@ class Ui_PlayerMainWindow(object):
         self.Vertical_splitter.setOrientation(QtCore.Qt.Orientation.Vertical)
         self.Vertical_splitter.setHandleWidth(1)
         self.Vertical_splitter.setObjectName("Vertical_splitter")
-        self.VideoView_widget = QVideoWidget(parent=self.Vertical_splitter)
+        self.VideoView_widget = QtWidgets.QWidget(parent=self.Vertical_splitter)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(10)
         sizePolicy.setVerticalStretch(0)
@@ -272,4 +272,3 @@ class Ui_PlayerMainWindow(object):
         self.PlayList_tree.setSortingEnabled(False)
         self.Settings_button.setToolTip(_translate("PlayerMainWindow", "Settings"))
         self.Status_label.setText(_translate("PlayerMainWindow", "TextLabel"))
-from PyQt6.QtMultimediaWidgets import QVideoWidget
