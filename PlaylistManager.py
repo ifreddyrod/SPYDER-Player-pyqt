@@ -15,7 +15,7 @@ PLAYLIST_COLOR = QColor(20, 6, 36)   #QColor(20, 6, 36)
 LIBRARY_COLOR = QColor(20, 6, 36)
 FAVORITES_COLOR = QColor(20, 6, 36)
 SEARCH_COLOR = QColor(20, 6, 36)  #QColor(0, 35, 63)
-SESSION_COLOR = QColor(0, 35, 63)
+SESSION_COLOR = QColor(39, 0, 42) #QColor(0, 35, 63)
 
 def pad(string: str) -> str:
     return "  " + string
@@ -70,12 +70,13 @@ class TreeItem(QTreeWidgetItem):
 class PlayListManager(QWidget):
     platform: str = ""
     treeItemSelectedSignal: pyqtSignal = pyqtSignal(str, str)
-    currentSelectedItem: QStandardItem = None
-    lastSelectedItem: QStandardItem = None
+    currentSelectedItem: TreeItem = None
+    lastSelectedItem: TreeItem = None
     searchResultsCount = 0
     currentItem = 0
     openedFilesList: TreeItem = None
-    openedSessionPlayLists: List[TreeItem] = []
+    openedSessionPlayLists: List[PlayListEntry] = []
+    openedSessionFiles: List[PlayListEntry] = []
     
     def __init__(self, playlistTreefromUI: QTreeWidget, appData: AppData, parent=None):
         super().__init__(parent)
@@ -116,20 +117,22 @@ class PlayListManager(QWidget):
         self.AppendPlayList(self.searchList)
         self.AppendPlayList(self.favoritesList)
         self.AppendPlayList(self.libraryList)
+
+        self.openedFilesList = None
+        self.currentSelectedItem = None
+        self.lastSelectedItem = None
         
-        '''if self.openedFilesList != None:
-            self.AppendPlayList(self.openedFilesList)
-        else:
-            self.openedFilesList = None'''
         
-    def ReAddOpenFilesList(self):
-        if self.openedFilesList != None:
-            self.AppendPlayList(self.openedFilesList)
+    def ReAddOpenFilesList(self):            
+        if len(self.openedSessionFiles) > 0:
+            for item in self.openedSessionFiles:
+                self.AddSessionFile(item)
             
-    def ReAddOpenSessionPlayLists(self):
-        for item in self.openedSessionPlayLists:
-            self.AppendPlayList(item)
-            
+    def ReAddOpenSessionPlayLists(self):            
+        if len(self.openedSessionPlayLists) > 0:
+            for item in self.openedSessionPlayLists:
+                self.LoadPlayList(item, False)
+                
     def LoadStyleSheet(self):
         iconPath = ":/icons/icons/"
             
@@ -280,7 +283,7 @@ class PlayListManager(QWidget):
     def ExpandAllPlaylists(self):
         self.playlistTree.expandAll()
                        
-    def LoadPlayList(self, playlist: PlayListEntry, isPersistent: bool = True):
+    def LoadPlayList(self, playlist: PlayListEntry, isPersistent: bool = True):        
         # Extract the file name without the extension
         playlistPath = playlist.source
         #playListFile = os.path.basename(playlistPath)
@@ -330,7 +333,8 @@ class PlayListManager(QWidget):
             self.AppendPlayList(playlistTreeItem)
         else:
             playlistTreeItem = TreeItem(pad(playlistName), SESSION_COLOR, True, False)
-            self.openedSessionPlayLists.append(playlistTreeItem)
+            if not self.IsEntryInSessionPlayList(playlist):
+                self.openedSessionPlayLists.append(playlist)
             self.AppendPlayList(playlistTreeItem)
                 
         #------------------------------
@@ -372,8 +376,12 @@ class PlayListManager(QWidget):
         
         self.AppendChannel(self.openedFilesList, item)
         self.UpdatePlayListChannelCount(self.openedFilesList)
+        
+        if not self.IsEntryInSessionFiles(fileEntry):
+            self.openedSessionFiles.append(fileEntry)
+            
         self.playlistTree.blockSignals(False)  
-        self.openedFilesList.setExpanded(True)
+        #self.openedFilesList.setSelected(True)
         #self.EmitTreeLayoutChanged()
             
     def ItemDoubleClicked(self, item: TreeItem, column):
@@ -769,7 +777,18 @@ class PlayListManager(QWidget):
             topItem = playlist.child(0)
             self.playlistTree.setCurrentItem(topItem)   
            
-           
+    def IsEntryInSessionPlayList(self, entry):
+        for item in self.openedSessionPlayLists:
+            if item.name == entry.name:
+                return True
+        return False
+    
+    def IsEntryInSessionFiles(self, entry):
+        for item in self.openedSessionFiles:
+            if item.name == entry.name:
+                return True
+        return False
+               
     def eventFilter(self, obj, event):
         if obj == self.playlistTree and event.type() == QEvent.Type.KeyPress and event.key() == Qt.Key.Key_Space:
             # Ignore the space bar as it triggers the itemSelect event

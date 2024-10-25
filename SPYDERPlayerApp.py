@@ -773,8 +773,6 @@ class SpyderPlayer(QWidget):
         if playing:
             self.controlPanelFS.ui.Play_button.setIcon(QIcon(":icons/icons/pause.png"))
             self.controlPanel.ui.Play_button.setIcon(QIcon(":icons/icons/pause.png"))
-            #self.controlPanelFS.ui.VideoPosition_slider.setEnabled(False)  #False
-            #self.controlPanel.ui.VideoPosition_slider.setEnabled(False)   #False
         else:
             self.controlPanelFS.ui.Play_button.setIcon(QIcon(":icons/icons/play.png"))
             self.controlPanel.ui.Play_button.setIcon(QIcon(":icons/icons/play.png"))
