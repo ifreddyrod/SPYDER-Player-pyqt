@@ -128,6 +128,7 @@ class SpyderPlayer(QWidget):
         # Setup Control Panels
         #---------------------------
         self.controlPanelFS = VideoControlPannel(self)  
+        self.controlPanelFS.setWindowOpacity(0.8)
         self.controlPanelFS.hide() 
         self.controlPanelFS.installEventFilter(self)
         self.controlPanel = VideoControlPannel(self)
@@ -135,29 +136,31 @@ class SpyderPlayer(QWidget):
         #self.controlPanel.installEventFilter(self)
         
 
-        #---------------------------           
-        # Setup player      
-        #---------------------------               
-        self.videoPanel = self.ui.VideoView_widget 
-        self.player = VideoPlayer(self.videoPanel, self)
-
-        self.player.installEventFilter(self) 
-        
         '''self.player = QMediaPlayer()
         self.audioOutput = QAudioOutput()
         self.player.setAudioOutput(self.audioOutput)
         self.player.setVideoOutput(self.videoPanel)
         self.player.installEventFilter(self)''' 
 
-        # Set the Left of vertical splitter to a fixed size
-        self.ui.Horizontal_splitter.setSizes([400, 1000])
-        self.ui.Vertical_splitter.setSizes([800, 1])
-        # Set the side of the table column to the width of the horizontal layout
-        #self.ui.Channels_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        #---------------------------
+        # Setup Layout
+        #---------------------------
         self.ui.botomverticalLayout.addWidget(self.controlPanel)
-        self.controlPanel.show()        
+        self.controlPanel.show()   
+        self.ui.Horizontal_splitter.setSizes([400, 1000])
+        self.ui.Vertical_splitter.setSizes([800, 1])   
+
         
-                
+
+        #---------------------------           
+        # Setup player      
+        #---------------------------               
+        self.videoPanel = self.ui.VideoView_widget 
+        self.player = VideoPlayer(self.videoPanel)
+
+        self.player.installEventFilter(self) 
+        self.videoPanel.installEventFilter(self)
+                                
         # Install event filter to detect window state changes
         self.setMouseTracking(True)
         #self.videoWidget.setMouseTracking(True)
@@ -568,7 +571,7 @@ class SpyderPlayer(QWidget):
         
             
                 
-    def OnMediaStatusChanged(self, status):
+    '''def OnMediaStatusChanged(self, status):
         message = str(status).split('.')[1]
         codec_info = self.player.metaData().value(QMediaMetaData.Key.AudioCodec)
         if codec_info:
@@ -620,7 +623,7 @@ class SpyderPlayer(QWidget):
                 self.ChangePlayingUIStates(False)
             #print("Playback Retry State: ", self.player.playbackState())
         else:
-            self.ChangePlayingUIStates(False)
+            self.ChangePlayingUIStates(False)'''
              
     def PlayVideo(self):
         try:
@@ -664,12 +667,13 @@ class SpyderPlayer(QWidget):
             
             
     def PlayerFullScreen(self):
-        self.ui.Horizontal_splitter.setSizes([0, 500])  # Hide left side    
-        self.ui.Vertical_splitter.setSizes([500, 0])  
+        self.ui.Horizontal_splitter.setSizes([0, 800])  # Hide left side    
+        self.ui.Vertical_splitter.setSizes([800, 0])  
         self.playListVisible = False
         self.setWindowState(Qt.WindowState.WindowFullScreen)
         self.ShowControlPanel()
-        self.videoPanel.activateWindow()
+        self.videoPanel.showFullScreen()
+        self.videoPanel.setFocus()
         self.isFullScreen = True  
                     
         if self.platform == "Linux":
@@ -686,7 +690,7 @@ class SpyderPlayer(QWidget):
         #self.ui.VideoView_widget.showNormal()  # Ensure the widget is visible
         self.ui.Horizontal_splitter.setSizes([400, 1000])  # Restore left side
         self.ui.Vertical_splitter.setSizes([800, 1])
-        
+        self.videoPanel.showNormal()
         self.playListVisible = True
         self.inactivityTimer.stop()
         self.setFocus()

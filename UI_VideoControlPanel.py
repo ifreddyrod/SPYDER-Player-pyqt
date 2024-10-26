@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_VideoControlPanel(object):
     def setupUi(self, VideoControlPanel):
         VideoControlPanel.setObjectName("VideoControlPanel")
-        VideoControlPanel.resize(611, 112)
+        VideoControlPanel.resize(602, 112)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -22,7 +22,7 @@ class Ui_VideoControlPanel(object):
         VideoControlPanel.setWindowOpacity(1.0)
         VideoControlPanel.setStyleSheet("QFrame\n"
 "{\n"
-"    background-color: rgba(0, 0, 0, 200); /*rgba(0, 0, 0, 150);*/\n"
+"    background-color: black; /*rgba(0, 0, 0, 200);*/\n"
 "    border: 1px solid  rgb(96, 96, 96); /* rgb(128, 128, 128);*/\n"
 "    border-radius: 10px;  \n"
 "}\n"
@@ -30,6 +30,7 @@ class Ui_VideoControlPanel(object):
 "QPushButton \n"
 "{\n"
 "    color: white;\n"
+"    background-color: rgba(0, 0, 0, 200); \n"
 "    border: 1px solid rgb(128, 128, 128);\n"
 "    border-radius: 10px;  \n"
 "}\n"
@@ -147,6 +148,7 @@ class Ui_VideoControlPanel(object):
         sizePolicy.setHeightForWidth(self.Control_frame.sizePolicy().hasHeightForWidth())
         self.Control_frame.setSizePolicy(sizePolicy)
         self.Control_frame.setMinimumSize(QtCore.QSize(600, 110))
+        self.Control_frame.setAutoFillBackground(False)
         self.Control_frame.setStyleSheet("")
         self.Control_frame.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.Control_frame.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
