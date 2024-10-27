@@ -38,12 +38,14 @@ for root, dirs, files in os.walk(vlc_plugin_path):
 assets_path = os.path.join('assets', 'icons')
 icon_file = os.path.join(assets_path, 'spider_dark_icon.ico')
 
+#hiddenimports=['PyQt6.QtCore', 'PyQt6.QtGui', 'PyQt6.QtWidgets', 'm3u_parser', 'pydantic'],
+
 a = Analysis(
     ['SpyderPlayerApp.py'],  
     pathex=[],
     binaries=vlc_plugins,
     datas=[(assets_path, 'assets/icons')],  # Include the assets folder
-    hiddenimports=['PyQt6.QtCore', 'PyQt6.QtGui', 'PyQt6.QtWidgets', 'm3u_parser', 'pydantic'],
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

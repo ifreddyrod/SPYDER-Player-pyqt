@@ -133,7 +133,7 @@ class SpyderPlayer(QWidget):
         self.controlPanelFS.installEventFilter(self)
         self.controlPanel = VideoControlPannel(self)
         self.ui.Bottom_widget = self.controlPanel
-        #self.controlPanel.installEventFilter(self)
+        self.controlPanel.installEventFilter(self)
         
 
         '''self.player = QMediaPlayer()
@@ -711,21 +711,22 @@ class SpyderPlayer(QWidget):
 
             
     def MutePlayer(self):            
-        self.player.ToggleMute()
         self.volume = self.player.GetVolume()
         
         if self.player.IsMuted():
+            self.UpdateVolumeSlider(self.volume)
+            self.controlPanelFS.ui.Volume_slider.setEnabled(True)
+            self.controlPanel.ui.Volume_slider.setEnabled(True)
+            self.controlPanel.ui.FullVolume_button.setEnabled(True)
+            self.controlPanelFS.ui.FullVolume_button.setEnabled(True) 
+            self.player.Mute(False)           
+        else:
             self.UpdateVolumeSlider(0)  
             self.controlPanelFS.ui.Volume_slider.setEnabled(False)
             self.controlPanel.ui.Volume_slider.setEnabled(False)
             self.controlPanel.ui.FullVolume_button.setEnabled(False)
             self.controlPanelFS.ui.FullVolume_button.setEnabled(False)
-        else:
-            self.UpdateVolumeSlider(self.volume)
-            self.controlPanelFS.ui.Volume_slider.setEnabled(True)
-            self.controlPanel.ui.Volume_slider.setEnabled(True)
-            self.controlPanel.ui.FullVolume_button.setEnabled(True)
-            self.controlPanelFS.ui.FullVolume_button.setEnabled(True)             
+            self.player.Mute(True)         
              
     def StopPlayer(self):
         self.player.Stop()

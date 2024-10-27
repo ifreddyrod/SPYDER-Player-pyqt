@@ -25,7 +25,7 @@ class VideoPlayer(QWidget):
             self.player = self.instance.media_player_new()
             self.player.set_xwindow(int(self.videoPanel.winId()))
         elif self.platform.startswith('Windows'): 
-            self.instance = vlc.Instance("--avcodec-hw=d3d11va") 
+            self.instance = vlc.Instance("--avcodec-hw=dxva2")  #d3d11va
             self.player = self.instance.media_player_new()
             self.player.set_hwnd(int(self.videoPanel.winId()))
         elif self.platform.startswith('Darwin'):
@@ -39,7 +39,8 @@ class VideoPlayer(QWidget):
         self.position = 0
         self.currentState = vlc.State.Stopped
         self.previousState = vlc.State.NothingSpecial
-            
+        self.Mute(False) 
+           
     def SetVideoSource(self, videoSource: str):     
         self.source = videoSource
         self.player.set_media(self.instance.media_new(self.source))
@@ -98,6 +99,9 @@ class VideoPlayer(QWidget):
         
     def IsMuted(self):
         return self.player.audio_get_mute()
+    
+    def Mute(self, mute: bool):
+        self.player.audio_set_mute(mute)
     
     def GetPlayerState(self):
         self.currentState = self.player.get_state()

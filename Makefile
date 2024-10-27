@@ -8,7 +8,7 @@ RCC := pyside6-rcc
 PYINSTALLER := pyinstaller
 MAIN_SCRIPT := SPYDERPlayerApp.py
 EXE_NAME := SpyderPlayer
-SPEC_NAME := SpyderPlayerVLC.spec
+SPEC_NAME := SpyderPlayerVLC
 
 
 # Convert .qrc resource files to .py and replace import statement

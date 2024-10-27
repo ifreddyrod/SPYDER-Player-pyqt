@@ -13,6 +13,9 @@ class Ui_PlayerMainWindow(object):
     def setupUi(self, PlayerMainWindow):
         PlayerMainWindow.setObjectName("PlayerMainWindow")
         PlayerMainWindow.resize(1200, 799)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/icons/icons/spider.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        PlayerMainWindow.setWindowIcon(icon)
         PlayerMainWindow.setStyleSheet("color: white;\n"
 "background-color: black;")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(PlayerMainWindow)
@@ -54,20 +57,21 @@ class Ui_PlayerMainWindow(object):
         self.Search_button.setSizePolicy(sizePolicy)
         self.Search_button.setMaximumSize(QtCore.QSize(32, 30))
         self.Search_button.setText("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/icons/icons/search.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
-        self.Search_button.setIcon(icon)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(":/icons/icons/search.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        self.Search_button.setIcon(icon1)
         self.Search_button.setIconSize(QtCore.QSize(22, 22))
         self.Search_button.setFlat(True)
         self.Search_button.setObjectName("Search_button")
         self.searchLayout.addWidget(self.Search_button)
         self.Query_input = QtWidgets.QLineEdit(parent=self.horizontalLayoutWidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.Query_input.sizePolicy().hasHeightForWidth())
         self.Query_input.setSizePolicy(sizePolicy)
-        self.Query_input.setMinimumSize(QtCore.QSize(0, 30))
+        self.Query_input.setMinimumSize(QtCore.QSize(0, 0))
+        self.Query_input.setMaximumSize(QtCore.QSize(16777215, 30))
         self.Query_input.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
         self.Query_input.setStyleSheet("/*background-color: rgb(30, 30, 30);\n"
 "color: rgb(20, 205, 255); */\n"
@@ -81,7 +85,7 @@ class Ui_PlayerMainWindow(object):
 "    padding-left: 25px;\n"
 "    color: rgb(20, 205, 255); \n"
 "}")
-        self.Query_input.setMaxLength(1000)
+        self.Query_input.setMaxLength(300)
         self.Query_input.setFrame(False)
         self.Query_input.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeading|QtCore.Qt.AlignmentFlag.AlignLeft|QtCore.Qt.AlignmentFlag.AlignVCenter)
         self.Query_input.setObjectName("Query_input")
@@ -203,9 +207,9 @@ class Ui_PlayerMainWindow(object):
         self.Settings_button.setSizePolicy(sizePolicy)
         self.Settings_button.setMaximumSize(QtCore.QSize(32, 30))
         self.Settings_button.setText("")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/icons/icons/settings-sliders.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
-        self.Settings_button.setIcon(icon1)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(":/icons/icons/settings-sliders.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        self.Settings_button.setIcon(icon2)
         self.Settings_button.setIconSize(QtCore.QSize(22, 22))
         self.Settings_button.setFlat(True)
         self.Settings_button.setObjectName("Settings_button")
@@ -266,7 +270,7 @@ class Ui_PlayerMainWindow(object):
 
     def retranslateUi(self, PlayerMainWindow):
         _translate = QtCore.QCoreApplication.translate
-        PlayerMainWindow.setWindowTitle(_translate("PlayerMainWindow", "Form"))
+        PlayerMainWindow.setWindowTitle(_translate("PlayerMainWindow", "SPYDER Player"))
         self.Search_button.setToolTip(_translate("PlayerMainWindow", "Search All Lists"))
         self.Query_input.setToolTip(_translate("PlayerMainWindow", "Enter Search Query (multiple phrases can be searched with + separator.  Example search: sports + 4K)"))
         self.PlayList_tree.setSortingEnabled(False)
