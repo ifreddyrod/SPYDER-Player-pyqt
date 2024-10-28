@@ -564,7 +564,7 @@ class SpyderPlayer(QWidget):
             print("Stalled Video - Resetting")
             self.statusLabel.setText("Stalled Video - Resetting")
             self.player.stop()
-            time.sleep(1)
+            #time.sleep(1)
             self.PlayVideo()
             self.retryPlaying = False  
             if self.player.playbackState() == QMediaPlayer.PlaybackState.StoppedState:
@@ -576,7 +576,7 @@ class SpyderPlayer(QWidget):
         if self.retryPlaying:
             print("Retrying Playback")
             self.player.stop()
-            time.sleep(1)
+            #time.sleep(1)
             self.PlayVideo()
             self.retryPlaying = False
             if self.player.playbackState() == QMediaPlayer.PlaybackState.StoppedState:
@@ -587,6 +587,8 @@ class SpyderPlayer(QWidget):
              
     def PlayVideo(self):
         try:
+            self.player.setSource(QUrl(''))
+            time.sleep(1)
             self.player.setSource(QUrl(self.currentSource))
             self.player.play()
         except Exception as e:
