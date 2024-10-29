@@ -94,12 +94,14 @@ class PlayListManager(QWidget):
         
         # Load Custom Stylesheet
         self.playlistTree.setStyleSheet(self.LoadStyleSheet())
-        
+        self.setMouseTracking(True)
+        self.lower()
         
         # Add core Playlists
         self.ResetAllLists()
         
         # Setup Event Handlers
+        #self.installEventFilter(self)
         self.playlistTree.installEventFilter(self)
         self.playlistTree.itemDoubleClicked.connect(self.ItemDoubleClicked)
         self.playlistTree.itemClicked.connect(self.ItemClicked)
@@ -790,10 +792,13 @@ class PlayListManager(QWidget):
         return False
                
     def eventFilter(self, obj, event):
-        if obj == self.playlistTree and event.type() == QEvent.Type.KeyPress and event.key() == Qt.Key.Key_Space:
-            # Ignore the space bar as it triggers the itemSelect event
-            return True
-            
+        if obj == self.playlistTree and event.type() == QEvent.Type.KeyPress:
+            if event.key() == Qt.Key.Key_Space:
+                return True
+            elif event.key() == Qt.Key.Key_M:
+                self.parent().MutePlayer()
+                return True
+        
         return super().eventFilter(obj, event)
             
         

@@ -11,9 +11,10 @@ class VideoPlayer(QWidget):
     playerStateChanged = pyqtSignal(vlc.State)
     errorOccured = pyqtSignal(str)
     
-    def __init__(self, videoPanel: QWidget, parent=None):
+    def __init__(self, mainWindow: QWidget, parent=None):
         super(VideoPlayer, self).__init__(parent)
-        self.videoPanel = videoPanel    
+        self.mainWindow = mainWindow
+        self.videoPanel = self.mainWindow.videoPanel  
         
         self.updateTimer = QTimer(self)
         self.updateTimer.setInterval(250)
@@ -32,8 +33,13 @@ class VideoPlayer(QWidget):
             self.instance = vlc.Instance("--avcodec-hw=videotoolbox")
             self.player = self.instance.media_player_new()
             self.player.set_nsobject(int(self.videoPanel.winId()))   
-            
-          
+                
+                
+        self.videoPanel.mousePressEvent = self.UserActivity
+        self.videoPanel.mouseMoveEvent = self.UserActivity
+        self.videoPanel.mouseDoubleClickEvent = self.UserActivity
+        self.videoPanel.keyPressEvent = self.UserActivity  
+              
         self.source = ""
         self.duration = 0
         self.position = 0
@@ -133,3 +139,8 @@ class VideoPlayer(QWidget):
             self.playerStateChanged.emit(self.currentState)
             self.previousState = self.currentState
         
+    def UserActivity(self, event):
+        self.mainWindow.ActivateControlPanel()
+        self.mainWindow.event(event)
+    
+    

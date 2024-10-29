@@ -133,7 +133,7 @@ class SpyderPlayer(QWidget):
         self.controlPanelFS.installEventFilter(self)
         self.controlPanel = VideoControlPannel(self)
         self.ui.Bottom_widget = self.controlPanel
-        self.controlPanel.installEventFilter(self)
+        #self.controlPanel.installEventFilter(self)
         
 
         '''self.player = QMediaPlayer()
@@ -149,14 +149,19 @@ class SpyderPlayer(QWidget):
         self.controlPanel.show()   
         self.ui.Horizontal_splitter.setSizes([400, 1000])
         self.ui.Vertical_splitter.setSizes([800, 1])   
-
+        self.ui.Horizontal_splitter.installEventFilter(self)
+        self.ui.Vertical_splitter.installEventFilter(self)
         
-
+        self.ui.ShowControlPanel_top_label.installEventFilter(self)
+        self.ui.ShowControlPanel_bottom_label.installEventFilter(self)
+        self.ui.ShowControlPanel_right_label.installEventFilter(self)
+        self.ui.ShowControlPanel_left_label.installEventFilter(self)
+        
         #---------------------------           
         # Setup player      
         #---------------------------               
         self.videoPanel = self.ui.VideoView_widget 
-        self.player = VideoPlayer(self.videoPanel)
+        self.player = VideoPlayer(self)
 
         self.player.installEventFilter(self) 
         self.videoPanel.installEventFilter(self)
@@ -340,7 +345,7 @@ class SpyderPlayer(QWidget):
         
         self.splashScreen.hide()
         self.setWindowOpacity(1.0)
-               
+        self.ActivateControlPanel()     
         
                  
     def eventFilter(self, obj, event):
@@ -374,10 +379,11 @@ class SpyderPlayer(QWidget):
                     else:
                         self.PlayerFullScreen()
                         return True
-                #elif event.key() == Qt.Key.Key_Space and self.playlistmanager.playlistTree.hasFocus():
-                    #self.PlayPausePlayer()
-                    #return True
-                elif event.key() == Qt.Key.Key_K or event.key() == Qt.Key.Key_Space:
+                    
+                elif event.key() == Qt.Key.Key_K: 
+                    self.PlayPausePlayer()
+                    return True
+                elif event.key() == Qt.Key.Key_Space and not self.playlistmanager.playlistTree.hasFocus():
                     self.PlayPausePlayer()
                     return True
                 elif event.key() == Qt.Key.Key_M:
@@ -675,6 +681,7 @@ class SpyderPlayer(QWidget):
         self.videoPanel.showFullScreen()
         self.videoPanel.setFocus()
         self.isFullScreen = True  
+        self.ui.Vertical_splitter.setFocus()
                     
         if self.platform == "Linux":
             # Initial postion is off when going to fullscreen in linux, so just hide it initially
@@ -696,6 +703,7 @@ class SpyderPlayer(QWidget):
         self.setFocus()
         self.videoPanel.activateWindow()
         self.isFullScreen = False
+        self.ShowControlPanel()
         #self.playerController.hide()  # Hide control panel in normal screen mode
             
     def TogglePlaylistView(self):
@@ -1011,7 +1019,12 @@ class SpyderPlayer(QWidget):
             
     def __del__(self):
         self.screensaverInhibitor.uninhibit()
-       
+      
+    def ActivateControlPanel(self):
+        if self.isFullScreen:
+            self.controlPanelFS.setFocus()
+        else:
+            self.controlPanel.setFocus()
        
 if __name__ == "__main__":
     app = QApplication(sys.argv)
