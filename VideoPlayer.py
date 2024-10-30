@@ -3,7 +3,7 @@ import re, os
 import platform
 from PyQt6.QtCore import QTimer, pyqtSignal
 from PyQt6.QtWidgets import QWidget
-
+from PyQt6.QtWidgets import QApplication
 
 class VideoPlayer(QWidget):
     platform: str = platform.system()
@@ -26,20 +26,14 @@ class VideoPlayer(QWidget):
             self.player = self.instance.media_player_new()
             self.player.set_xwindow(int(self.videoPanel.winId()))
         elif self.platform.startswith('Windows'): 
-            self.instance = vlc.Instance("--avcodec-hw=dxva2")  #d3d11va
+            self.instance = vlc.Instance("--avcodec-hw=d3d11va")  #d3d11va #dxva2
             self.player = self.instance.media_player_new()
             self.player.set_hwnd(int(self.videoPanel.winId()))
         elif self.platform.startswith('Darwin'):
             self.instance = vlc.Instance("--avcodec-hw=videotoolbox")
             self.player = self.instance.media_player_new()
             self.player.set_nsobject(int(self.videoPanel.winId()))   
-                
-                
-        self.videoPanel.mousePressEvent = self.UserActivity
-        self.videoPanel.mouseMoveEvent = self.UserActivity
-        self.videoPanel.mouseDoubleClickEvent = self.UserActivity
-        self.videoPanel.keyPressEvent = self.UserActivity  
-              
+        
         self.source = ""
         self.duration = 0
         self.position = 0
@@ -47,8 +41,12 @@ class VideoPlayer(QWidget):
         self.previousState = vlc.State.NothingSpecial
         self.Mute(False) 
            
-    def SetVideoSource(self, videoSource: str):     
+    def SetVideoSource(self, videoSource: str):    
         self.source = videoSource
+        self.player.set_media(self.instance.media_new(self.source))
+        
+    def RefreshVideoSource(self):
+        self.player.set_media(self.instance.media_new(""))
         self.player.set_media(self.instance.media_new(self.source))
         
     def Play(self):
@@ -143,4 +141,6 @@ class VideoPlayer(QWidget):
         self.mainWindow.ActivateControlPanel()
         self.mainWindow.event(event)
     
-    
+    '''def event(self, event):
+        QApplication.sendEvent(self.mainWindow, event)
+        return True'''

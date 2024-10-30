@@ -795,9 +795,9 @@ class PlayListManager(QWidget):
         if obj == self.playlistTree and event.type() == QEvent.Type.KeyPress:
             if event.key() == Qt.Key.Key_Space:
                 return True
-            elif event.key() == Qt.Key.Key_M:
-                self.parent().MutePlayer()
-                return True
+            #elif event.key() == Qt.Key.Key_M:
+                #self.parent().MutePlayer()
+                #return True
         
         return super().eventFilter(obj, event)
             
