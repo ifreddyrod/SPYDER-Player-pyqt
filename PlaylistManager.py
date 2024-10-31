@@ -317,8 +317,12 @@ class PlayListManager(QWidget):
         # Attempt to parse local playlist file   
         #---------------------------------------- 
         else:
-            # Attempt to read the playlist file o
-            parser.parse_m3u(playlistPath, check_live=False)
+            # Verify that the playlistPath exists, then parse the file
+            if os.path.exists(playlistPath):
+                parser.parse_m3u(playlistPath, check_live=False)
+            else:
+                print("The playlist file does not exist.")
+                return
 
         #------------------------------
         # Check if the parser is empty
