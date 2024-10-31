@@ -419,18 +419,22 @@ class SpyderPlayer(QWidget):
                  
     def eventFilter(self, obj, event):
         #print("Event Filter: ", event.type().name )
+        self.KeepSettingsOnTopIfVisible()
+    
         if event.type() == QEvent.Type.WindowStateChange:
             if self.windowState() == Qt.WindowState.WindowFullScreen or self.windowState() == Qt.WindowState.WindowMaximized:
-                self.PlayerFullScreen()
+                if QApplication.focusObject() != None and not self.settingsManager.settingStack.isVisible():
+                    self.PlayerFullScreen()
                 print("Full Screen: ", QEvent.Type.WindowStateChange.name)
                 
             elif self.windowState() == Qt.WindowState.WindowMinimized:
                 pass  # Do nothing
             else:
-                self.PlayerNormalScreen()
+                #print("Focused object: ", str(QApplication.focusObject()) )
+                if QApplication.focusObject() != None and not self.settingsManager.settingStack.isVisible():
+                    self.PlayerNormalScreen()
+                                      
                 print("Normal Screen: ", QEvent.Type.WindowStateChange.name)
-                #self.ShowCursor()
-            #print("Window State: ", self.windowState())
                 
         elif event.type() == QEvent.Type.KeyRelease:   
             self.UserActivityDetected()
@@ -527,12 +531,10 @@ class SpyderPlayer(QWidget):
                 
             elif event.key() == Qt.Key.Key_Return:
                 self.SearchChannels()
-                #self.ui.PlayList_tree.setFocus()
                 return True
             
             elif event.key() == Qt.Key.Key_Escape:
                 self.ui.Query_input.setText('')
-                #self.ui.Playlist_treeview.setFocus()
                 return True
             
             
@@ -556,6 +558,13 @@ class SpyderPlayer(QWidget):
                        
         return super().eventFilter(obj, event)
 
+    def KeepSettingsOnTopIfVisible(self):
+        try:
+            if self.settingsManager.settingStack.isVisible():
+                self.settingsManager.settingStack.setFocus()
+        except:
+            pass
+        
     def Format_ms_to_Time(self, ms: int):
         # Convert milliseconds to seconds
         seconds = int(ms / 1000)

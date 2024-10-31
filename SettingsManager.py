@@ -6,6 +6,7 @@ from PyQt6.QtGui import QFont
 from DraggableWidget import DraggableWidget
 from enum import Enum
 from AppData import * 
+import platform
 
 # Import Converted UI Files
 from UI_Settings import Ui_SettingsMain
@@ -491,6 +492,7 @@ class OpenFileSelection(DraggableWidget):
               
         
 class SettingsManager(QObject):
+    platform = platform.system()
     changesMade = False
     reLoadAllPlayListsSignal = pyqtSignal()
     loadMediaFileSignal = pyqtSignal(PlayListEntry)
@@ -523,8 +525,10 @@ class SettingsManager(QObject):
         self.settingStack.setFixedWidth(780)
         self.settingStack.setFixedHeight(430) 
         
-        self.settingStack.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)  
-        #self.settingStack.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.settingStack.setWindowFlags(Qt.WindowType.FramelessWindowHint) # | Qt.WindowType.WindowStaysOnTopHint) 
+        
+        #if self.platform == "Linux": 
+        self.settingStack.setWindowModality(Qt.WindowModality.ApplicationModal)
         
       
     def ShowSettingsFirst(self):
