@@ -4,7 +4,7 @@ import platform
 from PyQt6.QtCore import QTimer, pyqtSignal
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtWidgets import QApplication
-from VideoPlayer import VideoPlayer
+from VideoPlayer import *
 
 class VLCPlayer(VideoPlayer):
     def __init__(self, mainWindow: QWidget, parent=None):
@@ -116,29 +116,56 @@ class VLCPlayer(VideoPlayer):
         self.player.audio_set_mute(mute)
     
     def GetPlayerState(self):
-        self.currentState = self.player.get_state()
+        self.currentState = self.TranslateState(self.player.get_state())
         return self.currentState
+    
+    def TranslateState(self, state: vlc.State) -> ENUM_PLAYER_STATE:
+        playerState = ENUM_PLAYER_STATE.IDLE
+        
+        if state == vlc.State.NothingSpecial:
+            playerState = ENUM_PLAYER_STATE.IDLE
+        elif state == vlc.State.Opening:
+            playerState = ENUM_PLAYER_STATE.LOADING
+        elif state == vlc.State.Buffering:
+            playerState = ENUM_PLAYER_STATE.LOADING
+        elif state == vlc.State.Paused:
+            playerState = ENUM_PLAYER_STATE.PAUSED
+        elif state == vlc.State.Playing:
+            playerState = ENUM_PLAYER_STATE.PLAYING
+        elif state == vlc.State.Stopped:
+            playerState = ENUM_PLAYER_STATE.STOPPED
+        elif state == vlc.State.Ended:
+            #print("Ended: " + str(self.duration) + " " + str(self.position))
+            if self.duration > 0 and (self.position/self.duration) > 0.98:
+                playerState = ENUM_PLAYER_STATE.STOPPED
+            else:
+                playerState = ENUM_PLAYER_STATE.STALLED
+        elif state == vlc.State.Error:
+            playerState = ENUM_PLAYER_STATE.ERROR
+            
+        return playerState
+        
 
     def EmitCurrentPlayerState(self):
-        self.currentState = self.GetPlayerState()
+        self.currentState = self.TranslateState(self.GetPlayerState())
         self.UpdatePlayerState(self.currentState)
     
     def UpdatePlayerStatus(self):
         state = self.GetPlayerState()
-        
-        if state == vlc.State.Playing:
+            
+        if state == ENUM_PLAYER_STATE.PLAYING:
             videoTimePosition = self.GetPosition()
             duration = self.GetVideoDuration()
             
             if duration > 0:
                 self.UpdatePosition(videoTimePosition)
-        elif state == vlc.State.Ended:
+        elif state == ENUM_PLAYER_STATE.STALLED:
             self.UpdatePosition(self.duration)
             self.updateTimer.stop()        
-        elif state == vlc.State.Error:
+        elif state == ENUM_PLAYER_STATE.ERROR:
             self.updateTimer.stop()
             self.ErrorOccured(str(self.player.get_error()))
-        elif state == vlc.State.Stopped or state == vlc.State.Paused:
+        elif state == ENUM_PLAYER_STATE.STOPPED or state == ENUM_PLAYER_STATE.PAUSED:
             self.updateTimer.stop()
         
         if self.currentState != self.previousState:
@@ -160,14 +187,13 @@ class VLCPlayer(VideoPlayer):
             self.UpdatePlayerState(self.currentState)           
         
     def OnErrorOccured(self, event):
+        self.currentState = ENUM_PLAYER_STATE.ERROR
+        self.UpdatePlayerState(self.currentState)
         self.ErrorOccured(str(self.player.get_error()))
         
     def OnPlayerLengthChanged(self, event):
         self.duration = self.GetVideoDuration()
         self.UpdatePosition(self.duration)
         
-    '''def event(self, event):
-        QApplication.sendEvent(self.mainWindow, event)
-        return True'''
 
         

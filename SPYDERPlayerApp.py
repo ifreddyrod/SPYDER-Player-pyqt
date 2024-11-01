@@ -3,8 +3,9 @@ from PyQt6 import uic, QtCore
 from PyQt6.QtGui import QCursor, QIcon, QMouseEvent
 from PyQt6.QtCore import Qt, QUrl, QEvent, QTimer, QPoint, pyqtSignal
 from PyQt6.QtWidgets import QApplication, QWidget, QStyleFactory
-from VideoPlayer import VideoPlayer, ENUM_PLAYER_TYPE
+from VideoPlayer import *
 from VLCPlayer import VLCPlayer
+from QtPlayer import QtPlayer
 from enum import Enum
 import vlc
 from PlaylistManager import PlayListManager
@@ -62,8 +63,8 @@ class VideoOverlay(QWidget):
         
     def Resize(self):
         panel = self.SpyderPlayer.videoPanel
-        panel_width = self.SpyderPlayer.ui.ShowControlPanel_top_label.width()  #panel.width()
-        panel_height = int(self.SpyderPlayer.ui.ShowControlPanel_left_label.height())# * 0.85) 
+        panel_width = self.SpyderPlayer.ui.ShowControlPanel_top_label.width() 
+        panel_height = int(self.SpyderPlayer.ui.ShowControlPanel_left_label.height())
         new_x =  panel.x()
         new_y =  panel.y()    
 
@@ -192,14 +193,6 @@ class SpyderPlayer(QWidget):
         self.controlPanelFS.installEventFilter(self)
         self.controlPanel = VideoControlPannel(self)
         self.ui.Bottom_widget = self.controlPanel
-        #self.controlPanel.installEventFilter(self)
-        
-
-        '''self.player = QMediaPlayer()
-        self.audioOutput = QAudioOutput()
-        self.player.setAudioOutput(self.audioOutput)
-        self.player.setVideoOutput(self.videoPanel)
-        self.player.installEventFilter(self)''' 
 
         #---------------------------
         # Setup Layout
@@ -221,10 +214,12 @@ class SpyderPlayer(QWidget):
         #---------------------------               
         self.videoPanel = self.ui.VideoView_widget 
        # self.player = VideoPlayer(self)
-        self.playerType = ENUM_PLAYER_TYPE.VLC
+        self.playerType = ENUM_PLAYER_TYPE.QTMEDIA
         
         if self.playerType == ENUM_PLAYER_TYPE.VLC:
             self.player = VLCPlayer(self)
+        elif self.playerType == ENUM_PLAYER_TYPE.QTMEDIA:
+            self.player = QtPlayer(self)
             
         #self.player.installEventFilter(self) 
         self.videoPanel.installEventFilter(self)
@@ -737,22 +732,33 @@ class SpyderPlayer(QWidget):
         else:
             self.ChangePlayingUIStates(False)
                                
-    def PlaybackStateChanged(self, state: vlc.State):
-        print("Playback State Changed: ", str(state))
-        #print("vlc.State.Playing type = ", type(vlc.State.Playing))
-        if state == vlc.State.Playing:
+    def PlaybackStateChanged(self, state: ENUM_PLAYER_STATE):
+        print("Playback State Changed: ", str(state.name))
+        
+        if state == ENUM_PLAYER_STATE.PLAYING:
+            self.ShowCursorNormal()
             self.PlayerDurationChanged(self.player.GetVideoDuration())
             self.ChangePlayingUIStates(True)
             self.screensaverInhibitor.inhibit()
             self.retryPlaying = True
-        elif state == vlc.State.Buffering:
+            self.statusLabel.setText("")
+        elif state == ENUM_PLAYER_STATE.LOADING:
+            self.ShowCursorBusy()
             self.statusLabel.setText("Buffering ... .. .")
-        elif state == vlc.State.Ended and self.videoDuration == 0:
-            self.StalledVideoDetected()
+        elif state == ENUM_PLAYER_STATE.STALLED and self.videoDuration == 0:
+            if self.retryPlaying:
+                self.ShowCursorBusy()
+                self.StalledVideoDetected()
+            else:
+                self.statusLabel.setText("Invalid Media or Source")
+                self.ShowCursorNormal()
         else:
+            self.ShowCursorNormal()
             self.stalledVideoTimer.stop()
             self.ChangePlayingUIStates(False)
             self.screensaverInhibitor.uninhibit()
+            self.statusLabel.setText("")
+            
                 
         '''elif state == vlc.State.Stopped or state == vlc.State.Ended:
             self.controlPanelFS.ui.VideoPosition_slider.setValue(self.videoDuration)
@@ -858,7 +864,7 @@ class SpyderPlayer(QWidget):
         #self.audioOutput.setVolume(volume/100)
         self.player.SetVolume(volume)
         self.UpdateVolumeSlider(volume)
-        #self.audioOutput.setMuted(False)
+        self.player.Mute(False)
         
     def UpdateVolumeSlider(self, volume: int):
         self.controlPanelFS.ui.Volume_slider.setValue(volume)
@@ -955,20 +961,15 @@ class SpyderPlayer(QWidget):
         self.controlPanel.ui.VideoPosition_slider.setEnabled(self.videoChangesPosition)            
                 
     def PlayPausePlayer(self):
-        #if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
-            #self.player.pause()
-            #self.ChangePlayingUIStates(False)
-            
         state = self.player.GetPlayerState()
         
-        if state == vlc.State.Playing:
+        if state == ENUM_PLAYER_STATE.PLAYING:
             self.player.Pause()    
-        #elif state == vlc.State.Ended:
         else:   
             self.setFocus()
             # Check if end of video has been reached
-            #if self.videoDuration > 0 and self.videoPosition == self.videoDuration:
-            if self.player.GetPlayerState() == vlc.State.Ended:
+            if self.videoDuration > 0 and self.videoPosition == self.videoDuration:
+            #if self.player.GetPlayerState() == ENUM_PLAYER_STATE.STOPPED:
                 self.videoPosition = 0
                 self.player.Stop()
                 self.player.Play()
@@ -976,11 +977,8 @@ class SpyderPlayer(QWidget):
                 #self.player.SetPosition(self.videoPosition)
             #self.PlayVideo()
             else:
-                #self.player.SetPosition(self.videoPosition)
                 self.player.Play()
-            
-            #self.ChangePlayingUIStates(True)
-            #self.PlayChannel()
+
 
     def PlayLastChannel(self):
         channel_name, stream_url = self.playlistmanager.GoToLastSelectedItem()
