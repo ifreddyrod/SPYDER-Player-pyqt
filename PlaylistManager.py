@@ -94,12 +94,14 @@ class PlayListManager(QWidget):
         
         # Load Custom Stylesheet
         self.playlistTree.setStyleSheet(self.LoadStyleSheet())
-        
+        self.setMouseTracking(True)
+        self.lower()
         
         # Add core Playlists
         self.ResetAllLists()
         
         # Setup Event Handlers
+        #self.installEventFilter(self)
         self.playlistTree.installEventFilter(self)
         self.playlistTree.itemDoubleClicked.connect(self.ItemDoubleClicked)
         self.playlistTree.itemClicked.connect(self.ItemClicked)
@@ -315,13 +317,12 @@ class PlayListManager(QWidget):
         # Attempt to parse local playlist file   
         #---------------------------------------- 
         else:
-            #Check if the file exists
-            if not os.path.exists(playlistPath):
-                print(f"File: {playlistPath} does not exist.")
+            # Verify that the playlistPath exists, then parse the file
+            if os.path.exists(playlistPath):
+                parser.parse_m3u(playlistPath, check_live=False)
+            else:
+                print("The playlist file does not exist.")
                 return
-            
-            # Parse the file
-            parser.parse_m3u(playlistPath, check_live=False)
 
         #------------------------------
         # Check if the parser is empty
@@ -795,10 +796,13 @@ class PlayListManager(QWidget):
         return False
                
     def eventFilter(self, obj, event):
-        if obj == self.playlistTree and event.type() == QEvent.Type.KeyPress and event.key() == Qt.Key.Key_Space:
-            # Ignore the space bar as it triggers the itemSelect event
-            return True
-            
+        if obj == self.playlistTree and event.type() == QEvent.Type.KeyPress:
+            if event.key() == Qt.Key.Key_Space:
+                return True
+            #elif event.key() == Qt.Key.Key_M:
+                #self.parent().MutePlayer()
+                #return True
+        
         return super().eventFilter(obj, event)
             
         
