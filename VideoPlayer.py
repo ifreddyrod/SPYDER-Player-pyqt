@@ -1,146 +1,99 @@
-import vlc
-import re, os
 import platform
-from PyQt6.QtCore import QTimer, pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QWidget
-from PyQt6.QtWidgets import QApplication
+import vlc
 
+from enum import Enum
+from abc import abstractmethod
+
+class ENUM_PLAYER_TYPE(Enum):
+    VLC = 0
+    QTMEDIA = 1 
+
+#------------------------------------------------
+# Video Player Base Class
+#------------------------------------------------
 class VideoPlayer(QWidget):
     platform: str = platform.system()
     updatePosition = pyqtSignal(int)
+    updateDuration = pyqtSignal(int)
     playerStateChanged = pyqtSignal(vlc.State)
     errorOccured = pyqtSignal(str)
+    mainWindow: QWidget = None
+    videoPanel: QWidget = None
+    source: str = ""
+    duration: int = 0
+    position: int = 0
     
-    def __init__(self, mainWindow: QWidget, parent=None):
-        super(VideoPlayer, self).__init__(parent)
-        self.mainWindow = mainWindow
-        self.videoPanel = self.mainWindow.videoPanel  
-        
-        self.updateTimer = QTimer(self)
-        self.updateTimer.setInterval(250)
-        self.updateTimer.timeout.connect(self.UpdatePlayerStatus)
-        
-        # Get the video widget's window handle
-        if self.platform.startswith('Linux'): 
-            self.instance = vlc.Instance("--avcodec-hw=vaapi")
-            self.player = self.instance.media_player_new()
-            self.player.set_xwindow(int(self.videoPanel.winId()))
-        elif self.platform.startswith('Windows'): 
-            self.instance = vlc.Instance("--avcodec-hw=d3d11va")  #d3d11va #dxva2
-            self.player = self.instance.media_player_new()
-            self.player.set_hwnd(int(self.videoPanel.winId()))
-        elif self.platform.startswith('Darwin'):
-            self.instance = vlc.Instance("--avcodec-hw=videotoolbox")
-            self.player = self.instance.media_player_new()
-            self.player.set_nsobject(int(self.videoPanel.winId()))   
-        
-        self.source = ""
-        self.duration = 0
-        self.position = 0
-        self.currentState = vlc.State.Stopped
-        self.previousState = vlc.State.NothingSpecial
-        self.Mute(False) 
-           
-    def SetVideoSource(self, videoSource: str):    
-        self.source = videoSource
-        self.player.set_media(self.instance.media_new(self.source))
-        
-    def RefreshVideoSource(self):
-        self.player.set_media(self.instance.media_new(""))
-        self.player.set_media(self.instance.media_new(self.source))
-        
-    def Play(self):
-        self.previousState = vlc.State.NothingSpecial
-        
-        try:
-            self.player.play()
-            self.updateTimer.start()
-        except Exception as e:
-            self.updateTimer.stop()
-            self.errorOccured.emit(str(e))
-            
-        self.EmitCurrentPlayerState()
-        
-        
-    def Pause(self):
-        try:
-            self.player.pause()
-        except Exception as e:
-            self.errorOccured.emit(str(e))
-            
-        self.updateTimer.stop()
-        self.EmitCurrentPlayerState()
-        
-    def Stop(self):
-        try:
-            self.player.stop()
-        except Exception as e:
-            self.errorOccured.emit(str(e))
-            
-        self.updateTimer.stop()
-        self.EmitCurrentPlayerState()
-        
-    def SetPosition(self, position: int):
-        self.player.set_time(position)
+    #-----------------------
+    # Signal Methods
+    #-----------------------
+    def UpdatePosition(self, position: int):
         self.position = position
+        self.updatePosition.emit(position)
+    
+    def UpdateDuration(self, duration: int):
+        self.duration = duration
+        self.updateDuration.emit(duration)
         
+    def UpdatePlayerState(self, state: vlc.State):
+        self.playerStateChanged.emit(state)
+    
+    def ErrorOccured(self, error: str):
+        self.errorOccured.emit(error)
+        
+    #-----------------------
+    # Abstract Methods
+    #-----------------------
+    @abstractmethod
+    def InitPlayer(self):
+        pass
+    
+    @abstractmethod
+    def Play(self):
+        pass
+    
+    @abstractmethod
+    def Pause(self):
+        pass
+    
+    @abstractmethod
+    def Stop(self):
+        pass
+    
+    @abstractmethod
+    def SetPosition(self, position: int):
+        pass
+    
+    @abstractmethod
     def GetPosition(self):
-        self.position = self.player.get_time()
-        return self.position
-    
-    def GetVideoDuration(self):
-        self.duration = self.player.get_length()
-        return self.duration
-    
+        pass
+        
+    @abstractmethod
     def SetVolume(self, volume: int):
-        self.player.audio_set_volume(volume)
-        
+        pass
+    
+    @abstractmethod
     def GetVolume(self):
-        return self.player.audio_get_volume()
-        
-    def ToggleMute(self):
-        self.player.audio_set_mute(not self.IsMuted())
-        
-    def IsMuted(self):
-        return self.player.audio_get_mute()
+        pass
     
+    @abstractmethod
     def Mute(self, mute: bool):
-        self.player.audio_set_mute(mute)
+        pass
     
-    def GetPlayerState(self):
-        self.currentState = self.player.get_state()
-        return self.currentState
-
-    def EmitCurrentPlayerState(self):
-        self.currentState = self.GetPlayerState()
-        self.playerStateChanged.emit(self.currentState)
+    @abstractmethod
+    def IsMuted(self):
+        pass
     
-    def UpdatePlayerStatus(self):
-        state = self.GetPlayerState()
-        
-        if state == vlc.State.Playing:
-            videoTimePosition = self.GetPosition()
-            duration = self.GetVideoDuration()
-            
-            if duration > 0:
-                self.updatePosition.emit(videoTimePosition)
-        elif state == vlc.State.Ended:
-            self.updatePosition.emit(self.duration)
-            self.updateTimer.stop()        
-        elif state == vlc.State.Error:
-            self.updateTimer.stop()
-            self.errorOccured.emit(str(self.player.get_error()))
-        elif state == vlc.State.Stopped or state == vlc.State.Paused:
-            self.updateTimer.stop()
-        
-        if self.currentState != self.previousState:
-            self.playerStateChanged.emit(self.currentState)
-            self.previousState = self.currentState
-        
-    def UserActivity(self, event):
-        self.mainWindow.ActivateControlPanel()
-        self.mainWindow.event(event)
+    @abstractmethod
+    def SetVideoSource(self, videoSource: str):
+        pass
     
-    '''def event(self, event):
-        QApplication.sendEvent(self.mainWindow, event)
-        return True'''
+    @abstractmethod
+    def RefreshVideoSource(self):
+        pass
+    
+    @abstractmethod
+    def GetVideoDuration(self):
+        pass
+    

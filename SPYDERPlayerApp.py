@@ -3,7 +3,9 @@ from PyQt6 import uic, QtCore
 from PyQt6.QtGui import QCursor, QIcon, QMouseEvent
 from PyQt6.QtCore import Qt, QUrl, QEvent, QTimer, QPoint, pyqtSignal
 from PyQt6.QtWidgets import QApplication, QWidget, QStyleFactory
-from VideoPlayer import VideoPlayer
+from VideoPlayer import VideoPlayer, ENUM_PLAYER_TYPE
+from VLCPlayer import VLCPlayer
+from enum import Enum
 import vlc
 from PlaylistManager import PlayListManager
 from ScreensaverInhibitor import ScreensaverInhibitor
@@ -218,9 +220,13 @@ class SpyderPlayer(QWidget):
         # Setup player      
         #---------------------------               
         self.videoPanel = self.ui.VideoView_widget 
-        self.player = VideoPlayer(self)
-
-        self.player.installEventFilter(self) 
+       # self.player = VideoPlayer(self)
+        self.playerType = ENUM_PLAYER_TYPE.VLC
+        
+        if self.playerType == ENUM_PLAYER_TYPE.VLC:
+            self.player = VLCPlayer(self)
+            
+        #self.player.installEventFilter(self) 
         self.videoPanel.installEventFilter(self)
                                 
         # Install event filter to detect window state changes
