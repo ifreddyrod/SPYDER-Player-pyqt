@@ -21,14 +21,8 @@ class ENUM_PLAYER_STATE(Enum):
     PAUSED = 3
     STOPPED = 4
     STALLED = 5
-    ERROR = 6
-    
-class ENUM_MEDIA_STATE(Enum):
-    BUFFERING = 0
-    LOADED = 1
-    ENDED = 2
-    FAILED = 3
-
+    ENDED = 6
+    ERROR = 7
     
 #------------------------------------------------
 # Video Player Base Class
@@ -39,6 +33,7 @@ class VideoPlayer(QWidget):
     updateDuration = pyqtSignal(int)
     playerStateChanged = pyqtSignal(ENUM_PLAYER_STATE)
     errorOccured = pyqtSignal(str)
+    currentState: ENUM_PLAYER_STATE = ENUM_PLAYER_STATE.IDLE
     mainWindow: QWidget = None
     videoPanel: QWidget = None
     source: str = ""
@@ -115,3 +110,10 @@ class VideoPlayer(QWidget):
     def GetVideoDuration(self):
         pass
     
+    @abstractmethod
+    def OnChangingPosition(self, isPlaying: bool):
+        pass
+    
+    @abstractmethod
+    def OnChangedPosition(self, isPlaying: bool):
+        pass

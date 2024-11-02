@@ -22,7 +22,7 @@ class QtPlayer(VideoPlayer):
         self.player.durationChanged.connect(self.PlayerDurationChanged)
         self.player.positionChanged.connect(self.PlayerPositionChanged)
         self.player.playbackStateChanged.connect(self.PlaybackStateChanged)
-        
+        self.player.mediaStatusChanged.connect(self.MediaStatusChanged)
         
     def InitPlayer(self):
         self.player = QMediaPlayer()
@@ -33,6 +33,7 @@ class QtPlayer(VideoPlayer):
         
     def SetVideoSource(self, videoSource: str):  
         self.source = videoSource
+        self.player.setSource(QUrl(self.source))
         
     def RefreshVideoSource(self):
         self.player.setSource(QUrl(''))
@@ -41,7 +42,6 @@ class QtPlayer(VideoPlayer):
     
     def Play(self):
         try:
-            self.RefreshVideoSource()
             self.player.play()
         except Exception as e:
             self.player.stop()  
@@ -93,28 +93,48 @@ class QtPlayer(VideoPlayer):
         self.position = position
         self.UpdatePosition(position)                
         
-    def PlaybackStateChanged(self, state):
-        mediaState = self.player.mediaStatus
+    def GetPlayerState(self) -> ENUM_PLAYER_STATE:
+        return self.currentState
         
+    def PlaybackStateChanged(self, state):        
         if state == QMediaPlayer.PlaybackState.PlayingState:
-            self.currentState = ENUM_PLAYER_STATE.PLAYING
-                       
-            if mediaState == QMediaPlayer.MediaStatus.BufferedMedia:
-                self.currentState = ENUM_PLAYER_STATE.LOADING
-            elif mediaState == QMediaPlayer.MediaStatus.LoadingMedia:
-                self.currentState = ENUM_PLAYER_STATE.LOADING
-            elif mediaState == QMediaPlayer.MediaStatus.InvalidMedia:
-                self.currentState = ENUM_PLAYER_STATE.STALLED
-            elif mediaState == QMediaPlayer.MediaStatus.EndOfMedia:
-                self.currentState = ENUM_PLAYER_STATE.STOPPED
-            elif mediaState == QMediaPlayer.MediaStatus.NoMedia:
-                self.currentState = ENUM_PLAYER_STATE.IDLE
-            elif mediaState == QMediaPlayer.MediaStatus.StalledMedia:
-                self.currentState = ENUM_PLAYER_STATE.STALLED
-                         
+            self.currentState = ENUM_PLAYER_STATE.PLAYING           
         elif state == QMediaPlayer.PlaybackState.PausedState:
             self.currentState = ENUM_PLAYER_STATE.PAUSED
         elif state == QMediaPlayer.PlaybackState.StoppedState:
             self.currentState = ENUM_PLAYER_STATE.STOPPED
+            
+        self.UpdatePlayerState(self.currentState)
+        
+    def MediaStatusChanged(self, mediaState):
+        print("[Player State] -- ", self.currentState.name)
+        print("[Media Status] -- ", mediaState.name)
+        
+        #if self.currentState == ENUM_PLAYER_STATE.PLAYING or self.currentState == ENUM_PLAYER_STATE.LOADING or self.currentState == ENUM_PLAYER_STATE.IDLE:
+        if self.currentState == ENUM_PLAYER_STATE.PAUSED:
+            return
+            
+        if mediaState == QMediaPlayer.MediaStatus.BufferingMedia and self.duration == 0:
+            #if self.currentState != ENUM_PLAYER_STATE.PAUSED:
+            self.currentState = ENUM_PLAYER_STATE.LOADING
+        elif mediaState == QMediaPlayer.MediaStatus.LoadingMedia:
+            #if self.currentState != ENUM_PLAYER_STATE.PAUSED:
+            self.currentState = ENUM_PLAYER_STATE.LOADING
+        elif mediaState == QMediaPlayer.MediaStatus.BufferedMedia:
+            self.currentState = ENUM_PLAYER_STATE.PLAYING
+        elif mediaState == QMediaPlayer.MediaStatus.LoadedMedia:
+            if self.currentState == ENUM_PLAYER_STATE.PLAYING:
+                self.currentState = ENUM_PLAYER_STATE.PLAYING
+        elif mediaState == QMediaPlayer.MediaStatus.InvalidMedia:
+            self.currentState = ENUM_PLAYER_STATE.STALLED
+        elif mediaState == QMediaPlayer.MediaStatus.EndOfMedia:
+            if self.duration > 0:
+                self.currentState = ENUM_PLAYER_STATE.ENDED
+            else:
+                self.currentState = ENUM_PLAYER_STATE.STOPPED
+        elif mediaState == QMediaPlayer.MediaStatus.NoMedia:
+            self.currentState = ENUM_PLAYER_STATE.IDLE
+        elif mediaState == QMediaPlayer.MediaStatus.StalledMedia:
+            self.currentState = ENUM_PLAYER_STATE.STALLED
             
         self.UpdatePlayerState(self.currentState)

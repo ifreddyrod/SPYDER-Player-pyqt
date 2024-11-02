@@ -1,5 +1,5 @@
 from PyQt6 import uic
-from PyQt6.QtWidgets import QTreeWidgetItem, QWidget, QTreeWidget
+from PyQt6.QtWidgets import QTreeWidgetItem, QWidget, QTreeWidget, QApplication
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor
 from PyQt6.QtCore import QEvent, Qt, pyqtSignal, QModelIndex
 from m3u_parser import M3uParser
@@ -801,8 +801,8 @@ class PlayListManager(QWidget):
                 return True
             #elif event.key() == Qt.Key.Key_M:
                 #self.parent().MutePlayer()
-                #return True
-        
+                
+        #QApplication.sendEvent(self.parent(), event)
         return super().eventFilter(obj, event)
             
         

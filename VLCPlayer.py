@@ -10,7 +10,10 @@ class VLCPlayer(VideoPlayer):
     def __init__(self, mainWindow: QWidget, parent=None):
         super(VideoPlayer, self).__init__(parent)
         self.mainWindow = mainWindow
-        self.videoPanel = self.mainWindow.videoPanel  
+        #self.videoPanel = self.mainWindow.videoPanel
+        #self.mainWindow.ui.gridLayout.removeWidget(self.mainWindow.videoPanel)
+        self.videoPanel = QWidget(self.mainWindow.videoPanel)  
+        self.mainWindow.ui.gridLayout.addWidget(self.videoPanel, 1, 1, 1, 1)
         
         self.updateTimer = QTimer()
         self.updateTimer.setInterval(100)
@@ -82,6 +85,7 @@ class VLCPlayer(VideoPlayer):
     def Stop(self):
         try:
             self.player.stop()
+            self.UpdatePosition(0)
         except Exception as e:
             self.ErrorOccured(str(e))
             
@@ -121,6 +125,7 @@ class VLCPlayer(VideoPlayer):
     
     def TranslateState(self, state: vlc.State) -> ENUM_PLAYER_STATE:
         playerState = ENUM_PLAYER_STATE.IDLE
+        #print("VLC State: " + str(state))
         
         if state == vlc.State.NothingSpecial:
             playerState = ENUM_PLAYER_STATE.IDLE
@@ -135,9 +140,9 @@ class VLCPlayer(VideoPlayer):
         elif state == vlc.State.Stopped:
             playerState = ENUM_PLAYER_STATE.STOPPED
         elif state == vlc.State.Ended:
-            #print("Ended: " + str(self.duration) + " " + str(self.position))
-            if self.duration > 0 and (self.position/self.duration) > 0.98:
-                playerState = ENUM_PLAYER_STATE.STOPPED
+            if self.duration > 0:
+                playerState = ENUM_PLAYER_STATE.ENDED
+                self.UpdatePosition(self.duration)
             else:
                 playerState = ENUM_PLAYER_STATE.STALLED
         elif state == vlc.State.Error:
@@ -160,7 +165,7 @@ class VLCPlayer(VideoPlayer):
             if duration > 0:
                 self.UpdatePosition(videoTimePosition)
         elif state == ENUM_PLAYER_STATE.STALLED:
-            self.UpdatePosition(self.duration)
+            #self.UpdatePosition(self.duration)
             self.updateTimer.stop()        
         elif state == ENUM_PLAYER_STATE.ERROR:
             self.updateTimer.stop()
@@ -195,5 +200,11 @@ class VLCPlayer(VideoPlayer):
         self.duration = self.GetVideoDuration()
         self.UpdatePosition(self.duration)
         
-
+    def OnChangingPosition(self, isPlaying):
+        if isPlaying:
+            self.Pause()
+            
+    def OnChangedPosition(self, isPlaying):
+        if isPlaying:
+            self.Play()
         

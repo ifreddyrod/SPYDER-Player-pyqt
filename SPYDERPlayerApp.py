@@ -6,8 +6,6 @@ from PyQt6.QtWidgets import QApplication, QWidget, QStyleFactory
 from VideoPlayer import *
 from VLCPlayer import VLCPlayer
 from QtPlayer import QtPlayer
-from enum import Enum
-import vlc
 from PlaylistManager import PlayListManager
 from ScreensaverInhibitor import ScreensaverInhibitor
 from SettingsManager import SettingsManager
@@ -50,7 +48,7 @@ class VideoOverlay(QWidget):
         self.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint )
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         
-        self.ui.Overlay_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 2); font:30pt; border: none; ") #border: none;
+        self.ui.Overlay_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 2); font:30pt; border: none;") #border: none;
         
         self.overlayTxt = ""
         self.ui.Overlay_label.setText(self.overlayTxt)
@@ -62,34 +60,20 @@ class VideoOverlay(QWidget):
         return True
         
     def Resize(self):
+        #screen = QApplication.primaryScreen()  # Get primary screen
+        #screen_geometry = screen.geometry()  # Get screen geometry
+        #screenWidth = screen.size().width()        
         panel = self.SpyderPlayer.videoPanel
-        panel_width = self.SpyderPlayer.ui.ShowControlPanel_top_label.width() 
-        panel_height = int(self.SpyderPlayer.ui.ShowControlPanel_left_label.height())
-        new_x =  panel.x()
-        new_y =  panel.y()    
+        panel_width = self.SpyderPlayer.ui.ShowControlPanel_top_label.width() - 4
+        panel_height = self.SpyderPlayer.ui.ShowControlPanel_left_label.height() - 4
+        new_x =  panel.x() + 1
+        new_y =  panel.y() + 1
 
         #print(f"Coordinates: {new_x}, {new_y}")
+        #print(f"Width: {panel_width}, Height: {panel_height}")
         self.setFixedWidth(panel_width)
         self.setFixedHeight(panel_height) 
         #self.move(new_x, new_y)
-        global_pos = panel.mapToGlobal(QPoint(new_x, new_y))
-        self.move(global_pos)
-
-    def ResizeFullScreen(self):
-        screen = QApplication.primaryScreen()  # Get primary screen
-        #screen_geometry = screen.geometry()  # Get screen geometry
-        screenWidth = screen.size().width()
-        
-        panel = self.SpyderPlayer.videoPanel
-        panel_width = screen.size().width()
-        panel_height = int(self.SpyderPlayer.ui.ShowControlPanel_left_label.height())# * 0.85)      #int(panel.height() * 0.85)
-        new_x =  panel.x()
-        new_y =  panel.y()    
-
-        #print(f"Coordinates: {new_x}, {new_y}")
-        self.setFixedWidth(panel_width)
-        self.setFixedHeight(panel_height) 
-
         global_pos = panel.mapToGlobal(QPoint(new_x, new_y))
         self.move(global_pos)
 
@@ -182,7 +166,7 @@ class SpyderPlayer(QWidget):
         # Setup Playlist Manager
         #---------------------------
         self.playlistmanager = PlayListManager(self.ui.PlayList_tree, self.appData, self)
-        self.playlistmanager.installEventFilter(self)
+        #self.playlistmanager.installEventFilter(self)
                 
         #---------------------------
         # Setup Control Panels
@@ -205,16 +189,20 @@ class SpyderPlayer(QWidget):
         self.ui.Vertical_splitter.installEventFilter(self)
         
         self.ui.ShowControlPanel_top_label.installEventFilter(self)
+        self.ui.ShowControlPanel_top_label.setMouseTracking(True)
         self.ui.ShowControlPanel_bottom_label.installEventFilter(self)
+        self.ui.ShowControlPanel_bottom_label.setMouseTracking(True)
         self.ui.ShowControlPanel_right_label.installEventFilter(self)
+        self.ui.ShowControlPanel_right_label.setMouseTracking(True)
         self.ui.ShowControlPanel_left_label.installEventFilter(self)
+        self.ui.ShowControlPanel_left_label.setMouseTracking(True)
         
         #---------------------------           
         # Setup player      
         #---------------------------               
         self.videoPanel = self.ui.VideoView_widget 
        # self.player = VideoPlayer(self)
-        self.playerType = ENUM_PLAYER_TYPE.QTMEDIA
+        self.playerType = ENUM_PLAYER_TYPE.VLC
         
         if self.playerType == ENUM_PLAYER_TYPE.VLC:
             self.player = VLCPlayer(self)
@@ -227,7 +215,7 @@ class SpyderPlayer(QWidget):
         # Install event filter to detect window state changes
         self.setMouseTracking(True)
         #self.videoWidget.setMouseTracking(True)
-        self.videoPanel.setMouseTracking(True)
+        #self.videoPanel.setMouseTracking(True)
         #self.ui.Channels_table.setMouseTracking(True)
         self.installEventFilter(self)
         #self.videoStack.installEventFilter(self)
@@ -240,7 +228,7 @@ class SpyderPlayer(QWidget):
         # Setup Video Overlay
         #---------------------------
         self.overlay = VideoOverlay(self)
-        #self.overlay.installEventFilter(self)
+        self.overlay.installEventFilter(self)
                 
         #----------------------------------------------------------------------------
         # Connect signals
@@ -440,15 +428,15 @@ class SpyderPlayer(QWidget):
         elif event.type() == QEvent.Type.KeyRelease:   
             self.UserActivityDetected()
             #print("Key Press: ", QEvent.Type.KeyPress.name)
-            if self.ui.Query_input.hasFocus() == False:
+            if not self.ui.Query_input.hasFocus():
                 if event.key() == Qt.Key.Key_Escape and self.isFullScreen: 
                     self.PlayerNormalScreen()
-                    print("Key Press: esc")
+                    #print("Key Press: esc")
                     return True
                 elif event.key() == Qt.Key.Key_F:
                     if self.isFullScreen:
                         self.PlayerNormalScreen()
-                        print("Key Press: F")
+                        #print("Key Press: F")
                         return True
                     else:
                         self.PlayerFullScreen()
@@ -465,16 +453,6 @@ class SpyderPlayer(QWidget):
                 elif event.key() == Qt.Key.Key_O:
                     #print("Key Press: Q")
                     self.settingsManager.ShowSettings()
-                    return True
-                elif event.key() == Qt.Key.Key_W:
-                    print("Key Press: W")
-                    #self.activateWindow()
-                    #self.videoPanel.setFocus()
-                    self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
-                    #self.setFocus()
-                    #self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
-                    #self.ShowCursor()
-                    #print("Show cursor")
                     return True
                 elif event.key() == Qt.Key.Key_L:
                     #print("Key Press: P")
@@ -508,7 +486,7 @@ class SpyderPlayer(QWidget):
                     return True
                 elif event.key() == Qt.Key.Key_B: # or Qt.Key.Key_PageDown:
                     if self.playlistmanager.isVisible():
-                        print("Key Press: B")
+                        #print("Key Press: B")
                         self.playlistmanager.GotoBottomOfList()
                         
                 elif event.key() == Qt.Key.Key_D:
@@ -527,7 +505,6 @@ class SpyderPlayer(QWidget):
                     self.PlayPreviousChannel()
                     return True
                 else:   
-                    #self.ShowCursor()
                     return True
                 
             elif event.key() == Qt.Key.Key_Return:
@@ -537,25 +514,14 @@ class SpyderPlayer(QWidget):
             elif event.key() == Qt.Key.Key_Escape:
                 self.ui.Query_input.setText('')
                 return True
-            
-            
+                       
             else:
                 pass
-                #self.ShowCursor()
+                
                 
         elif event.type() in [QEvent.Type.MouseMove, QEvent.Type.MouseButtonPress, QEvent.Type.Wheel]:
             #print("Event Filter: ", QEvent.Type.MouseMove.name)
             self.UserActivityDetected()
-            #self.ShowCursor()  
-            '''if self.windowState() == Qt.WindowState.WindowFullScreen:
-                pass
-                #self.ShowCursor()
-                # Restart the timer on mouse move
-                #self.inactivityTimer.start()
-            elif event.type() == QEvent.Type.MouseButtonPress:
-                self.dragging = True
-            elif event.type() == QEvent.Type.MouseButtonRelease:
-                self.dragging = False'''
                        
         return super().eventFilter(obj, event)
 
@@ -609,23 +575,9 @@ class SpyderPlayer(QWidget):
             self.controlPanel.ui.VideoPosition_slider.setRange(0, duration)
             self.videoChangesPosition = True
 
-    def VideoTimePositionChanged(self, position):
-        # Keep reseting timer if video keeps playing
-        #if position != self.videoPosition and self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
-            #self.stalledVideoTimer.start()
-         
+    def VideoTimePositionChanged(self, position):         
         self.videoPosition = position
-        
-        #print("Video Time: ", position)
-        #print("Video Duration: ", self.videoDuration)
-        
-        '''if self.videoDuration > 0:
-            sliderPosition = int((position / self.videoDuration) * 1000)
-        else:
-            sliderPosition = 0'''
-            
-        #print("Position Changed: ", position )
-                    
+
         if self.videoChangesPosition == True:
             videoTime = self.Format_ms_to_Time(position)
             self.controlPanelFS.ui.CurrentTime_label.setText(videoTime)
@@ -635,18 +587,11 @@ class SpyderPlayer(QWidget):
 
             
     def OnSliderPressed(self):
-        self.videoPlaying = self.player.GetPlayerState() == vlc.State.Playing
-        if self.videoPlaying:
-            self.player.Pause()
+        self.videoPlaying = self.player.GetPlayerState() == ENUM_PLAYER_STATE.PLAYING
+        self.player.OnChangingPosition(self.videoPlaying)
         
         
-    def ChangeVideoPosition(self): 
-        #if self.isFullScreen:
-            #if not self.controlPanelFS.hasFocus():
-                
-            #self.controlPanelFS.setFocus()
-            #self.overlay.setFocus()
-            
+    def ChangeVideoPosition(self):             
         self.videoChangesPosition = False      
         slider = self.sender()
         position = slider.value()
@@ -658,8 +603,7 @@ class SpyderPlayer(QWidget):
 
     def OnSliderReleased(self):
         self.VideoTimePositionChanged(self.videoPosition)
-        if self.videoPlaying:
-            self.player.Play()
+        self.player.OnChangedPosition(self.videoPlaying)
         
             
                 
@@ -744,7 +688,7 @@ class SpyderPlayer(QWidget):
             self.statusLabel.setText("")
         elif state == ENUM_PLAYER_STATE.LOADING:
             self.ShowCursorBusy()
-            self.statusLabel.setText("Buffering ... .. .")
+            self.statusLabel.setText("Buffering .....")
         elif state == ENUM_PLAYER_STATE.STALLED and self.videoDuration == 0:
             if self.retryPlaying:
                 self.ShowCursorBusy()
@@ -758,16 +702,7 @@ class SpyderPlayer(QWidget):
             self.ChangePlayingUIStates(False)
             self.screensaverInhibitor.uninhibit()
             self.statusLabel.setText("")
-            
-                
-        '''elif state == vlc.State.Stopped or state == vlc.State.Ended:
-            self.controlPanelFS.ui.VideoPosition_slider.setValue(self.videoDuration)
-            self.controlPanel.ui.VideoPosition_slider.setValue(self.videoDuration)
-            self.stalledVideoTimer.stop()
-            self.ChangePlayingUIStates(False)
-            self.screensaverInhibitor.uninhibit()'''
-        
-            
+           
             
     def PlayerFullScreen(self):
         self.ui.Horizontal_splitter.setSizes([0, 800])  # Hide left side    
@@ -806,7 +741,6 @@ class SpyderPlayer(QWidget):
         self.isFullScreen = False
         self.ShowControlPanel()
         self.overlay.Resize()
-        #self.playerController.hide()  # Hide control panel in normal screen mode
             
     def TogglePlaylistView(self):
         if self.playListVisible:
@@ -814,12 +748,9 @@ class SpyderPlayer(QWidget):
             self.ui.Horizontal_splitter.setHandleWidth(1)
             self.playListVisible = False
             self.overlay.setFocus()
-            if self.isFullScreen:
-                self.overlay.ResizeFullScreen()
-            else:
-                self.overlay.Resize()
+            self.overlay.Resize()
         else:
-            self.ui.Horizontal_splitter.setSizes([300, 1000])
+            self.ui.Horizontal_splitter.setSizes([400, 1000])
             self.ui.Horizontal_splitter.setHandleWidth(4)
             self.playListVisible = True
             self.overlay.Resize()
@@ -853,15 +784,13 @@ class SpyderPlayer(QWidget):
     
     def FullVolumePlayer(self):
         self.player.SetVolume(100)
-        #self.audioOutput.setVolume(1.0)
-       # self.audioOutput.setMuted(False)
         self.UpdateVolumeSlider(100)
                 
     def ChangeVolume(self):
         slider = self.sender()
         volume = slider.value()
         print(f"Volume: {volume}")
-        #self.audioOutput.setVolume(volume/100)
+
         self.player.SetVolume(volume)
         self.UpdateVolumeSlider(volume)
         self.player.Mute(False)
@@ -871,22 +800,20 @@ class SpyderPlayer(QWidget):
         self.controlPanel.ui.Volume_slider.setValue(volume)
                 
     def IncreaseVolume(self):
-        #volume = self.audioOutput.volume()  
         volume = self.player.GetVolume()          
         volume = volume + 10
         if volume > 100:
             volume = 100
-        #self.audioOutput.setVolume(volume)
+
         self.player.SetVolume(volume)
         self.UpdateVolumeSlider(volume)
         
     def DecreaseVolume(self):
-        #volume = self.audioOutput.volume() 
         volume = self.player.GetVolume()            
         volume = volume - 10
         if volume < 0:
             volume = 0
-        #self.audioOutput.setVolume(volume)
+
         self.player.SetVolume(volume)
         self.UpdateVolumeSlider(volume)
         
@@ -900,11 +827,11 @@ class SpyderPlayer(QWidget):
             self.player.SetPosition(self.player.GetPosition() - 10000)
             
     def PlayNextChannel(self):
-        channelName, source =self.playlistmanager.GoToAdjacentItem(True)
+        channelName, source = self.playlistmanager.GoToAdjacentItem(True)
         self.PlaySelectedChannel(channelName, source)
         
     def PlayPreviousChannel(self):
-        channelName, source =self.playlistmanager.GoToAdjacentItem(False)
+        channelName, source = self.playlistmanager.GoToAdjacentItem(False)
         self.PlaySelectedChannel(channelName, source)
                 
     def WindowChanged(self):
@@ -914,8 +841,7 @@ class SpyderPlayer(QWidget):
             self.ui.Vertical_splitter.setSizes([800, 1])
             self.controlPanel.setFocus()
             self.overlay.Resize()
-            
-            #self.ShowControlPanel()
+
         elif self.windowState() == QWidget.WindowState.WindowMinimized:
             self.overlay.showMinimized()
             pass  # Do nothing
@@ -925,8 +851,6 @@ class SpyderPlayer(QWidget):
             self.overlay.Resize()
             self.showFullScreen()
             self.overlay.setFocus()
-            #self.videoPanel.setFocus()
-            #self.ui.Channels_table.setFocus()
             self.inactivityTimer.start()
             
            
@@ -966,16 +890,11 @@ class SpyderPlayer(QWidget):
         if state == ENUM_PLAYER_STATE.PLAYING:
             self.player.Pause()    
         else:   
-            self.setFocus()
-            # Check if end of video has been reached
-            if self.videoDuration > 0 and self.videoPosition == self.videoDuration:
-            #if self.player.GetPlayerState() == ENUM_PLAYER_STATE.STOPPED:
+            # Check if video reached end, if so stop and restart at beginning
+            if self.player.GetPlayerState() == ENUM_PLAYER_STATE.ENDED:
                 self.videoPosition = 0
                 self.player.Stop()
                 self.player.Play()
-            #elif self.videoDuration > 0 and self.videoPosition > 0:
-                #self.player.SetPosition(self.videoPosition)
-            #self.PlayVideo()
             else:
                 self.player.Play()
 
@@ -994,7 +913,7 @@ class SpyderPlayer(QWidget):
         panel_width = self.controlPanelFS.width()
         panel_height = self.controlPanelFS.height()
         
-        if self.windowState() == self.isFullScreen:  #Qt.WindowState.WindowFullScreen:
+        if self.windowState() == self.isFullScreen:  
             new_x = (self.width() - panel_width) // 2
             new_y = self.height() - panel_height - 20
             global_pos = self.mapToGlobal(QPoint(new_x, new_y))
@@ -1007,7 +926,6 @@ class SpyderPlayer(QWidget):
             self.controlPanelPosition = global_pos
             self.controlPanelFS.move(global_pos)
             
-        #if self.windowState() == Qt.WindowState.WindowFullScreen:
         if self.isFullScreen:
             self.controlPanelFS.show()
         else:
@@ -1104,19 +1022,13 @@ class SpyderPlayer(QWidget):
                 if self.playListVisible:
                     self.playlistmanager.activateWindow()
                 else:
-                    #self.videoPanel.activateWindow()
-                    #self.controlPanelFS.setFocus()
                     self.overlay.setFocus()
-                    #self.videoPanel.setFocus()
                 
                 
     def InactivityDetected(self):
         if self.isFullScreen and not self.controlPanelFS.hasFocus():
             self.controlPanelFS.hide()
             self.overlay.setFocus()
-            #self.videoPanel.activateWindow()
-            #self.videoPanel.setFocus()
-
             
             if not self.playListVisible and not self.settingsManager.settingStack.isVisible():
                 QApplication.setOverrideCursor(Qt.CursorShape.BlankCursor)
@@ -1126,7 +1038,6 @@ class SpyderPlayer(QWidget):
         self.settingsManager.ShowSettingsFirst()        
             
     def GetUserAppDataDirectory(self, app_name):
-        
         if self.platform == 'Windows':  
             settings_dir = Path(os.getenv('APPDATA')) / app_name
         elif self.platform  == 'Linux':  
@@ -1149,10 +1060,7 @@ class SpyderPlayer(QWidget):
             self.controlPanel.setFocus()
        
     def OnHSplitterResized(self, pos, index):
-        if self.isFullScreen:
-            self.overlay.ResizeFullScreen()
-        else:
-            self.overlay.Resize() 
+        self.overlay.Resize()
         
         
         
