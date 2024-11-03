@@ -204,7 +204,7 @@ background-color: rgb(27, 27, 27);</string>
   <widget class="QPushButton" name="OpenMediaFile_button">
    <property name="geometry">
     <rect>
-     <x>480</x>
+     <x>450</x>
      <y>110</y>
      <width>261</width>
      <height>51</height>
@@ -227,7 +227,7 @@ background-color: rgb(27, 27, 27);</string>
   <widget class="QPushButton" name="OpenPlayList_button">
    <property name="geometry">
     <rect>
-     <x>480</x>
+     <x>450</x>
      <y>50</y>
      <width>261</width>
      <height>51</height>

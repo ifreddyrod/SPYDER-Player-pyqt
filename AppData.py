@@ -75,3 +75,30 @@ class AppData(BaseModel):
             data_to_save['PlayerType'] = self.PlayerType.name
         with open(self._dataFile, "w") as file:
             json.dump(data_to_save, file, indent=4)
+
+
+
+def SavePlayListToFile(playlist: List[PlayListEntry], filepath: str):
+    """
+    Save a list of PlayListEntry objects to an M3U playlist file.
+    
+    Args:
+        playlist_entries: List of PlayListEntry objects containing track information
+        filepath: Path where the M3U file should be saved
+    """
+    with open(filepath, 'w', encoding='utf-8') as f:
+        # Write M3U header
+        f.write('#EXTM3U\n')
+        
+        for entry in playlist:
+            # Write extended info tag with track name and parent name
+            #f.write(f'#EXTINF:-1,{entry.name} - {entry.parentName}\n')
+            f.write(f'#EXTINF:-1,{entry.name}\n')
+            
+            if entry.sourceType == "file":
+                # Convert file path to use forward slashes for compatibility
+                normalized_path = entry.source.replace('\\', '/')
+                f.write(f'{normalized_path}\n')
+            else:  # URL
+                f.write(f'{entry.source}\n')    
+    
