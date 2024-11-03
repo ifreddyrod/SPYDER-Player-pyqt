@@ -141,7 +141,9 @@ class SpyderPlayer(QWidget):
         self.mouseMoveActive = False
         self.isFullScreen = False
                 
-        # Get Screensaver Inhibitor
+        #---------------------------        
+        # Load Screensaver Inhibitor
+        #---------------------------
         self.screensaverInhibitor = ScreensaverInhibitor()
         self.screensaverInhibitor.uninhibit()
      
@@ -201,12 +203,12 @@ class SpyderPlayer(QWidget):
         # Setup player      
         #---------------------------               
         self.videoPanel = self.ui.VideoView_widget 
-       # self.player = VideoPlayer(self)
-        self.playerType = ENUM_PLAYER_TYPE.VLC
         
-        if self.playerType == ENUM_PLAYER_TYPE.VLC:
+        print("PlayerType: ", self.appData.PlayerType)
+        
+        if self.appData.PlayerType == ENUM_PLAYER_TYPE.VLC:
             self.player = VLCPlayer(self)
-        elif self.playerType == ENUM_PLAYER_TYPE.QTMEDIA:
+        elif self.appData.PlayerType == ENUM_PLAYER_TYPE.QTMEDIA:
             self.player = QtPlayer(self)
             
         #self.player.installEventFilter(self) 

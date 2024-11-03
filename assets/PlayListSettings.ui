@@ -246,7 +246,7 @@ QTableWidget
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>110</y>
+     <y>50</y>
      <width>141</width>
      <height>41</height>
     </rect>
@@ -297,7 +297,7 @@ QTableWidget
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>230</y>
+     <y>150</y>
      <width>141</width>
      <height>41</height>
     </rect>
@@ -321,7 +321,7 @@ QTableWidget
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>170</y>
+     <y>100</y>
      <width>141</width>
      <height>41</height>
     </rect>
@@ -354,6 +354,81 @@ QTableWidget
     <string notr="true">background-color: qlineargradient(spread:pad, x1:0.369, y1:0.182, x2:1, y2:1, stop:0 rgba(57, 9, 126, 255), stop:1 rgba(129, 18, 129, 255));</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="Apply_button">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>270</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string> Apply     </string>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/check.png</normaloff>
+     <disabledoff>:/icons/icons/check-disabled.png</disabledoff>:/icons/icons/check.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Reorder_button">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>200</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string> Reorder    </string>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/reorder.png</normaloff>
+     <disabledoff>:/icons/icons/reorder-disabled.png</disabledoff>:/icons/icons/reorder.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Cancel_button">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>320</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>  Cancel       </string>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/cancel.png</normaloff>
+     <disabledoff>:/icons/icons/cancel-disabled.png</disabledoff>:/icons/icons/cancel.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+  </widget>
   <zorder>background_widget</zorder>
   <zorder>Titlebar_widget</zorder>
   <zorder>PlayList_table</zorder>
@@ -361,6 +436,9 @@ QTableWidget
   <zorder>Back_button</zorder>
   <zorder>Delete_button</zorder>
   <zorder>AddNew_button</zorder>
+  <zorder>Apply_button</zorder>
+  <zorder>Reorder_button</zorder>
+  <zorder>Cancel_button</zorder>
  </widget>
  <resources>
   <include location="resources.qrc"/>

@@ -1,6 +1,6 @@
 from PyQt6 import uic
 from PyQt6.QtWidgets import QTreeWidgetItem, QWidget, QTreeWidget, QApplication
-from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor
+from PyQt6.QtGui import QIcon, QColor
 from PyQt6.QtCore import QEvent, Qt, pyqtSignal, QModelIndex
 from m3u_parser import M3uParser
 from AppData import * 
@@ -113,8 +113,13 @@ class PlayListManager(QWidget):
         
         # Add core Playlists
         self.searchList = TreeItem(pad("Search Results"), SEARCH_COLOR, True)
+        self.searchList.setIcon(0, QIcon(":icons/icons/search-list.png"))
+        
         self.favoritesList = TreeItem(pad("Favorites"), FAVORITES_COLOR, True)
+        self.favoritesList.setIcon(0, QIcon(":icons/icons/star-white.png"))
+        
         self.libraryList = TreeItem(pad("Library"), LIBRARY_COLOR, True)
+        self.libraryList.setIcon(0, QIcon(":icons/icons/library.png"))
         
         self.AppendPlayList(self.searchList)
         self.AppendPlayList(self.favoritesList)

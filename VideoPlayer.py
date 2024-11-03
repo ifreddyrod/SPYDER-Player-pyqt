@@ -11,8 +11,8 @@ from abc import abstractmethod
 # Video Player ENUMS
 #------------------------------------------------
 class ENUM_PLAYER_TYPE(Enum):
-    VLC = 0
-    QTMEDIA = 1 
+    VLC = "VLC"
+    QTMEDIA = "QTMEDIA"
     
 class ENUM_PLAYER_STATE(Enum):
     IDLE = 0

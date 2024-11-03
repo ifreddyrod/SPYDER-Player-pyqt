@@ -7,6 +7,7 @@ from DraggableWidget import DraggableWidget
 from enum import Enum
 from AppData import * 
 import platform
+import copy
 
 # Import Converted UI Files
 from UI_Settings import Ui_SettingsMain
@@ -18,10 +19,13 @@ class ENUM_SettingsViews(Enum):
     INTRO = 0
     PLAYLIST = 1 
     LIBRARY  = 2
-    PLAYLIST_EDITOR = 3
-    LIBRARY_EDITOR = 4
-    OPEN_PLAYLIST = 5
-    OPEN_FILE = 6
+    FAVORITES = 3
+    PLAYLIST_ENTRY = 4
+    LIBRARY_ENTRY = 5
+    OPEN_PLAYLIST = 6
+    OPEN_FILE = 7
+    HOTKEYS = 8
+    APPSETTINGS = 9
     
     
 class SettingsIntro(DraggableWidget):
@@ -34,6 +38,7 @@ class SettingsIntro(DraggableWidget):
         self.ui.Close_button.clicked.connect(self.settingsManager.HideSettings)
         self.ui.PlayList_button.clicked.connect(self.settingsManager.ShowPlayListSettings)
         self.ui.Library_button.clicked.connect(self.settingsManager.ShowLibrarySettings)
+        self.ui.Favorites_button.clicked.connect(self.settingsManager.ShowFavoritesSettings)
         self.ui.HotKeys_button.clicked.connect(self.HotKeysButtonClicked)
         self.ui.OpenMediaFile_button.clicked.connect(self.settingsManager.ShowOpenFileSelector)
         self.ui.OpenPlayList_button.clicked.connect(self.settingsManager.ShowOpenPlayListSelector)
@@ -42,27 +47,12 @@ class SettingsIntro(DraggableWidget):
         #self.SettingsManager.ShowHotKeySettings()
         pass
         
-    ''' def BackButtonClicked(self):
-        self.settingsManager.HideSettings()
         
-    def ShowPlayListSettings(self):
-        self.settingsManager.ShowPlayListSettings()
-        
-    def ShowLibrarySettings(self):
-        self.settingsManager.ShowLibrarySettings()
-        
-    def ShowOpenFileSelector(self):
-        self.settingsManager.ShowOpenFileSelector()
-        
-    def ShowOpenPlayListSelector(self):
-        self.settingsManager.ShowOpenPlayListSelector()'''
-        
-
-         
-
 class ListSettings(DraggableWidget):
     entryRow = -1
     editList: List[PlayListEntry] = []
+    tempList: List[PlayListEntry] = []
+    reordering: bool = False
     
     def __init__(self, SettingsManager, ListType: ENUM_SettingsViews):
         super().__init__()
@@ -73,17 +63,26 @@ class ListSettings(DraggableWidget):
         self.ui.setupUi(self)
         
         if self.listType == ENUM_SettingsViews.PLAYLIST:
-            self.ui.Titlebar_label.setText("PlayList Settings")
+            self.ui.Titlebar_label.setText("PlayLists Editor")
             self.editList = self.settingsManager.appData.PlayLists
         elif self.listType == ENUM_SettingsViews.LIBRARY:
-            self.ui.Titlebar_label.setText("Library Settings")
+            self.ui.Titlebar_label.setText("Library Editor")
             self.editList = self.settingsManager.appData.Library
             columnFont = QFont()
             columnFont.setPointSize(14)
-            column0 = QTableWidgetItem("Item Name")
+            column0 = QTableWidgetItem("Library Entry Name")
             column0.setFont(columnFont)
             self.ui.PlayList_table.setHorizontalHeaderItem(0, column0)
-            
+        elif self.listType == ENUM_SettingsViews.FAVORITES:
+            self.ui.Titlebar_label.setText("Favorites Editor")
+            self.editList = self.settingsManager.appData.Favorites
+            columnFont = QFont()
+            columnFont.setPointSize(14)
+            column0 = QTableWidgetItem("Favorite Name")
+            column0.setFont(columnFont)
+            self.ui.PlayList_table.setHorizontalHeaderItem(0, column0)  
+            self.ui.AddNew_button.hide()  
+            self.ui.Edit_button.hide()
             
         # Set Column Settings 
         self.ui.PlayList_table.setColumnWidth(0, 250)
@@ -96,19 +95,116 @@ class ListSettings(DraggableWidget):
         self.ui.Edit_button.clicked.connect(self.EditEntry)
         self.ui.Delete_button.clicked.connect(self.DeleteEntry)
         self.ui.PlayList_table.cellClicked.connect(self.RowSelected)
+        self.ui.Reorder_button.clicked.connect(self.Reorder)
+        self.ui.Apply_button.clicked.connect(self.ApplyChanges)
+        self.ui.Cancel_button.clicked.connect(self.CancelChanges)
+        
+        self.ui.PlayList_table.setDragDropMode(QTableWidget.DragDropMode.InternalMove)
+        self.ui.PlayList_table.setDragEnabled(False)
+        self.ui.PlayList_table.setAcceptDrops(False)     
+
+        self.ui.Apply_button.hide()
+        self.ui.Cancel_button.hide()           
+        self.ui.PlayList_table.dropEvent = self.dropEvent
+        
+    def dropEvent(self, event):
+        if event.source() == self.ui.PlayList_table and self.reordering:
+            # Get the row being dragged
+            selected_row = self.ui.PlayList_table.selectedItems()[0].row()
+            
+            # Get the target row
+            drop_row = self.ui.PlayList_table.rowAt(event.position().toPoint().y())
+            
+            # If dropping below the last row, move to the end
+            if drop_row == -1:
+                drop_row = len(self.tempList)
+                
+            # Prevent dropping on itself
+            if selected_row == drop_row:
+                event.ignore()
+                return
+                
+            # Get all data from the row being moved
+            moving_item = self.tempList.pop(selected_row)
+            
+            # Insert the item at the new position
+            self.tempList.insert(drop_row if drop_row < selected_row else drop_row, moving_item)
+            
+            # Select the moved row
+            self.ui.PlayList_table.selectRow(drop_row if drop_row < selected_row else drop_row)
+            
+            self.UpdateTable()
+            event.accept()
+        else:
+            event.ignore()
+            
+    def Reorder(self):
+        self.ui.PlayList_table.setDragEnabled(True)
+        self.ui.PlayList_table.setAcceptDrops(True)
+        self.ui.Edit_button.setEnabled(False)
+        self.ui.AddNew_button.setEnabled(False)
+        self.ui.Delete_button.setEnabled(False)
+        self.ui.Reorder_button.setEnabled(False)
+        self.ui.Back_button.setEnabled(False)        
+        self.ui.Apply_button.show()
+        self.ui.Cancel_button.show()
+        self.reordering = True
+        self.tempList = copy.deepcopy(self.editList)
+        
+    def ApplyChanges(self):
+        self.ui.PlayList_table.setDragEnabled(False)
+        self.ui.PlayList_table.setAcceptDrops(False)
+        self.ui.Apply_button.hide()
+        self.ui.Cancel_button.hide()
+        self.reordering = False
+        
+        if self.listType == ENUM_SettingsViews.PLAYLIST:
+            self.settingsManager.appData.PlayLists = copy.deepcopy(self.tempList)
+        elif self.listType == ENUM_SettingsViews.LIBRARY:
+            self.settingsManager.appData.Library = copy.deepcopy(self.tempList)
+        elif self.listType == ENUM_SettingsViews.FAVORITES:
+            self.settingsManager.appData.Favorites = copy.deepcopy(self.tempList)
+            
+        self.settingsManager.changesMade = True
+        self.SaveData()
+        
+        if self.listType == ENUM_SettingsViews.PLAYLIST:
+            self.editList = self.settingsManager.appData.PlayLists
+        elif self.listType == ENUM_SettingsViews.LIBRARY:
+            self.editList = self.settingsManager.appData.Library
+        elif self.listType == ENUM_SettingsViews.FAVORITES:
+            self.editList = self.settingsManager.appData.Favorites
+        
+        self.UpdateTable()  
         
         
+    def CancelChanges(self):
+        self.ui.PlayList_table.setDragEnabled(False)
+        self.ui.PlayList_table.setAcceptDrops(False)
+        self.ui.Apply_button.hide()
+        self.ui.Cancel_button.hide()  
+        self.reordering = False
+        self.UpdateTable()       
+        
+                
     def BackButtonClicked(self):
         self.settingsManager.ShowSettings()
         
-    def UpdateTable(self):        
+    def UpdateTable(self):               
+        # Clear the table
+        self.ui.PlayList_table.clearContents()   
+          
         # Update the table row count
-        self.ui.PlayList_table.setRowCount(len(self.editList)) 
+        if self.reordering:
+            displayList = self.tempList
+        else:
+            displayList = self.editList
         
-        # Update the table contents
-        row = 0
-        for item in self.editList:
-            #print(keys.name, keys.hotkey)
+        self.ui.PlayList_table.setRowCount(len(displayList)) 
+        
+        # Update the table
+        for row, item in enumerate(displayList):
+            print(row, item)
             name = QTableWidgetItem(item.name)
             source = QTableWidgetItem(item.source)
             name.setTextAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
@@ -117,12 +213,17 @@ class ListSettings(DraggableWidget):
             self.ui.PlayList_table.setItem(row, 1, source)
             self.ui.PlayList_table.setRowHeight(row, 50)
             row += 1
+         
+        # Enable buttons if not currently reordering
+        if not self.reordering:    
+            self.ui.PlayList_table.setCurrentCell(-1,-1)
             
-        self.ui.PlayList_table.setCurrentCell(-1,-1)
+            self.ui.Edit_button.setEnabled(False)
+            self.ui.Delete_button.setEnabled(False)
+            self.ui.AddNew_button.setEnabled(True)
+            self.ui.Reorder_button.setEnabled(True)
+            self.ui.Back_button.setEnabled(True)    
         
-        self.ui.Edit_button.setEnabled(False)
-        self.ui.Delete_button.setEnabled(False)
-        self.ui.AddNew_button.setEnabled(True)
     
     def UnselectRows(self):
         self.ui.PlayList_table.setCurrentCell(-1,-1)
@@ -208,11 +309,11 @@ class EntryEditor(DraggableWidget):
                 sourceType='file',
                 source='')
         
-        if self.entryType == ENUM_SettingsViews.PLAYLIST_EDITOR:
+        if self.entryType == ENUM_SettingsViews.PLAYLIST_ENTRY:
             self.ui.Titlebar_label.setText("PlayList Add New Entry")
             self.ui.EntryName_label.setText("New PlayList Name:")
             
-        elif self.entryType == ENUM_SettingsViews.LIBRARY_EDITOR:
+        elif self.entryType == ENUM_SettingsViews.LIBRARY_ENTRY:
             self.ui.Titlebar_label.setText("Library Add New Entry")
             self.ui.EntryName_label.setText("New Entry Name:")
             
@@ -242,11 +343,11 @@ class EntryEditor(DraggableWidget):
         self.blockSignals(True)
         self.editEntry = entry
         
-        if self.entryType == ENUM_SettingsViews.PLAYLIST_EDITOR:
+        if self.entryType == ENUM_SettingsViews.PLAYLIST_ENTRY:
             self.ui.Titlebar_label.setText("PlayList Edit Entry")
             self.ui.EntryName_label.setText("PlayList Name:")
             
-        elif self.entryType == ENUM_SettingsViews.LIBRARY_EDITOR:
+        elif self.entryType == ENUM_SettingsViews.LIBRARY_ENTRY:
             self.ui.Titlebar_label.setText("Library Edit Entry")
             self.ui.EntryName_label.setText("Entry Name:")
             
@@ -292,18 +393,18 @@ class EntryEditor(DraggableWidget):
                     del self.editEntry
                     self.editEntry = None
                     
-                if self.entryType == ENUM_SettingsViews.PLAYLIST_EDITOR:
+                if self.entryType == ENUM_SettingsViews.PLAYLIST_ENTRY:
                     self.settingsManager.ShowPlayListSettings(False)
-                elif self.entryType == ENUM_SettingsViews.LIBRARY_EDITOR:
+                elif self.entryType == ENUM_SettingsViews.LIBRARY_ENTRY:
                     self.settingsManager.ShowLibrarySettings(False)
                 
             elif ret == QMessageBox.StandardButton.Cancel:
                 # Do nothing stay on current window
                 pass
         else:
-            if self.entryType == ENUM_SettingsViews.PLAYLIST_EDITOR:
+            if self.entryType == ENUM_SettingsViews.PLAYLIST_ENTRY:
                 self.settingsManager.ShowPlayListSettings()
-            elif self.entryType == ENUM_SettingsViews.LIBRARY_EDITOR:
+            elif self.entryType == ENUM_SettingsViews.LIBRARY_ENTRY:
                 self.settingsManager.ShowLibrarySettings()
         
     def SaveButtonClicked(self):
@@ -312,9 +413,9 @@ class EntryEditor(DraggableWidget):
             self.editEntry.sourceType = self.ui.SourceType_combobox.currentText()
             self.editEntry.source = self.ui.Source_textedit.toPlainText()
             
-            if self.entryType == ENUM_SettingsViews.PLAYLIST_EDITOR:
+            if self.entryType == ENUM_SettingsViews.PLAYLIST_ENTRY:
                 parentName = '' 
-            elif self.entryType == ENUM_SettingsViews.LIBRARY_EDITOR:
+            elif self.entryType == ENUM_SettingsViews.LIBRARY_ENTRY:
                 parentName = 'Library'
             
             self.editEntry.parentName = parentName
@@ -330,9 +431,9 @@ class EntryEditor(DraggableWidget):
         self.settingsManager.SaveSettings()
         
         # Go back to previous window
-        if self.entryType == ENUM_SettingsViews.PLAYLIST_EDITOR:
+        if self.entryType == ENUM_SettingsViews.PLAYLIST_ENTRY:
             self.settingsManager.ShowPlayListSettings(True)
-        elif self.entryType == ENUM_SettingsViews.LIBRARY_EDITOR:
+        elif self.entryType == ENUM_SettingsViews.LIBRARY_ENTRY:
             self.settingsManager.ShowLibrarySettings(True)
             
             
@@ -351,9 +452,9 @@ class EntryEditor(DraggableWidget):
 
     def OpenFilesButtonClicked(self):
          # Open File Dialog
-        if self.entryType == ENUM_SettingsViews.PLAYLIST_EDITOR:
+        if self.entryType == ENUM_SettingsViews.PLAYLIST_ENTRY:
             filename, _ = QFileDialog.getOpenFileName(self, "Select PlayList File", "", "PlayList Files (*.m3u *.m3u8)")
-        elif self.entryType == ENUM_SettingsViews.LIBRARY_EDITOR:
+        elif self.entryType == ENUM_SettingsViews.LIBRARY_ENTRY:
             filename, _ = QFileDialog.getOpenFileName(self, "Select a Media File", "", "Media Files (*.mkv *.mp4 *.avi *.mov *.mp3 *.wmv *.wav *.mpg, *.mpeg *.m4v)")
         
         if filename:
@@ -508,8 +609,9 @@ class SettingsManager(QObject):
         self.SettingsIntro = SettingsIntro(self)
         self.PlayListSettings = ListSettings(self, ENUM_SettingsViews.PLAYLIST)
         self.LibrarySettings = ListSettings(self, ENUM_SettingsViews.LIBRARY)
-        self.PlayListEditor = EntryEditor(self, ENUM_SettingsViews.PLAYLIST_EDITOR)
-        self.LibraryEditor = EntryEditor(self, ENUM_SettingsViews.LIBRARY_EDITOR)
+        self.FavoritesSettings = ListSettings(self, ENUM_SettingsViews.FAVORITES)
+        self.PlayListEditor = EntryEditor(self, ENUM_SettingsViews.PLAYLIST_ENTRY)
+        self.LibraryEditor = EntryEditor(self, ENUM_SettingsViews.LIBRARY_ENTRY)
         self.OpenFileSelector = OpenFileSelection(self, ENUM_SettingsViews.OPEN_FILE)
         self.OpenPlayListSelector = OpenFileSelection(self, ENUM_SettingsViews.OPEN_PLAYLIST)
         
@@ -517,6 +619,7 @@ class SettingsManager(QObject):
         self.settingStack.addWidget(self.SettingsIntro)
         self.settingStack.addWidget(self.PlayListSettings)
         self.settingStack.addWidget(self.LibrarySettings)
+        self.settingStack.addWidget(self.FavoritesSettings)
         self.settingStack.addWidget(self.PlayListEditor)
         self.settingStack.addWidget(self.LibraryEditor)
         self.settingStack.addWidget(self.OpenPlayListSelector)
@@ -564,21 +667,27 @@ class SettingsManager(QObject):
         self.LibrarySettings.UnselectRows()
         self.settingStack.setCurrentIndex(ENUM_SettingsViews.LIBRARY.value)
         
+    def ShowFavoritesSettings(self, changesMade: bool = False):
+        self.changesMade |= changesMade
+        self.FavoritesSettings.UpdateTable()
+        self.FavoritesSettings.UnselectRows()
+        self.settingStack.setCurrentIndex(ENUM_SettingsViews.FAVORITES.value)
+        
     def ShowNewLibraryEditor(self, editList: List[PlayListEntry]):
         self.LibraryEditor.LoadNewEntry(editList)
-        self.settingStack.setCurrentIndex(ENUM_SettingsViews.LIBRARY_EDITOR.value)  
+        self.settingStack.setCurrentIndex(ENUM_SettingsViews.LIBRARY_ENTRY.value)  
        
     def ShowNewPlayListEditor(self, editList: List[PlayListEntry]):
         self.PlayListEditor.LoadNewEntry(editList)
-        self.settingStack.setCurrentIndex(ENUM_SettingsViews.PLAYLIST_EDITOR.value)
+        self.settingStack.setCurrentIndex(ENUM_SettingsViews.PLAYLIST_ENTRY.value)
                 
     def ShowEditLibraryEditor(self, editList: List[PlayListEntry], row):
         self.LibraryEditor.LoadEntry(editList, row)
-        self.settingStack.setCurrentIndex(ENUM_SettingsViews.LIBRARY_EDITOR.value)  
+        self.settingStack.setCurrentIndex(ENUM_SettingsViews.LIBRARY_ENTRY.value)  
         
     def ShowEditPlayListEditor(self, editList: List[PlayListEntry], row):
         self.PlayListEditor.LoadEntry(editList, row)
-        self.settingStack.setCurrentIndex(ENUM_SettingsViews.PLAYLIST_EDITOR.value)
+        self.settingStack.setCurrentIndex(ENUM_SettingsViews.PLAYLIST_ENTRY.value)
           
     def SaveSettings(self):
         if self.changesMade:

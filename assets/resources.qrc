@@ -1,5 +1,15 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/search-list.png</file>
+    <file>icons/search-white.png</file>
+    <file>icons/settings.png</file>
+    <file>icons/star-white.png</file>
+    <file>icons/check.png</file>
+    <file>icons/check-disabled.png</file>
+    <file>icons/cancel.png</file>
+    <file>icons/cancel-disabled.png</file>
+    <file>icons/reorder.png</file>
+    <file>icons/reorder-disabled.png</file>
     <file>icons/external-link.png</file>
     <file>icons/external-link-disabled.png</file>
     <file>icons/videofile.png</file>
