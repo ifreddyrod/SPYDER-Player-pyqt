@@ -512,18 +512,21 @@ class EntryEditor(DraggableWidget):
         elif self.entryType == ENUM_SettingsViews.FAVORITES_ENTRY:
             filename, _ = QFileDialog.getSaveFileName(self, "Enter new Playlist File", "", "PlayList File (*.m3u)")
             
-        if os.path.exists(filename):  
-            # Warn user of duplicate file 
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Icon.Warning)
-            msg.setText("File already in use")
-            msg.setInformativeText("Please enter a unique file name.")
-            msg.setWindowTitle("Duplicate File")
-            msg.setStandardButtons(QMessageBox.StandardButton.Ok)
-            msg.exec()
+            if os.path.exists(filename):  
+                # Warn user of duplicate file 
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Icon.Warning)
+                msg.setText("File already in use")
+                msg.setInformativeText("File already exists. Do you want to overwrite it?")
+                msg.setWindowTitle("Duplicate File")
+                msg.setStandardButtons(QMessageBox.StandardButton.Yes| QMessageBox.StandardButton.No)
+                ret = msg.exec()
             
-            # Re show Open Files Dialog
-            self.OpenFilesButtonClicked() 
+                if ret == QMessageBox.StandardButton.Yes:
+                    self.ui.Source_textedit.setPlainText(filename) 
+                else: 
+                    # Re show Open Files Dialog
+                    self.OpenFilesButtonClicked() 
             
         elif filename:
             self.ui.Source_textedit.setPlainText(filename)             
