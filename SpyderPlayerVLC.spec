@@ -65,7 +65,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='SpyderPlayerVLC',
+    name='SpyderPlayer',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

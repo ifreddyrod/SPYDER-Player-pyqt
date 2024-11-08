@@ -117,3 +117,7 @@ class VideoPlayer(QWidget):
     @abstractmethod
     def OnChangedPosition(self, isPlaying: bool):
         pass
+    
+    @abstractmethod
+    def ChangeUpdateTimerInterval(self, isFullScreen: bool):
+        pass

@@ -12,11 +12,13 @@ class VLCPlayer(VideoPlayer):
         self.mainWindow = mainWindow
         #self.videoPanel = self.mainWindow.videoPanel
         #self.mainWindow.ui.gridLayout.removeWidget(self.mainWindow.videoPanel)
-        self.videoPanel = QWidget(self.mainWindow.videoPanel)  
+        self.videoPanel = QWidget(self.mainWindow.videoPanel) 
+             
         self.mainWindow.ui.gridLayout.addWidget(self.videoPanel, 1, 1, 1, 1)
-        
+        self.mainWindow.videoPanel = self.videoPanel
+            
         self.updateTimer = QTimer()
-        self.updateTimer.setInterval(100)
+        self.updateTimer.setInterval(250)
         self.updateTimer.timeout.connect(self.UpdatePlayerStatus)
         
         self.InitPlayer()
@@ -207,4 +209,10 @@ class VLCPlayer(VideoPlayer):
     def OnChangedPosition(self, isPlaying):
         if isPlaying:
             self.Play()
+            
+    def ChangeUpdateTimerInterval(self, isFullScreen: bool):
+        if isFullScreen:
+            self.updateTimer.setInterval(1000)
+        else:
+            self.updateTimer.setInterval(250)
         

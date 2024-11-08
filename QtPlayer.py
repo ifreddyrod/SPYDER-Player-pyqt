@@ -13,9 +13,11 @@ class QtPlayer(VideoPlayer):
         self.mainWindow = mainWindow
         
         # Create and add QVideoWidget to the main window
+        #self.mainWindow.ui.gridLayout.removeWidget(self.mainWindow.videoPanel)
+        
         self.videoPanel = QVideoWidget(self.mainWindow.videoPanel)
         self.mainWindow.ui.gridLayout.addWidget(self.videoPanel, 1, 1, 1, 1)
-        
+            
         self.InitPlayer()    
         
         # Init Signals

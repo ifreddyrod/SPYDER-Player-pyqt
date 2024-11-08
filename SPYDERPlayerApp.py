@@ -129,6 +129,8 @@ class SpyderPlayer(QWidget):
     controlPanelPosition: QPoint = QPoint(0, 0)
     dataFilePath: str = "appdata.json"
     overlay: VideoOverlay = None
+    player = None
+    playerType: ENUM_PLAYER_TYPE = ENUM_PLAYER_TYPE.VLC
     
     def __init__(self, parent=None):
 
@@ -203,13 +205,10 @@ class SpyderPlayer(QWidget):
         # Setup player      
         #---------------------------               
         self.videoPanel = self.ui.VideoView_widget 
+        self.LoadPlayer()
         
-        print("PlayerType: ", self.appData.PlayerType)
+        print("PlayerType: ", self.playerType)        
         
-        if self.appData.PlayerType == ENUM_PLAYER_TYPE.VLC:
-            self.player = VLCPlayer(self)
-        elif self.appData.PlayerType == ENUM_PLAYER_TYPE.QTMEDIA:
-            self.player = QtPlayer(self)
             
         #self.player.installEventFilter(self) 
         self.videoPanel.installEventFilter(self)
@@ -362,6 +361,10 @@ class SpyderPlayer(QWidget):
         #print("User App Data Directory: " + str(self.GetUserAppDataDirectory("SpyderPlayer"))) 
         
     def InitializePlayLists(self):
+        # Reload Spyder Player if the player type has changed
+        if self.playerType != self.appData.PlayerType:
+            self.ReloadSpyderPlayer()
+        
         # Show Splash Screen
         self.overlay.hide()
         self.splashScreen.show()
@@ -406,7 +409,7 @@ class SpyderPlayer(QWidget):
         self.overlay.show() 
         self.OnHSplitterResized(0, 0)
         self.overlay.Resize() 
-        
+    
                  
     def eventFilter(self, obj, event):
         #print("Event Filter: ", event.type().name )
@@ -452,6 +455,7 @@ class SpyderPlayer(QWidget):
                     return True
                 elif event.key() == Qt.Key.Key_M:
                     self.MutePlayer()
+                    return True
                 elif event.key() == Qt.Key.Key_O:
                     #print("Key Press: Q")
                     self.settingsManager.ShowSettings()
@@ -482,6 +486,7 @@ class SpyderPlayer(QWidget):
                 elif event.key() == Qt.Key.Key_C:
                     if self.playlistmanager.isVisible():
                         self.playlistmanager.CollapseAllPlaylists()
+                    return True
                 elif event.key() == Qt.Key.Key_T: # or Qt.Key.Key_PageUp:
                     if self.playlistmanager.isVisible():
                         self.playlistmanager.GotoTopOfList()
@@ -490,16 +495,19 @@ class SpyderPlayer(QWidget):
                     if self.playlistmanager.isVisible():
                         #print("Key Press: B")
                         self.playlistmanager.GotoBottomOfList()
+                    return True
                         
                 elif event.key() == Qt.Key.Key_D:
                     if self.playlistmanager.isVisible():
                         self.playlistmanager.SortSearchResultsDescending()
+                    return True
                 elif event.key() == Qt.Key.Key_A:
                     if self.playlistmanager.isVisible():
                         self.playlistmanager.SortSearchResultsAscending()                       
                     return True
                 elif event.key() == Qt.Key.Key_Return and self.playlistmanager.playlistTree.hasFocus():
                     self.playlistmanager.ItemManuallyEntered()
+                    return True
                 elif event.key() == Qt.Key.Key_Period:
                     self.PlayNextChannel()
                     return True
@@ -527,6 +535,21 @@ class SpyderPlayer(QWidget):
                        
         return super().eventFilter(obj, event)
 
+    def LoadPlayer(self):
+        if self.player != None:
+            self.player.Stop()
+            #self.player.destroy()
+           # self.player = None
+            
+        if self.appData.PlayerType == ENUM_PLAYER_TYPE.VLC:
+            self.player = VLCPlayer(self)
+        elif self.appData.PlayerType == ENUM_PLAYER_TYPE.QTMEDIA:
+            self.player = QtPlayer(self)
+            
+        self.playerType = self.appData.PlayerType
+        self.ui.Status_label.setText("Player: " + self.playerType.name)
+        
+            
     def KeepSettingsOnTopIfVisible(self):
         try:
             if self.settingsManager.settingStack.isVisible():
@@ -843,8 +866,10 @@ class SpyderPlayer(QWidget):
             self.ui.Vertical_splitter.setSizes([800, 1])
             self.controlPanel.setFocus()
             self.overlay.Resize()
+            self.player.ChangeUpdateTimerInterval(False)
 
         elif self.windowState() == QWidget.WindowState.WindowMinimized:
+            self.player.ChangeUpdateTimerInterval(False)
             self.overlay.showMinimized()
             pass  # Do nothing
         else:
@@ -854,6 +879,7 @@ class SpyderPlayer(QWidget):
             self.showFullScreen()
             self.overlay.setFocus()
             self.inactivityTimer.start()
+            self.player.ChangeUpdateTimerInterval(True)
             
            
     def PlaySelectedChannel(self, channel_name, source):
@@ -1064,7 +1090,14 @@ class SpyderPlayer(QWidget):
     def OnHSplitterResized(self, pos, index):
         self.overlay.Resize()
         
-        
+    def ReloadSpyderPlayer(self):
+        global spyderPlayer
+        spyderPlayer.close()        # Close the current instance
+        spyderPlayer.deleteLater()   # Schedule it for deletion
+
+        # Create a new instance of MainWidget
+        spyderPlayer = SpyderPlayer()
+        spyderPlayer.show()       
         
           
 if __name__ == "__main__":

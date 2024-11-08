@@ -15,6 +15,7 @@ from UI_Settings import Ui_SettingsMain
 from UI_PlayListSettings import Ui_PlayListSettings
 from UI_EntryEditor import Ui_EntryEditor
 from UI_OpenFileSelection import Ui_OpenFileSelection
+from UI_PlayerSettings import Ui_PlayerSettings
 
 class ENUM_SettingsViews(Enum):
     INTRO = 0
@@ -26,8 +27,8 @@ class ENUM_SettingsViews(Enum):
     FAVORITES_ENTRY = 6
     OPEN_PLAYLIST = 7
     OPEN_FILE = 8
-    HOTKEYS = 9
-    APPSETTINGS = 10
+    APPSETTINGS = 9
+    HOTKEYS = 10
     
     
 class SettingsIntro(DraggableWidget):
@@ -44,6 +45,7 @@ class SettingsIntro(DraggableWidget):
         self.ui.HotKeys_button.clicked.connect(self.HotKeysButtonClicked)
         self.ui.OpenMediaFile_button.clicked.connect(self.settingsManager.ShowOpenFileSelector)
         self.ui.OpenPlayList_button.clicked.connect(self.settingsManager.ShowOpenPlayListSelector)
+        self.ui.PlayerSettings_button.clicked.connect(self.settingsManager.ShowPlayerSettings)
   
     def HotKeysButtonClicked(self):
         #self.SettingsManager.ShowHotKeySettings()
@@ -295,7 +297,32 @@ class ListSettings(DraggableWidget):
         self.settingsManager.appData.save()
         
         
+class PlayerSettings(DraggableWidget):
+    def __init__(self, SettingsManager, EntryType: ENUM_SettingsViews):
+        super().__init__()
         
+        self.settingsManager = SettingsManager
+        self.entryType = EntryType
+        
+        self.ui = Ui_PlayerSettings()
+        self.ui.setupUi(self)
+        
+        self.ui.Back_button.clicked.connect(self.BackButtonClicked)
+        self.ui.PlayerType_combobox.currentIndexChanged.connect(self.PlayerTypeChanged)
+        
+    def ShowPlayerSettings(self):
+        self.ui.PlayerType_combobox.setCurrentText(self.settingsManager.appData.PlayerType.name)
+        
+    def BackButtonClicked(self):
+        self.settingsManager.SaveSettings()
+        self.settingsManager.ShowSettings()
+        
+    def PlayerTypeChanged(self):
+        self.settingsManager.changesMade = True
+        self.settingsManager.appData.PlayerType = ENUM_PLAYER_TYPE(self.ui.PlayerType_combobox.currentText())
+        print("New Player Type: " + self.settingsManager.appData.PlayerType.name)
+ 
+                    
 class EntryEditor(DraggableWidget):
     entryChanged = False
     newEntry = False
@@ -686,6 +713,7 @@ class SettingsManager(QObject):
         self.FavoritesEditor = EntryEditor(self, ENUM_SettingsViews.FAVORITES_ENTRY)
         self.OpenFileSelector = OpenFileSelection(self, ENUM_SettingsViews.OPEN_FILE)
         self.OpenPlayListSelector = OpenFileSelection(self, ENUM_SettingsViews.OPEN_PLAYLIST)
+        self.PlayerSettings = PlayerSettings(self, ENUM_SettingsViews.APPSETTINGS)
         
         
         self.settingStack.addWidget(self.SettingsIntro)
@@ -697,6 +725,7 @@ class SettingsManager(QObject):
         self.settingStack.addWidget(self.FavoritesEditor)
         self.settingStack.addWidget(self.OpenPlayListSelector)
         self.settingStack.addWidget(self.OpenFileSelector)
+        self.settingStack.addWidget(self.PlayerSettings)
         
         self.settingStack.setFixedWidth(780)
         self.settingStack.setFixedHeight(430) 
@@ -783,7 +812,10 @@ class SettingsManager(QObject):
     def LoadPlayList(self, playListEntry: PlayListEntry):
         self.settingStack.hide()
         self.loadPlayListSignal.emit(playListEntry)
-        
+    
+    def ShowPlayerSettings(self):
+        self.PlayerSettings.ShowPlayerSettings()
+        self.settingStack.setCurrentIndex(ENUM_SettingsViews.APPSETTINGS.value)   
         
             
 
