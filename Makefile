@@ -34,6 +34,11 @@ clean:
 	-rm -rf build 
 	-rm -rf dist	
 
+clean-win:
+	@echo "Cleaning build directories..."
+	-rmdir /s /q __pycache__
+	-rmdir /s /q build
+	-rmdir /s /q dist
 
 # Build with the terminal enabled to view debug messages
 build-debug: clean
@@ -45,9 +50,15 @@ build: clean
 	@echo "Building project with PyInstaller..."
 	$(PYINSTALLER) --name $(EXE_NAME) --onefile --noconsole --icon=$(IMAGE_DIR)/spider_dark_icon.ico $(MAIN_SCRIPT) 
 
-build-vlc: clean
+build-win: clean-win
 	@echo "Building project with PyInstaller..."
 	$(PYINSTALLER) $(SPEC_NAME).spec
+
+build-mac: clean
+	@echo "Building project with PyInstaller..."
+	$(PYINSTALLER) $(SPEC_NAME).spec
+	@echo "Building app bundle..."
+	./build-mac-app.sh
 
 # Default target
 all: resources ui build

@@ -434,11 +434,11 @@ class SpyderPlayer(QWidget):
             self.UserActivityDetected()
             #print("Key Press: ", QEvent.Type.KeyPress.name)
             if not self.ui.Query_input.hasFocus():
-                if event.key() == Qt.Key.Key_Escape and self.isFullScreen: 
+                if event.key() == self.appData.HotKeys.escapeFullscreen and self.isFullScreen:  
                     self.PlayerNormalScreen()
                     #print("Key Press: esc")
                     return True
-                elif event.key() == Qt.Key.Key_F:
+                elif event.key() == self.appData.HotKeys.toggleFullscreen: 
                     if self.isFullScreen:
                         self.PlayerNormalScreen()
                         #print("Key Press: F")
@@ -447,71 +447,71 @@ class SpyderPlayer(QWidget):
                         self.PlayerFullScreen()
                         return True
                     
-                elif event.key() == Qt.Key.Key_K: 
+                elif event.key() == self.appData.HotKeys.playpause: 
                     self.PlayPausePlayer()
                     return True
-                elif event.key() == Qt.Key.Key_Space and not self.playlistmanager.playlistTree.hasFocus():
+                elif event.key() == self.appData.HotKeys.playpauseAlt and not self.playlistmanager.playlistTree.hasFocus():
                     self.PlayPausePlayer()
                     return True
-                elif event.key() == Qt.Key.Key_M:
+                elif event.key() == self.appData.HotKeys.volumeMute:
                     self.MutePlayer()
                     return True
-                elif event.key() == Qt.Key.Key_O:
+                elif event.key() == self.appData.HotKeys.showOptions: 
                     #print("Key Press: Q")
                     self.settingsManager.ShowSettings()
                     return True
-                elif event.key() == Qt.Key.Key_L:
+                elif event.key() == self.appData.HotKeys.togglePlaylist: 
                     #print("Key Press: P")
                     self.TogglePlaylistView()
                     return True
-                elif event.key() == Qt.Key.Key_Backspace:
+                elif event.key() == self.appData.HotKeys.gotoLast: #Qt.Key.Key_Backspace:
                     self.PlayLastChannel()
                     return True
-                elif event.key() == Qt.Key.Key_Up and not self.playlistmanager.playlistTree.hasFocus():
+                elif event.key() == self.appData.HotKeys.volumeUp and not self.playlistmanager.playlistTree.hasFocus(): 
                     self.IncreaseVolume()
                     return True
-                elif event.key() == Qt.Key.Key_Down and not self.playlistmanager.playlistTree.hasFocus():
+                elif event.key() ==  self.appData.HotKeys.volumeDown and not self.playlistmanager.playlistTree.hasFocus():
                     self.DecreaseVolume()
                     return True
-                elif event.key() == Qt.Key.Key_Left:
+                elif event.key() == self.appData.HotKeys.seekBackward: 
                     self.SkipBackward()
                     return True
-                elif event.key() == Qt.Key.Key_Right:
+                elif event.key() == self.appData.HotKeys.seekForward:
                     self.SkipForward()
                     return True
                     
                 #elif event.key() == Qt.Key.Key_C:
                     #if self.playlistmanager.isVisible():
                         #self.playlistmanager.CollapseCurrentPlaylist()
-                elif event.key() == Qt.Key.Key_C:
+                elif event.key() == self.appData.HotKeys.collapseAllLists: 
                     if self.playlistmanager.isVisible():
                         self.playlistmanager.CollapseAllPlaylists()
                     return True
-                elif event.key() == Qt.Key.Key_T: # or Qt.Key.Key_PageUp:
+                elif event.key() == self.appData.HotKeys.gotoTopofList: 
                     if self.playlistmanager.isVisible():
                         self.playlistmanager.GotoTopOfList()
                     return True
-                elif event.key() == Qt.Key.Key_B: # or Qt.Key.Key_PageDown:
+                elif event.key() == self.appData.HotKeys.gotoBottomofList: 
                     if self.playlistmanager.isVisible():
                         #print("Key Press: B")
                         self.playlistmanager.GotoBottomOfList()
                     return True
                         
-                elif event.key() == Qt.Key.Key_D:
+                elif event.key() == self.appData.HotKeys.sortListDescending:
                     if self.playlistmanager.isVisible():
                         self.playlistmanager.SortSearchResultsDescending()
                     return True
-                elif event.key() == Qt.Key.Key_A:
+                elif event.key() == self.appData.HotKeys.sortListAscending: 
                     if self.playlistmanager.isVisible():
                         self.playlistmanager.SortSearchResultsAscending()                       
                     return True
                 elif event.key() == Qt.Key.Key_Return and self.playlistmanager.playlistTree.hasFocus():
                     self.playlistmanager.ItemManuallyEntered()
                     return True
-                elif event.key() == Qt.Key.Key_Period:
+                elif event.key() == self.appData.HotKeys.playNext:  
                     self.PlayNextChannel()
                     return True
-                elif event.key() == Qt.Key.Key_Comma:
+                elif event.key() == self.appData.HotKeys.playPrevious:
                     self.PlayPreviousChannel()
                     return True
                 else:   
@@ -720,6 +720,7 @@ class SpyderPlayer(QWidget):
                 self.StalledVideoDetected()
             else:
                 self.statusLabel.setText("Invalid Media or Source")
+                self.screensaverInhibitor.uninhibit()
                 self.ShowCursorNormal()
         else:
             self.ShowCursorNormal()
@@ -1092,6 +1093,7 @@ class SpyderPlayer(QWidget):
         
     def ReloadSpyderPlayer(self):
         global spyderPlayer
+        self.player.Stop()
         spyderPlayer.close()        # Close the current instance
         spyderPlayer.deleteLater()   # Schedule it for deletion
 

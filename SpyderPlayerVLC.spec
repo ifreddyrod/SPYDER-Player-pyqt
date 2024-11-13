@@ -14,7 +14,8 @@ possible_paths = [
     os.path.join(os.environ.get('PROGRAMFILES', ''), 'VideoLAN', 'VLC', 'plugins'),
     os.path.join(os.environ.get('PROGRAMFILES(X86)', ''), 'VideoLAN', 'VLC', 'plugins'),
     '/usr/lib/vlc/plugins',  # Linux path
-    '/usr/local/lib/vlc/plugins'  # macOS path
+    '/Applications/VLC.app/Contents/MacOS/plugins',  # macOS VLC path
+    '/usr/local/lib/vlc/plugins'  # Another common macOS path
 ]
 
 for path in possible_paths:

@@ -4,6 +4,7 @@ from typing import List, Literal
 import json
 import os
 from VideoPlayer import ENUM_PLAYER_TYPE
+from PyQt6.QtCore import Qt
     
 class PlayListEntry(BaseModel):
     name: str
@@ -12,23 +13,25 @@ class PlayListEntry(BaseModel):
     source: str
 
 class AppHotKeys(BaseModel):
-    playpause: str = "k"
-    playpauseAlt: str = "space"
-    toggleFullscreen: str = "f"
-    escapeFullscreen: str = "esc"
-    togglePlaylist: str = "l"
-    volumeMute: str = "m"
-    volumeUp: str = "up"
-    volumeDown: str = "down"
-    seekForward: str = "right"
-    seekBackward: str = "left"
-    gotoTopofList: str = "t"
-    gotoBottomofList: str = "b"
-    collapseAllLists: str = "c"
-    sortListAscending: str = "a"
-    sortListDescending: str = "d"
-    gotoLast: str = "backspace"
-    showOptions: str = "o"
+    playpause: int = Qt.Key.Key_K
+    playpauseAlt: int = Qt.Key.Key_Space
+    toggleFullscreen: int = Qt.Key.Key_F
+    escapeFullscreen: int = Qt.Key.Key_Escape
+    togglePlaylist: int = Qt.Key.Key_L
+    volumeMute: int = Qt.Key.Key_M
+    volumeUp: int = Qt.Key.Key_Up
+    volumeDown: int = Qt.Key.Key_Down
+    seekForward: int = Qt.Key.Key_Right
+    seekBackward: int = Qt.Key.Key_Left
+    gotoTopofList: int = Qt.Key.Key_T
+    gotoBottomofList: int = Qt.Key.Key_B
+    collapseAllLists: int = Qt.Key.Key_C
+    sortListAscending: int = Qt.Key.Key_A
+    sortListDescending: int = Qt.Key.Key_D
+    gotoLast: int = Qt.Key.Key_Backspace
+    showOptions: int = Qt.Key.Key_O
+    playNext: int = Qt.Key.Key_Period
+    playPrevious: int = Qt.Key.Key_Comma
 
 class AppData(BaseModel):
     PlayerType: ENUM_PLAYER_TYPE = ENUM_PLAYER_TYPE.VLC
