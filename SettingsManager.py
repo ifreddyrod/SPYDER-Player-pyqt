@@ -1,7 +1,7 @@
 import sys
 from PyQt6 import uic
 from PyQt6.QtCore import Qt, QObject, pyqtSignal
-from PyQt6.QtWidgets import QStackedWidget, QWidget, QTableWidgetItem, QTableWidget, QMessageBox, QFileDialog
+from PyQt6.QtWidgets import QStackedWidget, QComboBox, QTableWidgetItem, QTableWidget, QMessageBox, QFileDialog, QStyledItemDelegate
 from PyQt6.QtGui import QFont, QIcon
 from DraggableWidget import DraggableWidget
 from enum import Enum
@@ -16,6 +16,7 @@ from UI_PlayListSettings import Ui_PlayListSettings
 from UI_EntryEditor import Ui_EntryEditor
 from UI_OpenFileSelection import Ui_OpenFileSelection
 from UI_PlayerSettings import Ui_PlayerSettings
+from UI_HotkeySettings import Ui_HotKeySettings
 
 class ENUM_SettingsViews(Enum):
     INTRO = 0
@@ -46,12 +47,166 @@ class SettingsIntro(DraggableWidget):
         self.ui.OpenMediaFile_button.clicked.connect(self.settingsManager.ShowOpenFileSelector)
         self.ui.OpenPlayList_button.clicked.connect(self.settingsManager.ShowOpenPlayListSelector)
         self.ui.PlayerSettings_button.clicked.connect(self.settingsManager.ShowPlayerSettings)
+        self.ui.HotKeys_button.clicked.connect(self.settingsManager.ShowHotKeySettings)
   
     def HotKeysButtonClicked(self):
         #self.SettingsManager.ShowHotKeySettings()
         pass
         
+ 
+class ComboBoxDelegate(QStyledItemDelegate):
+    def __init__(self, items, parent=None):
+        super().__init__(parent)
+        self.items = items
+        self.enabled = True
         
+    def createEditor(self, parent, option, index):
+        editor = QComboBox(parent)
+        editor.addItems(self.items)
+        editor.setEnabled(self.enabled)
+        return editor
+
+    def setEditorData(self, editor, index):
+        value = index.model().data(index, Qt.ItemDataRole.DisplayRole)
+        editor.setCurrentText(str(value))
+
+    def setModelData(self, editor, model, index):
+        value = editor.currentText()
+        model.setData(index, value, Qt.ItemDataRole.EditRole)
+        
+    def set_enabled(self, enabled):
+        self.enabled = enabled
+   
+class ReadOnlyDelegate(QStyledItemDelegate):
+    def createEditor(self, parent, option, index):
+        return None
+                   
+class HotkeySettings(DraggableWidget):  
+    hotkeyList = []
+    
+    def __init__(self, SettingsManager):
+        super().__init__()
+        self.settingsManager = SettingsManager
+        self.appHotKeys = SettingsManager.appData.HotKeys
+        self.ui = Ui_HotKeySettings()
+        self.ui.setupUi(self)
+        
+        # Set Column Settings 
+        self.ui.HotKeys_table.setColumnWidth(0, 250)
+        self.ui.HotKeys_table.setColumnWidth(1, 350)
+        self.ui.HotKeys_table.setWordWrap(True)
+        #self.ui.HotKeys_table.set
+        
+        self.LoadHotkeyList()
+         
+        self.ui.Apply_button.hide()
+        self.ui.Cancel_button.hide()
+         
+        self.ui.Back_button.clicked.connect(self.BackButtonClicked) 
+        self.ui.Apply_button.clicked.connect(self.ApplyChanges)
+        self.ui.Cancel_button.clicked.connect(self.CancelChanges)
+        self.ui.Edit_button.clicked.connect(self.EditButtonClicked)
+        self.ui.HotKeys_table.itemChanged.connect(self.HotkeyChanged)
+        
+    def BackButtonClicked(self):
+        self.settingsManager.ShowSettings()
+                
+    def LoadHotkeyList(self):
+        self.ui.HotKeys_table.clearContents() 
+        self.hotkeyList.clear()
+        
+        #for name, hotkey in self.settingsManager.appData.HotKeys.__dict__.items():
+            #print(name + ": " + Qt.Key(hotkey).name)
+        #self.appHotKeys = self.settingsManager.appData.HotKeys
+                
+        # Get Hotkeys from AppData
+        for name, hotkey in self.appHotKeys.__dict__.items():   
+            self.hotkeyList.append([name, Qt.Key(hotkey).name, Qt.Key(hotkey)])  
+               
+       
+        self.ui.HotKeys_table.setRowCount(len(self.hotkeyList))
+        hkItems = Qt.Key._member_names_ 
+        self.hkComboBox = ComboBoxDelegate(hkItems) 
+        self.playerAction = ReadOnlyDelegate()
+        self.ui.HotKeys_table.setItemDelegateForColumn(0, self.playerAction)
+        self.ui.HotKeys_table.setItemDelegateForColumn(1, self.hkComboBox)
+         
+        # Update Table with Hotkeys      
+        for idx, item in enumerate(self.hotkeyList): 
+            action = item[0]
+            hotkeyname = item[1]
+            hotkey = item[2]
+                  
+            hkIndex = hkItems.index(hotkeyname) 
+            actionItem = QTableWidgetItem(action)
+            actionItem.setTextAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+            hotkeyItem = QTableWidgetItem(hkItems[hkIndex])
+            hotkeyItem.setTextAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+            
+            self.ui.HotKeys_table.setItem(idx, 0, actionItem)  
+            self.ui.HotKeys_table.setItem(idx, 1, hotkeyItem)
+            
+        self.hkComboBox.set_enabled(False)    
+            
+    def EditButtonClicked(self):
+        self.hkComboBox.set_enabled(True)
+        
+        self.ui.Apply_button.show()
+        self.ui.Cancel_button.show()
+        self.ui.Edit_button.hide()
+        self.ui.Back_button.hide()
+        self.changed = False
+        
+    def CancelChanges(self):
+        self.hkComboBox.set_enabled(False)
+        self.ui.Apply_button.hide()
+        self.ui.Cancel_button.hide()
+        self.ui.Edit_button.show()
+        self.ui.Back_button.show()
+        self.LoadHotkeyList()
+        self.changed = False
+        
+    def ApplyChanges(self):
+        if self.changed:
+            # Check for duplicate hotkey names
+            if self.CheckForDuplicateHotkeys():
+                QMessageBox.warning(self, "Hotkey Error", "Duplicate hotkey detected!  Please select unique hotkeys.", QMessageBox.StandardButton.Ok)
+                return
+            
+            for row in range(self.ui.HotKeys_table.rowCount()):
+                self.settingsManager.appData.HotKeys.__dict__[self.ui.HotKeys_table.item(row, 0).text()] = getattr(Qt.Key, self.ui.HotKeys_table.item(row, 1).text())
+            
+            self.settingsManager.appData.save()
+            #self.appHotKeys = self.settingsManager.appData.HotKeys
+            #self.settingsManager = self.settingsManager.SaveRefresh()
+            
+            #for name, hotkey in self.settingsManager.appData.HotKeys.__dict__.items():
+                #print(name + ": " + str(hotkey))
+
+        #self.LoadHotkeyList()
+        self.CancelChanges()
+        
+    def CheckForDuplicateHotkeys(self) -> bool:
+        tableList = []
+        # Convert table keys to list
+        for row in range(self.ui.HotKeys_table.rowCount()):
+            tableList.append(self.ui.HotKeys_table.item(row, 1).text())
+            
+        # Compare Sizes of Lists
+        if len(tableList) != len(set(tableList)):
+            return True
+        else:
+            return False
+        
+        
+    def HotkeyChanged(self, item):
+        row = self.ui.HotKeys_table.currentRow()
+        
+        #if self.ui.HotKeys_table.item(row, 1).text() != self.hotkeyList[row][1]:  
+        if item.text() != self.hotkeyList[row][1]:
+            self.changed = True
+                        
+                
 class ListSettings(DraggableWidget):
     entryRow = -1
     editList: List[PlayListEntry] = []
@@ -94,6 +249,9 @@ class ListSettings(DraggableWidget):
         self.ui.PlayList_table.setColumnWidth(0, 250)
         self.ui.PlayList_table.setColumnWidth(1, 360)
         self.ui.PlayList_table.setWordWrap(True)
+        self.columns = ReadOnlyDelegate()
+        self.ui.PlayList_table.setItemDelegateForColumn(0, self.columns)
+        self.ui.PlayList_table.setItemDelegateForColumn(1, self.columns)
         
         # Setup Slots
         self.ui.Back_button.clicked.connect(self.BackButtonClicked) 
@@ -714,6 +872,7 @@ class SettingsManager(QObject):
         self.OpenFileSelector = OpenFileSelection(self, ENUM_SettingsViews.OPEN_FILE)
         self.OpenPlayListSelector = OpenFileSelection(self, ENUM_SettingsViews.OPEN_PLAYLIST)
         self.PlayerSettings = PlayerSettings(self, ENUM_SettingsViews.APPSETTINGS)
+        self.HotKeySettings = HotkeySettings(self)
         
         
         self.settingStack.addWidget(self.SettingsIntro)
@@ -726,6 +885,7 @@ class SettingsManager(QObject):
         self.settingStack.addWidget(self.OpenPlayListSelector)
         self.settingStack.addWidget(self.OpenFileSelector)
         self.settingStack.addWidget(self.PlayerSettings)
+        self.settingStack.addWidget(self.HotKeySettings)
         
         self.settingStack.setFixedWidth(780)
         self.settingStack.setFixedHeight(430) 
@@ -804,7 +964,7 @@ class SettingsManager(QObject):
     def SaveSettings(self):
         if self.changesMade:
             self.appData.save()
-            
+                 
     def LoadMediaFile(self, fileEntry: PlayListEntry):
         self.settingStack.hide()
         self.loadMediaFileSignal.emit(fileEntry)
@@ -817,7 +977,6 @@ class SettingsManager(QObject):
         self.PlayerSettings.ShowPlayerSettings()
         self.settingStack.setCurrentIndex(ENUM_SettingsViews.APPSETTINGS.value)   
         
-            
-
-        
-        
+    def ShowHotKeySettings(self):
+        #self.HotKeySettings.ShowHotKeySettings()
+        self.settingStack.setCurrentIndex(ENUM_SettingsViews.HOTKEYS.value)        

@@ -93,7 +93,7 @@ QHeaderView
     </property>
    </widget>
   </widget>
-  <widget class="QTableWidget" name="PlayList_table">
+  <widget class="QTableWidget" name="HotKeys_table">
    <property name="geometry">
     <rect>
      <x>160</x>
@@ -227,7 +227,7 @@ QTableWidget
     </property>
     <property name="font">
      <font>
-      <pointsize>16</pointsize>
+      <pointsize>15</pointsize>
      </font>
     </property>
    </column>
@@ -237,7 +237,7 @@ QTableWidget
     </property>
     <property name="font">
      <font>
-      <pointsize>16</pointsize>
+      <pointsize>15</pointsize>
      </font>
     </property>
    </column>
@@ -356,7 +356,7 @@ QTableWidget
   </widget>
   <zorder>background_widget</zorder>
   <zorder>Titlebar_widget</zorder>
-  <zorder>PlayList_table</zorder>
+  <zorder>HotKeys_table</zorder>
   <zorder>Edit_button</zorder>
   <zorder>Back_button</zorder>
   <zorder>Apply_button</zorder>
