@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>About</class>
+ <widget class="QWidget" name="About">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>780</width>
+    <height>430</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/*background-color: rgb(42, 42, 42);*/
+
+QLabel
+{
+	color: rgb(216, 216, 216);
+     background-color: transparent;
+}
+
+QPushButton 
+{	
+	color: rgb(216, 216, 216);
+	background-color: rgb(0, 0, 0);
+	border-radius: 10px;
+}
+
+QPushButton:hover 
+{
+	background-color: rgb(35, 11, 63);
+}
+
+QPushButton:disabled
+{
+	color: rgb(73, 73, 73);
+}
+
+QPushButton:pressed 
+{
+	background-color: rgb(82, 26, 149);
+}
+
+QTableWidget
+{
+	background-color: rgb(0, 0, 0);
+}
+
+QTableWidget::item::selected
+{
+	background-color: rgb(0, 58, 201);
+}
+
+QHeaderView::section
+{
+	background-color: rgb(20, 6, 36);
+}
+
+QHeaderView
+{
+	background-color: rgb(30, 30, 30);
+}
+
+QLineEdit
+{
+	color: rgb(216, 216, 216);
+	background-color: rgb(0, 0, 0);
+	padding-left:10px;
+}
+
+QTextEdit
+{
+	color: rgb(216, 216, 216);
+	background-color: rgb(0, 0, 0);
+	padding-left:25px;
+}
+
+QComboBox
+{
+	color: rgb(216, 216, 216);
+	background-color: rgb(0, 0, 0);
+}
+
+QComboBox QAbstractItemView {
+ 	border: 1px solid grey;
+ 	/*background: black;*/
+	selection-color: rgb(216, 216, 216);
+  	background-color: rgb(30, 30, 30);
+}
+</string>
+  </property>
+  <widget class="QWidget" name="Titlebar_widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>781</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(27, 27, 27);</string>
+   </property>
+   <widget class="QLabel" name="Titlebar_label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>0</y>
+      <width>251</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>About</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft</set>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="Back_button">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>380</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>  Back     </string>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/white-left-arrow.png</normaloff>
+     <disabledoff>:/icons/icons/white-left-arrow-disabled.png</disabledoff>:/icons/icons/white-left-arrow.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>15</width>
+     <height>15</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QLabel" name="License_label">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>240</y>
+     <width>251</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>License:  General Public License (GPL)</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="background_widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>30</y>
+     <width>801</width>
+     <height>421</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: qlineargradient(spread:pad, x1:0.369, y1:0.182, x2:1, y2:1, stop:0 rgba(57, 9, 126, 255), stop:1 rgba(129, 18, 129, 255));</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Title_label">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>40</y>
+     <width>481</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial Black</family>
+     <pointsize>20</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>SPYDER Player</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Version_label">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>80</y>
+     <width>481</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Version 1.0.0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Name_label">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>200</y>
+     <width>561</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Created by:  Fred Rodriguez</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="SourceCode_label">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>290</y>
+     <width>311</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;a href=&quot;https://github.com/ifreddyrod/SPYDER-Player&quot;&gt;Source Code &lt;/a&gt;'</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Name_label_2">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>110</y>
+     <width>681</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>SPYDER Player is an easy to use cross-platform media player with a focus on making streaming IPTV channels easier.  Managing playlists from various sources can be cumbersome.  SPYDER Player makes it easy to load, create, and mangage your playlists.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="LicenseLink_label">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>260</y>
+     <width>311</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;a href=&quot;https://www.gnu.org/licenses/gpl-3.0.txt&quot;&gt;www.gnu.org&lt;/a&gt;'</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Copyright_label">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>330</y>
+     <width>561</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Copyright © 2024, All Rights Reserved.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Background_image">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>20</y>
+     <width>512</width>
+     <height>512</height>
+    </rect>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>2000</width>
+     <height>2000</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="resources.qrc">:/icons/icons/spider-black.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <zorder>background_widget</zorder>
+  <zorder>Titlebar_widget</zorder>
+  <zorder>Back_button</zorder>
+  <zorder>License_label</zorder>
+  <zorder>Name_label</zorder>
+  <zorder>SourceCode_label</zorder>
+  <zorder>LicenseLink_label</zorder>
+  <zorder>Copyright_label</zorder>
+  <zorder>Background_image</zorder>
+  <zorder>Name_label_2</zorder>
+  <zorder>Title_label</zorder>
+  <zorder>Version_label</zorder>
+ </widget>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

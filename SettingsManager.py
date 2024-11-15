@@ -17,6 +17,7 @@ from UI_EntryEditor import Ui_EntryEditor
 from UI_OpenFileSelection import Ui_OpenFileSelection
 from UI_PlayerSettings import Ui_PlayerSettings
 from UI_HotkeySettings import Ui_HotKeySettings
+from UI_About import Ui_About
 
 class ENUM_SettingsViews(Enum):
     INTRO = 0
@@ -30,6 +31,7 @@ class ENUM_SettingsViews(Enum):
     OPEN_FILE = 8
     APPSETTINGS = 9
     HOTKEYS = 10
+    ABOUT = 11
     
     
 class SettingsIntro(DraggableWidget):
@@ -48,6 +50,7 @@ class SettingsIntro(DraggableWidget):
         self.ui.OpenPlayList_button.clicked.connect(self.settingsManager.ShowOpenPlayListSelector)
         self.ui.PlayerSettings_button.clicked.connect(self.settingsManager.ShowPlayerSettings)
         self.ui.HotKeys_button.clicked.connect(self.settingsManager.ShowHotKeySettings)
+        self.ui.About_button.clicked.connect(self.settingsManager.ShowAboutScreen)
   
     def HotKeysButtonClicked(self):
         #self.SettingsManager.ShowHotKeySettings()
@@ -848,6 +851,18 @@ class OpenFileSelection(DraggableWidget):
                     self.newEntry.parentName = self.newEntry.name
             self.settingsManager.LoadPlayList(self.newEntry)
               
+class About(DraggableWidget):
+    def __init__(self, SettingsManager):
+        super().__init__()     
+        self.settingsManager = SettingsManager  
+        
+        self.ui = Ui_About()
+        self.ui.setupUi(self)
+        
+        self.ui.Version_label.setText("Version: " + self.settingsManager.appVersion)
+        
+        self.ui.Back_button.clicked.connect(self.settingsManager.ShowSettings)
+        
         
 class SettingsManager(QObject):
     platform = platform.system()
@@ -856,10 +871,11 @@ class SettingsManager(QObject):
     loadMediaFileSignal = pyqtSignal(PlayListEntry)
     loadPlayListSignal = pyqtSignal(PlayListEntry)
     
-    def __init__(self, appData: AppData):
+    def __init__(self, appData: AppData, version: str):
         super().__init__()
         
         self.appData = appData
+        self.appVersion = version
         
         self.settingStack = QStackedWidget()
         
@@ -874,6 +890,7 @@ class SettingsManager(QObject):
         self.OpenPlayListSelector = OpenFileSelection(self, ENUM_SettingsViews.OPEN_PLAYLIST)
         self.PlayerSettings = PlayerSettings(self, ENUM_SettingsViews.APPSETTINGS)
         self.HotKeySettings = HotkeySettings(self)
+        self.About = About(self)
         
         
         self.settingStack.addWidget(self.SettingsIntro)
@@ -887,6 +904,7 @@ class SettingsManager(QObject):
         self.settingStack.addWidget(self.OpenFileSelector)
         self.settingStack.addWidget(self.PlayerSettings)
         self.settingStack.addWidget(self.HotKeySettings)
+        self.settingStack.addWidget(self.About)
         
         self.settingStack.setFixedWidth(780)
         self.settingStack.setFixedHeight(430) 
@@ -980,4 +998,7 @@ class SettingsManager(QObject):
         
     def ShowHotKeySettings(self):
         #self.HotKeySettings.ShowHotKeySettings()
-        self.settingStack.setCurrentIndex(ENUM_SettingsViews.HOTKEYS.value)        
+        self.settingStack.setCurrentIndex(ENUM_SettingsViews.HOTKEYS.value)   
+        
+    def ShowAboutScreen(self):
+        self.settingStack.setCurrentIndex(ENUM_SettingsViews.ABOUT.value)     

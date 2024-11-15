@@ -21,7 +21,7 @@ class Ui_SplashScreen(object):
         SplashScreen.setSizePolicy(sizePolicy)
         SplashScreen.setStyleSheet("color: rgb(216, 216, 216);")
         self.Background_image = QtWidgets.QLabel(parent=SplashScreen)
-        self.Background_image.setGeometry(QtCore.QRect(10, -40, 461, 401))
+        self.Background_image.setGeometry(QtCore.QRect(50, -20, 391, 391))
         self.Background_image.setMaximumSize(QtCore.QSize(2000, 2000))
         self.Background_image.setStyleSheet("")
         self.Background_image.setText("")
@@ -56,7 +56,7 @@ class Ui_SplashScreen(object):
         self.Status_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.Status_label.setObjectName("Status_label")
         self.background = QtWidgets.QWidget(parent=SplashScreen)
-        self.background.setGeometry(QtCore.QRect(0, -1, 531, 381))
+        self.background.setGeometry(QtCore.QRect(-40, -60, 531, 381))
         self.background.setStyleSheet("/*background-color: qlineargradient(spread:pad, x1:0.074, y1:0.968409, x2:0.881759, y2:0.221591, stop:0 rgba(209, 30, 255, 255), stop:1 rgba(37, 189, 255, 255));*/\n"
 "\n"
 "/*background-color: rgb(20, 5, 37);  */\n"

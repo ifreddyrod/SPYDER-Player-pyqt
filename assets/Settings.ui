@@ -293,6 +293,29 @@ background-color: rgb(27, 27, 27);</string>
     </size>
    </property>
   </widget>
+  <widget class="QPushButton" name="About_button">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>310</y>
+     <width>261</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>   About</string>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/white-information.png</normaloff>:/icons/icons/white-information.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+  </widget>
   <zorder>background_widget</zorder>
   <zorder>Titlebar_widget</zorder>
   <zorder>PlayList_button</zorder>
@@ -303,6 +326,7 @@ background-color: rgb(27, 27, 27);</string>
   <zorder>OpenPlayList_button</zorder>
   <zorder>Favorites_button</zorder>
   <zorder>PlayerSettings_button</zorder>
+  <zorder>About_button</zorder>
  </widget>
  <resources>
   <include location="resources.qrc"/>

@@ -118,6 +118,7 @@ class SplashScreen(QWidget):
         self.splashTimerCompleted = True
         
 class SpyderPlayer(QWidget):
+    version: str = "1.0.0 Beta"
     platform: str = platform.system()
     channelList = []
     playListVisible: bool = True
@@ -137,7 +138,7 @@ class SpyderPlayer(QWidget):
         super().__init__(parent)
         self.splashScreen = SplashScreen()
         self.splashScreen.ui.Status_label.setText("Initializing ...")
-        self.splashScreen.ui.Version_label.setText("Version: 1.0.0 Beta")
+        self.splashScreen.ui.Version_label.setText("Version: " + self.version)
         
         self.mousePressPos = None
         self.mouseMoveActive = False
@@ -223,7 +224,7 @@ class SpyderPlayer(QWidget):
         #self.ui.Channels_table.installEventFilter(self)   
         
         # Create Settings Manager
-        self.settingsManager = SettingsManager(self.appData)
+        self.settingsManager = SettingsManager(self.appData, self.version)
         
         #---------------------------
         # Setup Video Overlay
