@@ -28,10 +28,10 @@
   <widget class="QLabel" name="Background_image">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>-20</y>
-     <width>391</width>
-     <height>391</height>
+     <x>40</x>
+     <y>-30</y>
+     <width>400</width>
+     <height>400</height>
     </rect>
    </property>
    <property name="maximumSize">

@@ -133,7 +133,7 @@ class QtPlayer(VideoPlayer):
             if self.duration > 0:
                 self.currentState = ENUM_PLAYER_STATE.ENDED
             else:
-                self.currentState = ENUM_PLAYER_STATE.STOPPED
+                self.currentState = ENUM_PLAYER_STATE.STALLED #ENUM_PLAYER_STATE.STOPPED
         elif mediaState == QMediaPlayer.MediaStatus.NoMedia:
             self.currentState = ENUM_PLAYER_STATE.IDLE
         elif mediaState == QMediaPlayer.MediaStatus.StalledMedia:

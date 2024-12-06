@@ -159,10 +159,12 @@ class VLCPlayer(VideoPlayer):
     
     def UpdatePlayerStatus(self):
         state = self.GetPlayerState()
-            
+        #print("Update Player State: " + str(state)) 
+           
         if state == ENUM_PLAYER_STATE.PLAYING:
             videoTimePosition = self.GetPosition()
             duration = self.GetVideoDuration()
+            #print("Duration: " + str(duration) + " Position: " + str(videoTimePosition))
             
             if duration > 0:
                 self.UpdatePosition(videoTimePosition)
@@ -204,11 +206,15 @@ class VLCPlayer(VideoPlayer):
         
     def OnChangingPosition(self, isPlaying):
         if isPlaying:
-            self.Pause()
+            self.player.pause()
             
     def OnChangedPosition(self, isPlaying):
         if isPlaying:
-            self.Play()
+            self.player.play()
+            self.previousState = ENUM_PLAYER_STATE.PAUSED
+            self.currentState = ENUM_PLAYER_STATE.PLAYING
+            #self.UpdatePlayerState(self.currentState)
+            self.updateTimer.start()
             
     def ChangeUpdateTimerInterval(self, isFullScreen: bool):
         if isFullScreen:

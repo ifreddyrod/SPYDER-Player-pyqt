@@ -29,6 +29,10 @@ Build Instructions:
 - To build the application library on MacOS: `make build-mac`
 - To build the executable on Windows: `make build-win`
 
+Image Credits:
+- All images used in this project where found on https://www.flaticon.com
+- [Credited images](docs/ImageSources.md)
+
 ToDo:
 - More testing and bug finding
 - Create Installers for all Operating Systems

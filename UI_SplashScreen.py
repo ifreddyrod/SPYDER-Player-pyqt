@@ -21,7 +21,7 @@ class Ui_SplashScreen(object):
         SplashScreen.setSizePolicy(sizePolicy)
         SplashScreen.setStyleSheet("color: rgb(216, 216, 216);")
         self.Background_image = QtWidgets.QLabel(parent=SplashScreen)
-        self.Background_image.setGeometry(QtCore.QRect(50, -20, 391, 391))
+        self.Background_image.setGeometry(QtCore.QRect(40, -30, 400, 400))
         self.Background_image.setMaximumSize(QtCore.QSize(2000, 2000))
         self.Background_image.setStyleSheet("")
         self.Background_image.setText("")

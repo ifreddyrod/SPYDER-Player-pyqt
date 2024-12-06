@@ -132,6 +132,7 @@ class SpyderPlayer(QWidget):
     overlay: VideoOverlay = None
     player = None
     playerType: ENUM_PLAYER_TYPE = ENUM_PLAYER_TYPE.VLC
+    videoPlaying = False
     
     def __init__(self, parent=None):
 
@@ -614,11 +615,16 @@ class SpyderPlayer(QWidget):
             
     def OnSliderPressed(self):
         self.videoPlaying = self.player.GetPlayerState() == ENUM_PLAYER_STATE.PLAYING
+        #print("Video State: ", self.player.GetPlayerState().name)
+        #print("Video Playing: ", self.videoPlaying)
         self.player.OnChangingPosition(self.videoPlaying)
-        
+        if self.isFullScreen:
+            self.inactivityTimer.stop()
+            self.controlPanelFS.setFocus()
+
         
     def ChangeVideoPosition(self):             
-        self.videoChangesPosition = False      
+        self.videoChangesPosition = False                  
         slider = self.sender()
         position = slider.value()
         
@@ -628,64 +634,18 @@ class SpyderPlayer(QWidget):
         self.videoChangesPosition = True
 
     def OnSliderReleased(self):
+        print("Video State: ", self.player.GetPlayerState().name)
+        print("Video Playing: ", self.videoPlaying)
         self.VideoTimePositionChanged(self.videoPosition)
         self.player.OnChangedPosition(self.videoPlaying)
-        
+        if self.videoPlaying:
+            self.ChangePlayingUIStates(True)
             
-                
-    '''def OnMediaStatusChanged(self, status):
-        message = str(status).split('.')[1]
-        codec_info = self.player.metaData().value(QMediaMetaData.Key.AudioCodec)
-        if codec_info:
-            print(f"Audio codec: {codec_info}")
-        else:
-            print("Audio codec information not available")
-
-        if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
-            self.statusLabel.setText('')
-        else:
-            self.statusLabel.setText(message + " .....")
-        
-        if status == QMediaPlayer.MediaStatus.LoadedMedia:
-            self.ShowCursorNormal()
-        elif status == QMediaPlayer.MediaStatus.LoadingMedia:
-            self.ShowCursorBusy()
-        else: 
-            self.ShowCursorNormal()  
-
-        if status == QMediaPlayer.MediaStatus.InvalidMedia:
-            self.RetryPlaying()
+        if self.isFullScreen:
+            self.overlay.activateWindow()
+            self.overlay.setFocus()
+            self.inactivityTimer.start()        
             
-        # IF stream video unexpectedly ends, try and restart it (EndOfMedia ... Message)
-        if status == QMediaPlayer.MediaStatus.EndOfMedia and self.videoDuration == 0:
-            self.StalledVideoDetected()
-             
-    def StalledVideoDetected(self):
-        if self.retryPlaying:
-            self.stalledVideoTimer.stop()
-            print("Stalled Video - Resetting")
-            self.statusLabel.setText("Stalled Video - Resetting")
-            self.player.stop()
-            #time.sleep(1)
-            self.PlayVideo()
-            self.retryPlaying = False  
-            if self.player.playbackState() == QMediaPlayer.PlaybackState.StoppedState:
-                self.ChangePlayingUIStates(False)
-        else:
-            self.ChangePlayingUIStates(False)
-            
-    def RetryPlaying(self):
-        if self.retryPlaying:
-            print("Retrying Playback")
-            self.player.stop()
-            #time.sleep(1)
-            self.PlayVideo()
-            self.retryPlaying = False
-            if self.player.playbackState() == QMediaPlayer.PlaybackState.StoppedState:
-                self.ChangePlayingUIStates(False)
-            #print("Playback Retry State: ", self.player.playbackState())
-        else:
-            self.ChangePlayingUIStates(False)'''
              
     def StalledVideoDetected(self):
         if self.retryPlaying:
@@ -722,14 +682,13 @@ class SpyderPlayer(QWidget):
             else:
                 self.statusLabel.setText("Invalid Media or Source")
                 self.screensaverInhibitor.uninhibit()
-                self.ShowCursorNormal()
+                self.ShowCursorNormal() 
         else:
             self.ShowCursorNormal()
             self.stalledVideoTimer.stop()
             self.ChangePlayingUIStates(False)
             self.screensaverInhibitor.uninhibit()
-            self.statusLabel.setText("")
-           
+            self.statusLabel.setText("")          
             
     def PlayerFullScreen(self):
         self.ui.Horizontal_splitter.setSizes([0, 800])  # Hide left side    
@@ -745,6 +704,7 @@ class SpyderPlayer(QWidget):
         self.overlay.Resize()
         self.overlay.setFocus()
         
+
         if self.platform == "Linux":
             # Initial postion is off when going to fullscreen in linux, so just hide it initially
             self.controlPanelFS.hide()
