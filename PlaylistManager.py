@@ -308,7 +308,7 @@ class PlayListManager(QWidget):
                 response = requests.get(playlistPath)
                 
                 # Create a temporary file
-                with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.m3u') as temp_file:
+                with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.m3u', encoding='utf-8') as temp_file:
                     # Write the content to the temporary file
                     temp_file.write(response.text)
                     responseFile = temp_file.name
@@ -751,7 +751,8 @@ class PlayListManager(QWidget):
                     searchResultsCount += 1
                     
             self.UpdatePlayListChannelCount(playlistResults)
-            self.AppendPlayList(playlistResults, self.searchList)
+            if playlistResults.childCount() > 0:
+                self.AppendPlayList(playlistResults, self.searchList)
             
         self.UpdatePlayListChannelCount(self.searchList, searchResultsCount)
         self.playlistTree.blockSignals(False)
@@ -769,7 +770,26 @@ class PlayListManager(QWidget):
             searchList = self.searchList.child(i)     
             searchList.sortChildren(0, Qt.SortOrder.AscendingOrder)
                     
-
+    def SortListDescending(self):
+        selectedItem = self.playlistTree.currentItem()
+        if selectedItem is None:
+            return
+        if selectedItem.isPlayList:
+            selectedItem.sortChildren(0, Qt.SortOrder.DescendingOrder)
+        else:
+            playlist = selectedItem.parent()
+            playlist.sortChildren(0, Qt.SortOrder.DescendingOrder)
+            
+    def SortListAscending(self):
+        selectedItem = self.playlistTree.currentItem()
+        if selectedItem is None:
+            return
+        if selectedItem.isPlayList:
+            selectedItem.sortChildren(0, Qt.SortOrder.AscendingOrder)
+        else:
+            playlist = selectedItem.parent()
+            playlist.sortChildren(0, Qt.SortOrder.AscendingOrder)
+            
     def GotoBottomOfList(self):
         selectedItem = self.playlistTree.currentItem()
         

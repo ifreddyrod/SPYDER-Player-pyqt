@@ -39,6 +39,7 @@ class AppHotKeys(BaseModel):
     showOptions: int = Qt.Key.Key_O
     playNext: int = Qt.Key.Key_Period
     playPrevious: int = Qt.Key.Key_Comma
+    stopVideo: int = Qt.Key.Key_S
 
     @classmethod
     def validate_and_create(cls, data: Dict[str, Any]) -> 'AppHotKeys':
@@ -69,6 +70,7 @@ class AppHotKeys(BaseModel):
 
 class AppData(BaseModel):
     PlayerType: ENUM_PLAYER_TYPE = ENUM_PLAYER_TYPE.VLC
+    PlayListPath: str = ""
     HotKeys: AppHotKeys = Field(default_factory=AppHotKeys)
     Library: List[PlayListEntry] = Field(default_factory=list)
     Favorites: List[PlayListEntry] = Field(default_factory=list)
@@ -96,6 +98,13 @@ class AppData(BaseModel):
                     processed['PlayerType'] = data['PlayerType']
         except (ValueError, KeyError):
             processed['PlayerType'] = ENUM_PLAYER_TYPE.VLC
+            
+        # Handle PlayListPath    
+        try: 
+            if 'PlayListPath' in data:
+                processed['PlayListPath'] = data['PlayListPath']
+        except (ValueError, KeyError):
+            processed['PlayListPath'] = ""
 
         # Handle HotKeys
         if 'HotKeys' in data:
@@ -137,6 +146,7 @@ class AppData(BaseModel):
             default_data = cls(dataFilePath=file_path)
             default_data.save()
             return default_data
+        
         except Exception as e:
             print(f"Unexpected error: {e}. Using default configuration.")
             default_data = cls(dataFilePath=file_path)
@@ -152,6 +162,7 @@ class AppData(BaseModel):
                 data_to_save['PlayerType'] = self.PlayerType.name
             with open(self._dataFile, "w") as file:
                 json.dump(data_to_save, file, indent=4)
+                                
         except Exception as e:
             print(f"Error saving config file: {e}")
 

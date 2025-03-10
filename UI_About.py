@@ -185,4 +185,4 @@ class Ui_About(object):
         self.SourceCode_label.setText(_translate("About", "<a href=\"https://github.com/ifreddyrod/SPYDER-Player\">Source Code </a>\'"))
         self.Name_label_2.setText(_translate("About", "SPYDER Player is an easy to use cross-platform media player with a focus on making streaming IPTV channels easier.  Managing playlists from various sources can be cumbersome.  SPYDER Player makes it easy to load, create, and mangage your playlists."))
         self.LicenseLink_label.setText(_translate("About", "<a href=\"https://www.gnu.org/licenses/gpl-3.0.txt\">www.gnu.org</a>\'"))
-        self.Copyright_label.setText(_translate("About", "Copyright © 2024, All Rights Reserved."))
+        self.Copyright_label.setText(_translate("About", "Copyright © 2025, All Rights Reserved."))

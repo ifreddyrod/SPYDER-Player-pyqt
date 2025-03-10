@@ -2,7 +2,7 @@ import re, os
 from PyQt6 import uic, QtCore
 from PyQt6.QtGui import QCursor, QIcon, QMouseEvent
 from PyQt6.QtCore import Qt, QUrl, QEvent, QTimer, QPoint, pyqtSignal
-from PyQt6.QtWidgets import QApplication, QWidget, QStyleFactory
+from PyQt6.QtWidgets import QApplication, QWidget, QStyleFactory, QMenu
 from VideoPlayer import *
 from VLCPlayer import VLCPlayer
 from QtPlayer import QtPlayer
@@ -59,12 +59,13 @@ class VideoOverlay(QWidget):
         QApplication.sendEvent(self.SpyderPlayer, event)
         return True
         
-    def Resize(self):
-        #screen = QApplication.primaryScreen()  # Get primary screen
+    def Resize(self, forceFullscreen: bool = False):
+        screen = QApplication.primaryScreen()  # Get primary screen
         #screen_geometry = screen.geometry()  # Get screen geometry
-        #screenWidth = screen.size().width()        
+        screenWidth = screen.size().width()        
         panel = self.SpyderPlayer.videoPanel
-        panel_width = self.SpyderPlayer.ui.ShowControlPanel_top_label.width() - 4
+        panel_width = screenWidth if forceFullscreen else self.SpyderPlayer.ui.ShowControlPanel_top_label.width() - 4
+        #panel_width = self.SpyderPlayer.ui.ShowControlPanel_top_label.width() - 4
         panel_height = self.SpyderPlayer.ui.ShowControlPanel_left_label.height() - 4
         new_x =  panel.x() + 1
         new_y =  panel.y() + 1
@@ -118,7 +119,7 @@ class SplashScreen(QWidget):
         self.splashTimerCompleted = True
         
 class SpyderPlayer(QWidget):
-    version: str = "1.0.0 Beta"
+    version: str = "1.1.0 Beta"
     platform: str = platform.system()
     channelList = []
     playListVisible: bool = True
@@ -132,7 +133,8 @@ class SpyderPlayer(QWidget):
     overlay: VideoOverlay = None
     player = None
     playerType: ENUM_PLAYER_TYPE = ENUM_PLAYER_TYPE.VLC
-    videoPlaying = False
+    videoPlaying = False    
+    subtitlesEnabled = False
     
     def __init__(self, parent=None):
 
@@ -210,7 +212,11 @@ class SpyderPlayer(QWidget):
         self.LoadPlayer()
         
         print("PlayerType: ", self.playerType)        
-        
+            
+        '''if self.playerType == ENUM_PLAYER_TYPE.QTMEDIA:
+            # Close Captions not available in QtMediaplayer
+            self.controlPanel.ui.CloseCaption_button.hide()
+            self.controlPanelFS.ui.CloseCaption_button.hide()'''
             
         #self.player.installEventFilter(self) 
         self.videoPanel.installEventFilter(self)
@@ -288,6 +294,10 @@ class SpyderPlayer(QWidget):
         self.controlPanelFS.ui.Last_button.clicked.connect(self.PlayLastChannel)
         self.controlPanel.ui.Last_button.clicked.connect(self.PlayLastChannel) 
         
+        # Toggle Subtitles
+        self.controlPanelFS.ui.CloseCaption_button.clicked.connect(self.ShowSubtitleTracks)
+        self.controlPanel.ui.CloseCaption_button.clicked.connect(self.ShowSubtitleTracks)
+        
         # Search button
         self.ui.Search_button.clicked.connect(self.SearchChannels)
         
@@ -308,6 +318,10 @@ class SpyderPlayer(QWidget):
         self.stalledVideoTimer.setInterval(5000) 
         #self.stalledVideoTimer.timeout.connect(self.StalledVideoDetected) 
 
+        self.playbackStatusTimer = QTimer(self)
+        self.playbackStatusTimer.setInterval(10000)
+        self.playbackStatusTimer.timeout.connect(self.UpdatePlaybackStatus)
+        
         # Connect the player signals
         self.player.updatePosition.connect(self.VideoTimePositionChanged)
         self.player.playerStateChanged.connect(self.PlaybackStateChanged)
@@ -330,16 +344,13 @@ class SpyderPlayer(QWidget):
             
         self.controlPanelFS.ui.VideoPosition_slider.setEnabled(False)
         self.controlPanel.ui.VideoPosition_slider.setEnabled(False)
-
+        self.controlPanel.ui.CloseCaption_button.setEnabled(False)
+        self.controlPanelFS.ui.CloseCaption_button.setEnabled(False)
+        
         self.ui.Horizontal_splitter.splitterMoved.connect(self.OnHSplitterResized)
         
-        #self.player.audioOutputChanged.connect(self.ResetAudioOutput)
-        #self.audioOutput..connect(self.AudioOutputError)
-        #self.player.bufferProgressChanged.connect(self.PlayerBufferProgressChanged)
-        #self.player.errorChanged.connect(self.PlayerError)
-        #self.player.errorOccurred.connect(self.PlayerError)
-        #self.player.hasVideoChanged.connect(self.HasVideoChanged)   
-        
+        # Create a menu to display subtitle tracks
+        self.subtitlesMenu = QMenu(self)
         
         # Get the current font
         font = self.font()
@@ -501,11 +512,13 @@ class SpyderPlayer(QWidget):
                         
                 elif event.key() == self.appData.HotKeys.sortListDescending:
                     if self.playlistmanager.isVisible():
-                        self.playlistmanager.SortSearchResultsDescending()
+                        #self.playlistmanager.SortSearchResultsDescending()
+                        self.playlistmanager.SortListDescending()
                     return True
                 elif event.key() == self.appData.HotKeys.sortListAscending: 
                     if self.playlistmanager.isVisible():
-                        self.playlistmanager.SortSearchResultsAscending()                       
+                        #self.playlistmanager.SortSearchResultsAscending() 
+                        self.playlistmanager.SortListAscending()                      
                     return True
                 elif event.key() == Qt.Key.Key_Return and self.playlistmanager.playlistTree.hasFocus():
                     self.playlistmanager.ItemManuallyEntered()
@@ -515,6 +528,9 @@ class SpyderPlayer(QWidget):
                     return True
                 elif event.key() == self.appData.HotKeys.playPrevious:
                     self.PlayPreviousChannel()
+                    return True
+                elif event.key() == self.appData.HotKeys.stopVideo:
+                    self.StopPlayer()
                     return True
                 else:   
                     return True
@@ -672,6 +688,14 @@ class SpyderPlayer(QWidget):
             self.screensaverInhibitor.inhibit()
             self.retryPlaying = True
             self.statusLabel.setText("")
+            if self.subtitlesEnabled:
+                self.controlPanel.ui.CloseCaption_button.setEnabled(True)
+                self.controlPanelFS.ui.CloseCaption_button.setEnabled(True)
+            else:
+                self.controlPanel.ui.CloseCaption_button.setEnabled(False)
+                self.controlPanelFS.ui.CloseCaption_button.setEnabled(False)
+                
+            #self.playbackStatusTimer.start()
         elif state == ENUM_PLAYER_STATE.LOADING:
             self.ShowCursorBusy()
             self.statusLabel.setText("Buffering .....")
@@ -735,7 +759,7 @@ class SpyderPlayer(QWidget):
             self.ui.Horizontal_splitter.setHandleWidth(1)
             self.playListVisible = False
             self.overlay.setFocus()
-            self.overlay.Resize()
+            self.overlay.Resize(True)
         else:
             self.ui.Horizontal_splitter.setSizes([400, 1000])
             self.ui.Horizontal_splitter.setHandleWidth(4)
@@ -744,6 +768,7 @@ class SpyderPlayer(QWidget):
                    
         if self.isFullScreen:
             self.ShowControlPanel()
+            self.overlay.Resize()
 
             
     def MutePlayer(self):            
@@ -821,6 +846,32 @@ class SpyderPlayer(QWidget):
         channelName, source = self.playlistmanager.GoToAdjacentItem(False)
         self.PlaySelectedChannel(channelName, source)
                 
+    def ShowSubtitleTracks(self):
+        tracks = self.player.GetSubtitleTracks()
+        
+        if len(tracks) > 0:
+            self.subtitlesMenu.clear()
+            for track_id, track_name in tracks:
+                action = self.subtitlesMenu.addAction(track_name or f'Track {track_id}')
+                action.triggered.connect(lambda checked, tid=track_id: self.SelectSubtitleTrack(tid))
+            
+            subtitleButton = self.controlPanelFS.ui.CloseCaption_button if self.isFullScreen else self.controlPanel.ui.CloseCaption_button
+           
+            # Show menu at the button's position
+            self.subtitlesMenu.exec(subtitleButton.mapToGlobal(subtitleButton.rect().bottomLeft()))
+                
+             
+    def SelectSubtitleTrack(self, track_id):
+        # Set the selected subtitle track
+        print("Selected subtitle track:", track_id)
+        self.player.SetSubtitleTrack(track_id)
+                      
+    def ShowVideoResolution(self):
+        resolution = self.player.GetVideoResolution()
+        self.statusLabel.setText("Video Resolution: " + resolution)
+        
+        #self.ui.VideoView_widget.get
+    
     def WindowChanged(self):
         if self.windowState() == QWidget.WindowState.WindowMaximized or self.windowState() == QWidget.WindowState.WindowFullScreen:
             self.showNormal()
@@ -837,11 +888,11 @@ class SpyderPlayer(QWidget):
         else:
             self.ui.splitter.Horizontal_splitter.setSizes([0, 500])
             self.ui.splitter.Vertical_splitter.setSizes([500, 0])
-            self.overlay.Resize()
             self.showFullScreen()
             self.overlay.setFocus()
             self.inactivityTimer.start()
             self.player.ChangeUpdateTimerInterval(True)
+            self.overlay.Resize()
             
            
     def PlaySelectedChannel(self, channel_name, source):
@@ -1016,13 +1067,21 @@ class SpyderPlayer(QWidget):
                 
                 
     def InactivityDetected(self):
-        if self.isFullScreen and not self.controlPanelFS.hasFocus():
+        if self.isFullScreen and not self.controlPanelFS.hasFocus() and not self.subtitlesMenu.isVisible():
             self.controlPanelFS.hide()
             self.overlay.setFocus()
-            
+                      
             if not self.playListVisible and not self.settingsManager.settingStack.isVisible():
                 QApplication.setOverrideCursor(Qt.CursorShape.BlankCursor)
+
+     
+    def UpdatePlaybackStatus(self):
+        state = self.player.GetPlayerState()
+        
+        if state == ENUM_PLAYER_STATE.PLAYING:  
+            self.ShowVideoResolution()
             
+                
     def ShowSettings(self):
         print("Show Settings Button Pressed")
         self.settingsManager.ShowSettingsFirst()        

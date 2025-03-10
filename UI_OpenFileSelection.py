@@ -114,9 +114,9 @@ class Ui_OpenFileSelection(object):
         self.Open_button.setIconSize(QtCore.QSize(20, 20))
         self.Open_button.setObjectName("Open_button")
         self.OpenFiles_button = QtWidgets.QPushButton(parent=OpenFileSelection)
-        self.OpenFiles_button.setGeometry(QtCore.QRect(150, 120, 31, 21))
-        self.OpenFiles_button.setStyleSheet("border-radius: 0px;\n"
-"background-color: rgba(0, 0, 0, 0);\n"
+        self.OpenFiles_button.setGeometry(QtCore.QRect(150, 110, 31, 51))
+        self.OpenFiles_button.setStyleSheet("border-radius: 10px;\n"
+"/*background-color: rgba(0, 0, 0, 0);*/\n"
 "")
         self.OpenFiles_button.setText("")
         icon2 = QtGui.QIcon()
@@ -132,9 +132,11 @@ class Ui_OpenFileSelection(object):
         self.Source_textedit = QtWidgets.QTextEdit(parent=OpenFileSelection)
         self.Source_textedit.setGeometry(QtCore.QRect(151, 110, 481, 51))
         self.Source_textedit.setStyleSheet("border-radius: 10px;\n"
-"color: rgb(20, 205, 255); ")
+"color: rgb(20, 205, 255); \n"
+"padding-left: 40px;")
         self.Source_textedit.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         self.Source_textedit.setFrameShadow(QtWidgets.QFrame.Shadow.Plain)
+        self.Source_textedit.setAcceptRichText(False)
         self.Source_textedit.setObjectName("Source_textedit")
         self.SourceType_combobox = QtWidgets.QComboBox(parent=OpenFileSelection)
         self.SourceType_combobox.setGeometry(QtCore.QRect(151, 182, 120, 30))

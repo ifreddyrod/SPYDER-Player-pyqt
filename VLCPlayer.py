@@ -37,6 +37,9 @@ class VLCPlayer(VideoPlayer):
         self.currentState = vlc.State.Stopped
         self.previousState = vlc.State.NothingSpecial
         self.Mute(False) 
+        self.subtitleCount = -1
+        self.subtitleList = [] # List of tuples [(-1, b'Disable'), (2, b'English-SRT - [English]'), (3, b'Track 2'), (4, b'Track 3'), (5, b'Track 4'), (6, b'Track 5')]
+        self.subtitleIndex = -1
            
     def InitPlayer(self):
         # Get the video widget's window handle
@@ -56,6 +59,9 @@ class VLCPlayer(VideoPlayer):
                
     def SetVideoSource(self, videoSource: str):    
         self.source = videoSource
+        self.subtitleCount =  -1
+        self.subtitleList = []
+        self.subtitleIndex = -1
         self.player.set_media(self.instance.media_new(self.source))
         
     def RefreshVideoSource(self):
@@ -168,6 +174,30 @@ class VLCPlayer(VideoPlayer):
             
             if duration > 0:
                 self.UpdatePosition(videoTimePosition)
+                
+            subtitleCount = self.player.video_get_spu_count()
+            if self.subtitleCount != subtitleCount:
+                self.subtitleCount = subtitleCount
+                subtitleList = self.player.video_get_spu_description()
+                
+                print("Subtitle Count: " + str(subtitleCount))
+                self.subtitleList.clear()
+                for index, description in subtitleList:
+                    # Create track list as strings not utf-8 encoding
+                    if isinstance(description, bytes):
+                        try:
+                            description = description.decode('utf-8')
+                        except UnicodeDecodeError:
+                            description = description.decode('latin-1')  # fallback encoding
+                    
+                    self.subtitleList.append((index, description))
+                
+                if subtitleCount > 0:
+                    self.mainWindow.subtitlesEnabled = True
+                    self.player.video_set_spu(self.subtitleIndex)
+                else:
+                    self.mainWindow.subtitlesEnabled = False
+                
         elif state == ENUM_PLAYER_STATE.STALLED:
             #self.UpdatePosition(self.duration)
             self.updateTimer.stop()        
@@ -221,4 +251,40 @@ class VLCPlayer(VideoPlayer):
             self.updateTimer.setInterval(1000)
         else:
             self.updateTimer.setInterval(250)
+            
+    def GetSubtitleTracks(self):
+        return self.subtitleList
+        
+    def SetSubtitleTrack(self, index):
+        self.subtitleIndex = index
+        self.player.video_set_spu(index)
+        
+    def GetVideoResolution(self):
+        # Get video resolution
+        '''width, height = self.player.video_get_size(0)  # 0 for the first video track
+        if width > 0 and height > 0:
+            res_str = f"{width}x{height}"
+        else:
+            res_str = "Unknown"
+        
+        return res_str'''
+        
+        '''media = self.player.get_media()
+        res_str = "Unknown"
+        if media:
+            tracks = media.tracks_get()
+            for track in tracks:
+                if track.type == 1:  # Video track
+                    res_str = f"{track.width}x{track.height}"
+        return res_str'''
+    
+    
+        width = self.player.video_get_width()
+        height = self.player.video_get_height()
+        res_str = "Unknown"
+            
+        if width and height:
+            res_str = f"{width}x{height}"
+         
+        return res_str   
         

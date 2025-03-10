@@ -31,22 +31,25 @@ class WindowsInhibitor:
         import ctypes
         self.ctypes = ctypes
         self.timer = QTimer()
-        self.timer.timeout.connect(self.reset_screensaver)
+        self.timer.timeout.connect(self.reset_screensaver_and_sleep)
 
     def inhibit(self):
         self.timer.start(30000)  # Reset every 30 seconds
 
     def uninhibit(self):
         self.timer.stop()
+        # Clear the execution state to allow sleep and screensaver
         self.ctypes.windll.kernel32.SetThreadExecutionState(0x80000000)
 
-    def reset_screensaver(self):
-        self.ctypes.windll.kernel32.SetThreadExecutionState(0x80000002)
+    def reset_screensaver_and_sleep(self):
+        # Prevent both sleep and screensaver
+        self.ctypes.windll.kernel32.SetThreadExecutionState(0x80000002 | 0x00000001)
 
 class LinuxInhibitor:
     def __init__(self):
         import dbus
         self.bus = dbus.SessionBus()
+        self.inhibit_process = None
         try:
             self.saver = self.bus.get_object('org.freedesktop.ScreenSaver', '/ScreenSaver')
             self.iface = dbus.Interface(self.saver, 'org.freedesktop.ScreenSaver')
@@ -63,6 +66,10 @@ class LinuxInhibitor:
             except dbus.DBusException as e:
                 print(f"Error inhibiting screensaver: {e}")
 
+        if self.inhibit_process is None:
+            # Use systemd-inhibit to prevent sleep
+            self.inhibit_process = subprocess.Popen(['systemd-inhibit', '--what=idle', '--why=Playing video', 'sleep', 'infinity'])
+
     def uninhibit(self):
         if self.saver and self.cookie is not None:
             try:
@@ -71,6 +78,10 @@ class LinuxInhibitor:
                 self.cookie = None
             except dbus.DBusException as e:
                 print(f"Error uninhibiting screensaver: {e}")
+
+        if self.inhibit_process is not None:
+            self.inhibit_process.terminate()
+            self.inhibit_process = None
 
 
 class MacOSInhibitor:
@@ -81,7 +92,7 @@ class MacOSInhibitor:
 
     def inhibit(self):
         if self.process is None:
-            self.process = subprocess.Popen(['caffeinate', '-d'])
+            self.process = subprocess.Popen(['caffeinate', '-d', '-s'])
 
     def uninhibit(self):
         if self.process is not None:

@@ -29,7 +29,8 @@ class Ui_PlayerMainWindow(object):
 "QSplitter::handle\n"
 "{\n"
 "    background-color: transparent;\n"
-"}")
+"}\n"
+"")
         self.Horizontal_splitter.setLineWidth(4)
         self.Horizontal_splitter.setOrientation(QtCore.Qt.Orientation.Horizontal)
         self.Horizontal_splitter.setHandleWidth(4)
@@ -57,6 +58,10 @@ class Ui_PlayerMainWindow(object):
         sizePolicy.setHeightForWidth(self.Search_button.sizePolicy().hasHeightForWidth())
         self.Search_button.setSizePolicy(sizePolicy)
         self.Search_button.setMaximumSize(QtCore.QSize(32, 30))
+        self.Search_button.setStyleSheet("QPushButton:pressed\n"
+"{\n"
+"    background-color: rgb(50, 50, 50);\n"
+"}")
         self.Search_button.setText("")
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(":/icons/icons/search.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
@@ -207,6 +212,10 @@ class Ui_PlayerMainWindow(object):
         sizePolicy.setHeightForWidth(self.Settings_button.sizePolicy().hasHeightForWidth())
         self.Settings_button.setSizePolicy(sizePolicy)
         self.Settings_button.setMaximumSize(QtCore.QSize(32, 30))
+        self.Settings_button.setStyleSheet("QPushButton:pressed\n"
+"{\n"
+"    background-color: rgb(50, 50, 50);\n"
+"}")
         self.Settings_button.setText("")
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap(":/icons/icons/settings-sliders.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)

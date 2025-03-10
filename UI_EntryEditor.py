@@ -131,9 +131,10 @@ class Ui_EntryEditor(object):
         self.Save_button.setIconSize(QtCore.QSize(20, 20))
         self.Save_button.setObjectName("Save_button")
         self.OpenFiles_button = QtWidgets.QPushButton(parent=EntryEditor)
-        self.OpenFiles_button.setGeometry(QtCore.QRect(151, 240, 31, 21))
-        self.OpenFiles_button.setStyleSheet("border-radius: 0px;\n"
-"background-color: rgba(0, 0, 0, 0);\n"
+        self.OpenFiles_button.setGeometry(QtCore.QRect(150, 230, 35, 51))
+        self.OpenFiles_button.setAutoFillBackground(False)
+        self.OpenFiles_button.setStyleSheet("border-radius: 10px;\n"
+"/*background-color: rgba(1, 0, 0, 0);*/\n"
 "")
         self.OpenFiles_button.setText("")
         icon2 = QtGui.QIcon()
@@ -141,6 +142,7 @@ class Ui_EntryEditor(object):
         icon2.addPixmap(QtGui.QPixmap(":/icons/icons/white-folder-disabled.png"), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         self.OpenFiles_button.setIcon(icon2)
         self.OpenFiles_button.setIconSize(QtCore.QSize(20, 20))
+        self.OpenFiles_button.setFlat(False)
         self.OpenFiles_button.setObjectName("OpenFiles_button")
         self.Source_label = QtWidgets.QLabel(parent=EntryEditor)
         self.Source_label.setGeometry(QtCore.QRect(11, 230, 131, 16))
@@ -149,9 +151,12 @@ class Ui_EntryEditor(object):
         self.Source_textedit = QtWidgets.QTextEdit(parent=EntryEditor)
         self.Source_textedit.setGeometry(QtCore.QRect(151, 230, 481, 51))
         self.Source_textedit.setStyleSheet("border-radius: 10px;\n"
-"color: rgb(20, 205, 255); ")
+"color: rgb(20, 205, 255); \n"
+"padding-left: 40px;")
         self.Source_textedit.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         self.Source_textedit.setFrameShadow(QtWidgets.QFrame.Shadow.Plain)
+        self.Source_textedit.setLineWrapColumnOrWidth(0)
+        self.Source_textedit.setAcceptRichText(False)
         self.Source_textedit.setObjectName("Source_textedit")
         self.SourceType_combobox = QtWidgets.QComboBox(parent=EntryEditor)
         self.SourceType_combobox.setGeometry(QtCore.QRect(151, 170, 120, 30))
@@ -192,7 +197,7 @@ class Ui_EntryEditor(object):
         self.EntryName_label.setText(_translate("EntryEditor", "PlayList Name:"))
         self.Save_button.setText(_translate("EntryEditor", "  Save"))
         self.Source_label.setText(_translate("EntryEditor", "Source:"))
-        self.Source_textedit.setPlaceholderText(_translate("EntryEditor", "Paste full link here (https://myplaylistlink.com/list) or select a File"))
+        self.Source_textedit.setPlaceholderText(_translate("EntryEditor", "Paste full link here (https://myplaylistlink.com/list) or select a File in Dialog"))
         self.SourceType_combobox.setItemText(0, _translate("EntryEditor", "file"))
         self.SourceType_combobox.setItemText(1, _translate("EntryEditor", "url"))
         self.SourceType_label.setText(_translate("EntryEditor", "Source Type:"))

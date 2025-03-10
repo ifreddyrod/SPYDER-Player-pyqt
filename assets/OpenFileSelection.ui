@@ -172,14 +172,14 @@ QComboBox QAbstractItemView {
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>120</y>
+     <y>110</y>
      <width>31</width>
-     <height>21</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border-radius: 0px;
-background-color: rgba(0, 0, 0, 0);
+    <string notr="true">border-radius: 10px;
+/*background-color: rgba(0, 0, 0, 0);*/
 </string>
    </property>
    <property name="text">
@@ -224,13 +224,17 @@ background-color: rgba(0, 0, 0, 0);
    </property>
    <property name="styleSheet">
     <string notr="true">border-radius: 10px;
-color: rgb(20, 205, 255); </string>
+color: rgb(20, 205, 255); 
+padding-left: 40px;</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::Shape::NoFrame</enum>
    </property>
    <property name="frameShadow">
     <enum>QFrame::Shadow::Plain</enum>
+   </property>
+   <property name="acceptRichText">
+    <bool>false</bool>
    </property>
    <property name="placeholderText">
     <string>Paste full link here (https://myplaylistlink.com/list) or select a File in Dialog</string>

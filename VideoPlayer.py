@@ -121,3 +121,15 @@ class VideoPlayer(QWidget):
     @abstractmethod
     def ChangeUpdateTimerInterval(self, isFullScreen: bool):
         pass
+    
+    @abstractmethod
+    def GetVideoResolution(self):
+        pass
+    
+    @abstractmethod
+    def GetSubtitleTracks(self) -> list:
+        return
+    
+    @abstractmethod
+    def SetSubtitleTrack(self, index: int):
+        pass

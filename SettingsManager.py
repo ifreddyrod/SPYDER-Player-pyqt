@@ -464,25 +464,66 @@ class PlayerSettings(DraggableWidget):
         
         self.settingsManager = SettingsManager
         self.entryType = EntryType
+        self.entryChanged = False
         
         self.ui = Ui_PlayerSettings()
         self.ui.setupUi(self)
         
         self.ui.Back_button.clicked.connect(self.BackButtonClicked)
         self.ui.PlayerType_combobox.currentIndexChanged.connect(self.PlayerTypeChanged)
+        self.ui.PlaylistPath_textedit.textChanged.connect(self.PathChanged)
+        self.ui.OpenPath_button.clicked.connect(self.OpenPathButtonClicked)
+        self.ui.Save_button.clicked.connect(self.SaveButtonClicked)
         
     def ShowPlayerSettings(self):
         self.ui.PlayerType_combobox.setCurrentText(self.settingsManager.appData.PlayerType.name)
+        self.ui.PlaylistPath_textedit.setText(self.settingsManager.appData.PlayListPath)
+        self.entryChanged = False
         
     def BackButtonClicked(self):
-        self.settingsManager.SaveSettings()
-        self.settingsManager.ShowSettings()
+        if self.entryChanged:
+            # Ask if user wants to save changes in a message box
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Icon.Question)
+            msg.setText("Do you want to save your changes?")
+            msg.setWindowTitle("Save Changes")
+            msg.setStandardButtons(QMessageBox.StandardButton.Yes| QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel)
+            ret = msg.exec()
+            
+            if ret == QMessageBox.StandardButton.Yes:
+                # Save Changes
+                self.SaveButtonClicked()
+                
+            elif ret == QMessageBox.StandardButton.No:
+                self.settingsManager.ShowSettings()
+                
+            elif ret == QMessageBox.StandardButton.Cancel:
+                # Do nothing stay on current window
+                pass
+        else:
+            self.settingsManager.ShowSettings()
         
     def PlayerTypeChanged(self):
-        self.settingsManager.changesMade = True
-        self.settingsManager.appData.PlayerType = ENUM_PLAYER_TYPE(self.ui.PlayerType_combobox.currentText())
-        print("New Player Type: " + self.settingsManager.appData.PlayerType.name)
+        self.entryChanged = True
+        print("New Player Type: " + self.ui.PlayerType_combobox.currentText())
  
+    def PathChanged(self):
+        self.entryChanged = True
+        print("New Playlist Path: " + self.ui.PlaylistPath_textedit.toPlainText())
+        
+    def OpenPathButtonClicked(self):
+        newPath = QFileDialog.getExistingDirectory(self, "Select Directory", self.settingsManager.appData.PlayListPath)
+        
+        if newPath and newPath != self.settingsManager.appData.PlayListPath:
+            self.ui.PlaylistPath_textedit.setText(newPath)
+        
+    def SaveButtonClicked(self):
+        if self.entryChanged:
+            self.settingsManager.appData.PlayerType = ENUM_PLAYER_TYPE(self.ui.PlayerType_combobox.currentText())
+            self.settingsManager.appData.PlayListPath = self.ui.PlaylistPath_textedit.toPlainText()
+            self.settingsManager.changesMade = True
+            self.settingsManager.SaveSettings()
+            self.settingsManager.ShowSettings()
                     
 class EntryEditor(DraggableWidget):
     entryChanged = False
@@ -694,11 +735,11 @@ class EntryEditor(DraggableWidget):
     def OpenFilesButtonClicked(self):
          # Open File Dialog
         if self.entryType == ENUM_SettingsViews.PLAYLIST_ENTRY:
-            filename, _ = QFileDialog.getOpenFileName(self, "Select PlayList File", "", "PlayList Files (*.m3u *.m3u8)")
+            filename, _ = QFileDialog.getOpenFileName(self, "Select PlayList File", self.settingsManager.appData.PlayListPath, "PlayList Files (*.m3u *.m3u8)")
         elif self.entryType == ENUM_SettingsViews.LIBRARY_ENTRY:
-            filename, _ = QFileDialog.getOpenFileName(self, "Select a Media File", "", "Media Files (*.mkv *.mp4 *.avi *.mov *.mp3 *.wmv *.wav *.mpg, *.mpeg *.m4v)")
+            filename, _ = QFileDialog.getOpenFileName(self, "Select a Media File", self.settingsManager.appData.PlayListPath, "Media Files (*.mkv *.mp4 *.avi *.mov *.mp3 *.wmv *.wav *.mpg, *.mpeg *.m4v)")
         elif self.entryType == ENUM_SettingsViews.FAVORITES_ENTRY:
-            filename, _ = QFileDialog.getSaveFileName(self, "Enter new Playlist File", "", "PlayList File (*.m3u)")
+            filename, _ = QFileDialog.getSaveFileName(self, "Enter new Playlist File", self.settingsManager.appData.PlayListPath, "PlayList File (*.m3u)")
             
             '''if os.path.exists(filename):  
                 # Warn user of duplicate file 
@@ -759,6 +800,7 @@ class OpenFileSelection(DraggableWidget):
 
         self.ui.SourceType_combobox.setCurrentIndex(0)
         self.ui.Source_textedit.setText("")
+        self.ui.Source_textedit.setFocus()
         self.ui.OpenFiles_button.setEnabled(True)
         self.ui.OpenFiles_button.show()
         self.blockSignals(False)
@@ -774,7 +816,12 @@ class OpenFileSelection(DraggableWidget):
         if  self.ui.SourceType_combobox.currentText() != self.newEntry.sourceType or self.ui.Source_textedit.toPlainText() != self.newEntry.source:
             self.entryChanged = True
             self.SourceTypeChanged()
-            self.ui.Open_button.setEnabled(True)
+            if self.ui.Source_textedit.toPlainText().startswith('http://') or self.ui.Source_textedit.toPlainText().startswith('https://'):
+                self.ui.Open_button.setEnabled(True)
+                self.ui.SourceType_combobox.setCurrentIndex(1)  
+            else:
+                self.ui.SourceType_combobox.setCurrentIndex(0) 
+                self.ui.Open_button.setEnabled(True)
         else:
             self.entryChanged = False
             self.ui.Open_button.setEnabled(False)    
@@ -790,9 +837,9 @@ class OpenFileSelection(DraggableWidget):
     def OpenFilesButtonClicked(self):
          # Open File Dialog
         if self.entryType == ENUM_SettingsViews.OPEN_PLAYLIST:
-            filename, _ = QFileDialog.getOpenFileName(self, "Select PlayList File", "", "PlayList Files (*.m3u *.m3u8)")
+            filename, _ = QFileDialog.getOpenFileName(self, "Select PlayList File", self.settingsManager.appData.PlayListPath, "PlayList Files (*.m3u *.m3u8)")
         elif self.entryType == ENUM_SettingsViews.OPEN_FILE:
-            filename, _ = QFileDialog.getOpenFileName(self, "Select a Media File", "", "Media Files (*.mkv *.mp4 *.avi *.mov *.mp3 *.wmv *.wav *.mpg, *.mpeg *.m4v)")
+            filename, _ = QFileDialog.getOpenFileName(self, "Select a Media File", self.settingsManager.appData.PlayListPath, "Media Files (*.mkv *.mp4 *.avi *.mov *.mp3 *.wmv *.wav *.mpg, *.mpeg *.m4v)")
         
         if filename:
             self.ui.Source_textedit.setPlainText(filename)   

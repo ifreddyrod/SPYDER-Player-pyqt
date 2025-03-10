@@ -51,7 +51,8 @@ background-color: black;</string>
 QSplitter::handle
 {
     background-color: transparent;
-}</string>
+}
+</string>
      </property>
      <property name="lineWidth">
       <number>4</number>
@@ -101,6 +102,12 @@ QSplitter::handle
                </property>
                <property name="toolTip">
                 <string>Search All Lists</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton:pressed
+{
+	background-color: rgb(50, 50, 50);
+}</string>
                </property>
                <property name="text">
                 <string/>
@@ -324,6 +331,12 @@ QLineEdit
                </property>
                <property name="toolTip">
                 <string>Settings</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton:pressed
+{
+	background-color: rgb(50, 50, 50);
+}</string>
                </property>
                <property name="text">
                 <string/>

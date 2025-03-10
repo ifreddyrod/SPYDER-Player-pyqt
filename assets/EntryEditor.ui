@@ -216,15 +216,18 @@ QComboBox QAbstractItemView {
   <widget class="QPushButton" name="OpenFiles_button">
    <property name="geometry">
     <rect>
-     <x>151</x>
-     <y>240</y>
-     <width>31</width>
-     <height>21</height>
+     <x>150</x>
+     <y>230</y>
+     <width>35</width>
+     <height>51</height>
     </rect>
    </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
    <property name="styleSheet">
-    <string notr="true">border-radius: 0px;
-background-color: rgba(0, 0, 0, 0);
+    <string notr="true">border-radius: 10px;
+/*background-color: rgba(1, 0, 0, 0);*/
 </string>
    </property>
    <property name="text">
@@ -240,6 +243,9 @@ background-color: rgba(0, 0, 0, 0);
      <width>20</width>
      <height>20</height>
     </size>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QLabel" name="Source_label">
@@ -269,7 +275,8 @@ background-color: rgba(0, 0, 0, 0);
    </property>
    <property name="styleSheet">
     <string notr="true">border-radius: 10px;
-color: rgb(20, 205, 255); </string>
+color: rgb(20, 205, 255); 
+padding-left: 40px;</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::Shape::NoFrame</enum>
@@ -277,8 +284,14 @@ color: rgb(20, 205, 255); </string>
    <property name="frameShadow">
     <enum>QFrame::Shadow::Plain</enum>
    </property>
+   <property name="lineWrapColumnOrWidth">
+    <number>0</number>
+   </property>
+   <property name="acceptRichText">
+    <bool>false</bool>
+   </property>
    <property name="placeholderText">
-    <string>Paste full link here (https://myplaylistlink.com/list) or select a File</string>
+    <string>Paste full link here (https://myplaylistlink.com/list) or select a File in Dialog</string>
    </property>
   </widget>
   <widget class="QComboBox" name="SourceType_combobox">

@@ -295,7 +295,7 @@ QComboBox QAbstractItemView {
     </rect>
    </property>
    <property name="text">
-    <string>Copyright © 2024, All Rights Reserved.</string>
+    <string>Copyright © 2025, All Rights Reserved.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>

@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/close-caption-disabled.png</file>
+    <file>icons/close-caption.png</file>
     <file>icons/white-information.png</file>
     <file>icons/search-list.png</file>
     <file>icons/search-white.png</file>
