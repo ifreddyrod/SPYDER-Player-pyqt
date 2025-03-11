@@ -148,6 +148,26 @@ class QtPlayer(VideoPlayer):
                     self.mainWindow.subtitlesEnabled = False
                     
         elif mediaState == QMediaPlayer.MediaStatus.LoadedMedia:
+             # Get available video tracks
+            video_tracks = self.player.videoTracks()
+            highest_resolution = (0, 0)
+            highest_resolution_index = -1
+
+            # Iterate over available tracks
+            for index, track in enumerate(video_tracks):
+                resolution = track.value(QMediaMetaData.Key.Resolution)
+                if resolution:
+                    width = resolution.width()
+                    height = resolution.height()
+                    if width * height > highest_resolution[0] * highest_resolution[1]:
+                        highest_resolution = (width, height)
+                        highest_resolution_index = index
+
+            # Select the highest resolution track
+            if highest_resolution_index != -1:
+                self.player.setActiveVideoTrack(highest_resolution_index)
+            
+            
             if self.currentState == ENUM_PLAYER_STATE.PLAYING:
                 self.currentState = ENUM_PLAYER_STATE.PLAYING
         elif mediaState == QMediaPlayer.MediaStatus.InvalidMedia:
@@ -172,6 +192,7 @@ class QtPlayer(VideoPlayer):
         self.player.setActiveSubtitleTrack(index) 
         
     def GetVideoResolution(self):
+        #self.list_video_tracks()
         # Get resolution from metadata
         metadata = self.player.metaData()
         resolution = metadata.value(QMediaMetaData.Key.Resolution)
@@ -181,3 +202,36 @@ class QtPlayer(VideoPlayer):
             res_str = "Unknown"
             
         return res_str
+    
+    def list_video_tracks(self):
+        metadata = self.player.metaData()
+        if metadata:
+            try:
+                # Get the list of video tracks
+                tracks = self.player.videoTracks()
+                print(f"Found {len(tracks)} video track(s):")
+                
+                # Iterate through the tracks with error handling
+                for i, track in enumerate(tracks):
+                    print(f"Track {i}:")
+                    try:
+                        # Check if track has keys method and is iterable
+                        if hasattr(track, 'keys'):
+                            for key in track.keys():
+                                try:
+                                    value = track.value(key)
+                                    print(f"  {key}: {value}")
+                                except Exception as e:
+                                    print(f"    Error retrieving value for key '{key}': {e}")
+                        else:
+                            print("  No metadata keys available for this track.")
+                    except Exception as e:
+                        print(f"  Error processing track {i}: {e}")
+                
+                # Print the currently active video track index
+                active_track = self.player.activeVideoTrack()
+                print(f"Active video track index: {active_track}")
+            except Exception as e:
+                print(f"Error accessing video tracks: {e}")
+        else:
+            print("Metadata not available yet.")

@@ -259,32 +259,35 @@ class VLCPlayer(VideoPlayer):
         self.subtitleIndex = index
         self.player.video_set_spu(index)
         
-    def GetVideoResolution(self):
-        # Get video resolution
-        '''width, height = self.player.video_get_size(0)  # 0 for the first video track
-        if width > 0 and height > 0:
-            res_str = f"{width}x{height}"
-        else:
-            res_str = "Unknown"
-        
-        return res_str'''
-        
-        '''media = self.player.get_media()
+    def GetVideoResolution(self):        
+        media = self.player.get_media()
         res_str = "Unknown"
+        
         if media:
-            tracks = media.tracks_get()
-            for track in tracks:
-                if track.type == 1:  # Video track
-                    res_str = f"{track.width}x{track.height}"
-        return res_str'''
-    
-    
-        width = self.player.video_get_width()
-        height = self.player.video_get_height()
-        res_str = "Unknown"
+            # Parse media to get stats
+            media.parse_with_options(1, 0)
             
-        if width and height:
-            res_str = f"{width}x{height}"
-         
-        return res_str   
-        
+            # Parse media if not already parsed
+            if media.get_parsed_status() != vlc.MediaParsedStatus.done:
+                media.parse_with_options(vlc.MediaParseFlag.network, 0)
+                        
+            highest_resolution = (0, 0)
+            highest_resolution_index = -1        
+            trackCnt = self.player.video_get_track_count()  
+            print("Track Count: " + str(trackCnt))              
+
+            # Get track resolutions
+            for i in range(trackCnt+1):
+                width, height = self.player.video_get_size(i)
+                if width > 0 and height > 0:
+                    res_str = f"{width}x{height}"
+                    print("Track " + str(i) + " Resolution: " + res_str)
+                    if width * height > highest_resolution[0] * highest_resolution[1]:
+                            highest_resolution = (width, height)
+                            highest_resolution_index = i        
+            
+            if highest_resolution_index >= 0:
+                res_str = f"{highest_resolution[0]}x{highest_resolution[1]}"
+                       
+        return res_str
+    

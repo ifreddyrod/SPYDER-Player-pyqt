@@ -695,7 +695,7 @@ class SpyderPlayer(QWidget):
                 self.controlPanel.ui.CloseCaption_button.setEnabled(False)
                 self.controlPanelFS.ui.CloseCaption_button.setEnabled(False)
                 
-            #self.playbackStatusTimer.start()
+            self.playbackStatusTimer.start()
         elif state == ENUM_PLAYER_STATE.LOADING:
             self.ShowCursorBusy()
             self.statusLabel.setText("Buffering .....")
@@ -869,8 +869,7 @@ class SpyderPlayer(QWidget):
     def ShowVideoResolution(self):
         resolution = self.player.GetVideoResolution()
         self.statusLabel.setText("Video Resolution: " + resolution)
-        
-        #self.ui.VideoView_widget.get
+        self.playbackStatusTimer.stop()
     
     def WindowChanged(self):
         if self.windowState() == QWidget.WindowState.WindowMaximized or self.windowState() == QWidget.WindowState.WindowFullScreen:
@@ -1080,6 +1079,7 @@ class SpyderPlayer(QWidget):
         
         if state == ENUM_PLAYER_STATE.PLAYING:  
             self.ShowVideoResolution()
+            self.playbackStatusTimer.stop()
             
                 
     def ShowSettings(self):
