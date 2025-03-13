@@ -319,7 +319,8 @@ class SpyderPlayer(QWidget):
         #self.stalledVideoTimer.timeout.connect(self.StalledVideoDetected) 
 
         self.playbackStatusTimer = QTimer(self)
-        self.playbackStatusTimer.setInterval(10000)
+        interval = 10000 if self.appData.PlayerType == ENUM_PLAYER_TYPE.VLC else 3000
+        self.playbackStatusTimer.setInterval(interval)
         self.playbackStatusTimer.timeout.connect(self.UpdatePlaybackStatus)
         
         # Connect the player signals

@@ -159,6 +159,7 @@ class QtPlayer(VideoPlayer):
                 if resolution:
                     width = resolution.width()
                     height = resolution.height()
+                    print(f"Video track {index} resolution: {width}x{height}")
                     if width * height > highest_resolution[0] * highest_resolution[1]:
                         highest_resolution = (width, height)
                         highest_resolution_index = index
